@@ -2,7 +2,7 @@
 
 <ul id="error_message_box" class="error_message_box"></ul>
 
-<?php echo form_open($controller_name . '/save/' . $person_info->person_id, array('id'=>'customer_form', 'class'=>'form-horizontal')); ?>
+<?php echo form_open($controller_name . '/save/' . $person_info->person_id, array('id'=>'customer_form', 'enctype'=>'multipart/form-data', 'class'=>'form-horizontal')); ?>
 	<ul class="nav nav-tabs nav-justified" data-tabs="tabs">
 		<li class="active" role="presentation">
 			<a data-toggle="tab" href="#customer_basic_info"><?php echo $this->lang->line("customers_basic_information"); ?></a>
@@ -36,6 +36,43 @@
 					<?php echo form_label($this->lang->line('customers_consent'), 'consent', array('class' => 'required control-label col-xs-3')); ?>
 					<div class='col-xs-1'>
 						<?php echo form_checkbox('consent', '1', $person_info->consent == '' ? (boolean)!$this->config->item('enforce_privacy') : (boolean)$person_info->consent); ?>
+					</div>
+				</div>
+
+				<div class="form-group form-group-sm">
+					<?php echo form_label($this->lang->line('customers_image'), 'customer_image', array('class'=>'control-label col-xs-3')); ?>
+					<div class='col-xs-8'>
+						<div class="fileinput <?php echo $logo_exists ? 'fileinput-exists' : 'fileinput-new'; ?>" data-provides="fileinput">
+							<div class="fileinput-new thumbnail" style="width: 100px; height: 100px;"></div>
+							<div class="fileinput-preview fileinput-exists thumbnail" style="max-width: 100px; max-height: 100px;">
+								<img data-src="holder.js/100%x100%" alt="<?php echo $this->lang->line('customers_image'); ?>"
+									 src="<?php echo $image_path; ?>"
+									 style="max-height: 100%; max-width: 100%;">
+							</div>
+							<div>
+								<span class="btn btn-default btn-sm btn-file">
+									<span class="fileinput-new"><?php echo $this->lang->line("customers_select_image"); ?></span>
+									<span class="fileinput-exists"><?php echo $this->lang->line("customers_change_image"); ?></span>
+									<input type="file" name="customer_image" accept="image/*">
+								</span>
+								<a href="#" class="btn btn-default btn-sm fileinput-exists" data-dismiss="fileinput"><?php echo $this->lang->line("customers_remove_image"); ?></a>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="form-group form-group-sm">
+					<?php echo form_label($this->lang->line('customers_customer_number'), 'customer_number', array('class'=>'control-label col-xs-3')); ?>
+					<div class='col-xs-8'>
+						<div class="input-group">
+							<span class="input-group-addon input-sm"><span class="glyphicon glyphicon-barcode"></span></span>
+							<?php echo form_input(array(
+									'name'=>'customer_number',
+									'id'=>'customer_number',
+									'class'=>'form-control input-sm',
+									'value'=>$person_info->customer_number)
+									);?>
+						</div>
 					</div>
 				</div>
 

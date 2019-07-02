@@ -503,7 +503,10 @@ class Items extends Secure_Controller
 			'pack_name' => $this->input->post('pack_name') == NULL ? $default_pack_name : $this->input->post('pack_name'),
 			'low_sell_item_id' => $this->input->post('low_sell_item_id') == NULL ? $item_id : $this->input->post('low_sell_item_id'),
 			'deleted' => $this->input->post('is_deleted') != NULL,
-			'hsn_code' => $this->input->post('hsn_code') == NULL ? '' : $this->input->post('hsn_code')
+			'hsn_code' => $this->input->post('hsn_code') == NULL ? '' : $this->input->post('hsn_code'),
+			'is_membership' => $this->input->post('is_membership') != NULL,
+			'frequency' => $this->input->post('frequency')
+
 		);
 
 		if($item_data['item_type'] == ITEM_TEMP)
@@ -659,7 +662,7 @@ class Items extends Secure_Controller
 
 		// load upload library
 		$config = array('upload_path' => './uploads/item_pics/',
-			'allowed_types' => 'gif|jpg|png',
+			'allowed_types' => 'gif|jpg|jpeg|png',
 			'max_size' => '100',
 			'max_width' => '640',
 			'max_height' => '480'

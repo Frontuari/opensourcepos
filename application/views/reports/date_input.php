@@ -83,6 +83,20 @@ if(isset($error))
 	}
 	?>
 
+	<?php	
+	if (!empty($item_memberships) && count($item_memberships) > 1)
+	{
+	?>
+		<div class="form-group form-group-sm">
+			<?php echo form_label($this->lang->line('reports_item_name'), 'item_id', array('class'=>'required control-label col-xs-2')); ?>
+			<div id='report_item_membership' class="col-xs-3">
+				<?php echo form_dropdown('item_id', $item_memberships, 'all', array('id'=>'item_id', 'class'=>'form-control')); ?>
+			</div>
+		</div>
+	<?php
+	}
+	?>
+
 	<?php
 	echo form_button(array(
 		'name'=>'generate_report',
@@ -102,7 +116,7 @@ $(document).ready(function()
 
 	$("#generate_report").click(function()
 	{		
-		window.location = [window.location, start_date, end_date, $("#input_type").val() || 0, $("#location_id").val(), $("#discount_type_id").val() || 0 ].join("/");
+		window.location = [window.location, start_date, end_date, $("#input_type").val() || 0, $("#location_id").val(), $("#discount_type_id").val() || 0, $("#item_id").val() ].join("/");
 	});
 });
 </script>

@@ -83,17 +83,24 @@ class Barcode_lib
 		return $barcode_instance->validate($barcode);
 	}
 
-	public static function barcode_instance($item, $barcode_config)
+	public static function barcode_instance($item, $barcode_config, $customer_barcode = FALSE)
 	{
 		$barcode_instance = Barcode_lib::get_barcode_instance($barcode_config['barcode_type']);
-		$is_valid = empty($item['item_number']) && $barcode_config['barcode_generate_if_empty'] || $barcode_instance->validate($item['item_number']);
+		if(!$customer_barcode)
+		{
+			$is_valid = empty($item['item_number']) && $barcode_config['barcode_generate_if_empty'] || $barcode_instance->validate($item['item_number']);
+		}
+		else
+		{
+			$is_valid = empty($item['customer_number']) && $barcode_config['barcode_generate_if_empty'] || $barcode_instance->validate($item['customer_number']);
+		}
 
 		// if barcode validation does not succeed,
 		if(!$is_valid)
 		{
 			$barcode_instance = Barcode_lib::get_barcode_instance();
 		}
-		$seed = Barcode_lib::barcode_seed($item, $barcode_instance, $barcode_config);
+		$seed = Barcode_lib::barcode_seed($item, $barcode_instance, $barcode_config,$customer_barcode);
 		$barcode_instance->setData($seed);
 
 		return $barcode_instance;
@@ -122,13 +129,24 @@ class Barcode_lib
 		}
 	}
 
-	private static function barcode_seed($item, $barcode_instance, $barcode_config)
+	private static function barcode_seed($item, $barcode_instance, $barcode_config, $customer_barcode = FALSE)
 	{
-		$seed = $barcode_config['barcode_content'] !== "id" && !empty($item['item_number']) ? $item['item_number'] : $item['item_id'];
+		if(!$customer_barcode)
+		{
+			$seed = $barcode_config['barcode_content'] !== "id" && !empty($item['item_number']) ? $item['item_number'] : $item['item_id'];
+		}
+		else
+		{
+			$seed = $barcode_config['barcode_content'] !== "id" && !empty($item['customer_number']) ? $item['customer_number'] : $item['person_id'];
+		}
 
-		if($barcode_config['barcode_content'] !== "id" && !empty($item['item_number']))
+		if($barcode_config['barcode_content'] !== "id" && !empty($item['item_number']) && !$customer_barcode)
 		{
 			$seed = $item['item_number'];
+		}
+		else if($barcode_config['barcode_content'] !== "id" && !empty($item['customer_number']) && $customer_barcode)
+		{
+			$seed = $item['customer_number'];
 		}
 		else
 		{
@@ -139,7 +157,14 @@ class Barcode_lib
 			}
 			else
 			{
-				$seed = $item['item_id'];
+				if(!$customer_barcode)
+				{
+					$seed = $item['item_id'];
+				}
+				else
+				{
+					$seed = $item['person_id'];
+				}
 			}
 		}
 		return $seed;
@@ -186,46 +211,66 @@ class Barcode_lib
 		}
 	}
 
-	public function display_barcode($item, $barcode_config)
+	public function display_barcode($item, $barcode_config,$customer_barcode = FALSE)
 	{
 		$display_table = "<table>";
-		$display_table .= "<tr><td align='center'>" . $this->manage_display_layout($barcode_config['barcode_first_row'], $item, $barcode_config) . "</td></tr>";
+		$display_table .= "<tr><td align='center'>" . $this->manage_display_layout($barcode_config['barcode_first_row'], $item, $barcode_config, $customer_barcode) . "</td></tr>";
 		$barcode = $this->generate_barcode($item, $barcode_config);
 		$display_table .= "<tr><td align='center'><img src='data:image/png;base64,$barcode' /></td></tr>";
-		$display_table .= "<tr><td align='center'>" . $this->manage_display_layout($barcode_config['barcode_second_row'], $item, $barcode_config) . "</td></tr>";
-		$display_table .= "<tr><td align='center'>" . $this->manage_display_layout($barcode_config['barcode_third_row'], $item, $barcode_config) . "</td></tr>";
+		$display_table .= "<tr><td align='center'>" . $this->manage_display_layout($barcode_config['barcode_second_row'], $item, $barcode_config, $customer_barcode) . "</td></tr>";
+		$display_table .= "<tr><td align='center'>" . $this->manage_display_layout($barcode_config['barcode_third_row'], $item, $barcode_config, $customer_barcode) . "</td></tr>";
 		$display_table .= "</table>";
 
 		return $display_table;
 	}
 
-	private function manage_display_layout($layout_type, $item, $barcode_config)
+	private function manage_display_layout($layout_type, $item, $barcode_config, $customer_barcode = FALSE)
 	{
 		$result = '';
 
-		if($layout_type == 'name')
-		{
-			$result = $this->CI->lang->line('items_name') . " " . $item['name'];
-		}
-		elseif($layout_type == 'category' && isset($item['category']))
-		{
-			$result = $this->CI->lang->line('items_category') . " " . $item['category'];
-		}
-		elseif($layout_type == 'cost_price' && isset($item['cost_price']))
-		{
-			$result = $this->CI->lang->line('items_cost_price') . " " . to_currency($item['cost_price']);
-		}
-		elseif($layout_type == 'unit_price' && isset($item['unit_price']))
-		{
-			$result = $this->CI->lang->line('items_unit_price') . " " . to_currency($item['unit_price']);
-		}
-		elseif($layout_type == 'company_name')
-		{
-			$result = $barcode_config['company'];
-		}
-		elseif($layout_type == 'item_code')
-		{
-			$result = $barcode_config['barcode_content'] !== "id" && isset($item['item_number']) ? $item['item_number'] : $item['item_id'];
+		if(!$customer_barcode){
+			if($layout_type == 'name')
+			{
+				$result = $this->CI->lang->line('items_name') . " " . $item['name'];
+			}
+			elseif($layout_type == 'category' && isset($item['category']))
+			{
+				$result = $this->CI->lang->line('items_category') . " " . $item['category'];
+			}
+			elseif($layout_type == 'cost_price' && isset($item['cost_price']))
+			{
+				$result = $this->CI->lang->line('items_cost_price') . " " . to_currency($item['cost_price']);
+			}
+			elseif($layout_type == 'unit_price' && isset($item['unit_price']))
+			{
+				$result = $this->CI->lang->line('items_unit_price') . " " . to_currency($item['unit_price']);
+			}
+			elseif($layout_type == 'company_name')
+			{
+				$result = $barcode_config['company'];
+			}
+			elseif($layout_type == 'item_code')
+			{
+				$result = $barcode_config['barcode_content'] !== "id" && isset($item['item_number']) ? $item['item_number'] : $item['item_id'];
+			}
+		}else{
+			if($layout_type == 'name' || $layout_type == 'category')
+			{
+				$result = $this->CI->lang->line('common_first_name') . ": " . $item['first_name'];
+				$result .= " " . $item['last_name'];
+				if(!empty($item['dni']))
+				{
+					$result .= "<br>" . $this->CI->lang->line('common_dni') . ": " . $item['dni'];
+				}
+			}
+			elseif($layout_type == 'company_name')
+			{
+				$result = $barcode_config['company'];
+			}
+			elseif($layout_type == 'item_code')
+			{
+				$result = $barcode_config['barcode_content'] !== "id" && isset($item['customer_number']) ? $item['customer_number'] : $item['person_id'];
+			}
 		}
 
 		return character_limiter($result, 40);

@@ -25,6 +25,11 @@ define('PRICE_OPTION_KIT_STOCK', 2);
 
 define('NAME_SEPARATOR', ' | ');
 
+define('FREQUENCY_DAILY', 1);
+define('FREQUENCY_MONTHLY', 2);
+define('FREQUENCY_QUARTERLY', 3);
+define('FREQUENCY_ANNUALLY', 4);
+
 
 /**
  * Item class
@@ -273,6 +278,35 @@ class Item extends CI_Model
 		}
 
 		return $this->db->get();
+	}
+
+	/*
+	Returns all the items
+	*/
+	public function get_item_memberships($rows = 0, $limit_from = 0)
+	{
+		$this->db->from('items');
+		$this->db->join('suppliers', 'suppliers.person_id = items.supplier_id', 'left');
+		$this->db->where('items.deleted', 0);
+		$this->db->where('items.is_membership', 1);
+
+		// order by name of item
+		$this->db->order_by('items.name', 'asc');
+
+		if($rows > 0)
+		{
+			$this->db->limit($rows, $limit_from);
+		}
+
+
+		$items = $this->db->get()->result_array();
+
+		foreach($items as $item_data)
+		{
+			$item_memberships[$item_data['item_id']] = $item_data['name'];
+		}
+
+		return $item_memberships;
 	}
 
 	/*

@@ -6,6 +6,17 @@
 
 class Customer extends Person
 {
+
+	private $log;
+
+	function get_log(){
+		return $this->log;
+	}
+
+	function set_log($log){
+		return $this->log = $this->log."<br>".$log;
+	}
+
 	/*
 	Determines if a given person_id is a customer
 	*/
@@ -188,20 +199,51 @@ class Customer extends Person
 		//Run these queries as a transaction, we want to make sure we do all or nothing
 		$this->db->trans_start();
 
+		$this->set_log("ID To Send: ".$customer_id);
+
 		if(parent::save($person_data, $customer_id))
 		{
+			$this->set_log($this->db->last_query());
 			if(!$customer_id || !$this->exists($customer_id))
 			{
+				$this->set_log($this->db->last_query());
 				$customer_data['person_id'] = $person_data['person_id'];
 				$success = $this->db->insert('customers', $customer_data);
+				$this->set_log($this->db->last_query());
 			}
 			else
 			{
 				$this->db->where('person_id', $customer_id);
 				$success = $this->db->update('customers', $customer_data);
+				$this->set_log($this->db->last_query());
 			}
+		}else{
+			$this->set_log($this->db->last_query());	
 		}
 
+		$this->db->trans_complete();
+
+		$success &= $this->db->trans_status();
+
+		return $success;
+	}
+
+	/*
+	Inserts or updates a customer
+	*/
+	public function save(&$customer_data, $customer_id = FALSE)
+	{
+		$success = FALSE;
+
+		//Run these queries as a transaction, we want to make sure we do all or nothing
+		$this->db->trans_start();
+
+		$this->set_log("ID To Send: ".$customer_id);
+
+		$this->db->where('person_id', $customer_id);
+		$success = $this->db->update('customers', $customer_data);
+		$this->set_log($this->db->last_query());
+			
 		$this->db->trans_complete();
 
 		$success &= $this->db->trans_status();
@@ -293,6 +335,8 @@ class Customer extends Person
 		$this->db->group_start();
 			$this->db->like('first_name', $search);
 			$this->db->or_like('last_name', $search);
+			$this->db->or_like('dni', $search);
+			$this->db->or_like('customer_number', $search);
 			$this->db->or_like('CONCAT(first_name, " ", last_name)', $search);
 			if($unique)
 			{
@@ -405,6 +449,128 @@ class Customer extends Person
 		}
 
 		return $this->db->get();
+	}
+
+ 	/*
+	Get search suggestions to find customers
+	*/
+	public function get_status($person_id)
+	{
+		$suggestions = array();
+
+		// create a temporary table to contain all the sum and average of items
+		$this->db->query('CREATE TEMPORARY TABLE IF NOT EXISTS ' . $this->db->dbprefix('sales_items_temp') .
+			' (INDEX(sale_id)) ENGINE=MEMORY
+			(
+				SELECT
+					MAX(sales.sale_id) AS sale_id,
+					MAX(sales_items.item_id) AS item_id,
+					MAX(CASE 
+						WHEN items.frequency = ' . FREQUENCY_DAILY . ' 
+							THEN (CASE WHEN DATEDIFF(CURDATE(),DATE_FORMAT(sales.sale_time,\'%Y-%m-%d\')) > 1 THEN 0 ELSE 1 END)
+						WHEN items.frequency = ' . FREQUENCY_MONTHLY . ' 
+							THEN (CASE WHEN DATEDIFF(CURDATE(),DATE_FORMAT(sales.sale_time,\'%Y-%m-%d\')) > 30 THEN 0 ELSE 1 END)
+						WHEN items.frequency = ' . FREQUENCY_QUARTERLY . ' 
+							THEN (CASE WHEN DATEDIFF(CURDATE(),DATE_FORMAT(sales.sale_time,\'%Y-%m-%d\')) > 90 THEN 0 ELSE 1 END)
+						WHEN items.frequency = ' . FREQUENCY_ANNUALLY . ' 
+							THEN (CASE WHEN DATEDIFF(CURDATE(),DATE_FORMAT(sales.sale_time,\'%Y-%m-%d\')) > 365 THEN 0 ELSE 1 END)
+					END) AS status 
+				FROM ' . $this->db->dbprefix('sales') . ' AS sales
+				INNER JOIN ' . $this->db->dbprefix('sales_items') . ' AS sales_items 
+					ON sales_items.sale_id = sales.sale_id
+				INNER JOIN ' . $this->db->dbprefix('items') . ' AS items 
+					ON sales_items.item_id = items.item_id
+				WHERE sales.customer_id = ' . $this->db->escape($person_id) . ' 
+				AND items.is_membership = 1 
+			)'
+		);
+
+		$this->db->select('customers.person_id,
+			people.dni,
+			people.first_name,
+			people.last_name,
+			people.gender,
+			customers.company_name,
+			customers.pic_filename,
+			people.phone_number,
+			sales_items_temp.item_id,
+			CASE 
+				WHEN (sales.sale_status = ' . COMPLETED . ' AND sales_payments.payment_amount > 0) 
+					THEN sales_items_temp.status 
+				ELSE 2 
+			END AS status');
+
+		$this->db->from('customers AS customers');
+		$this->db->join('people AS people', 'customers.person_id = people.person_id');
+		$this->db->join('sales AS sales','sales.customer_id = customers.person_id');
+		$this->db->join('sales_payments AS sales_payments', 'sales.sale_id = sales_payments.sale_id');
+		$this->db->join('sales_items_temp AS sales_items_temp', 'sales.sale_id = sales_items_temp.sale_id');
+		$this->db->where('customers.person_id', $person_id);
+
+		$query = $this->db->get();
+		foreach($query->result() as $row)
+		{
+			$suggestions[] = array(
+				'id' => $row->person_id, 
+				'item_id' => $row->item_id, 
+				'dni' => $row->dni, 
+				'gender' => $row->gender, 
+				'name' => $row->first_name . ' ' . $row->last_name . (!empty($row->company_name) ? ' [' . $row->company_name . ']' : ''). (!empty($row->phone_number) ? ' [' . $row->phone_number . ']' : ''),
+				'pic_filename' => $row->pic_filename, 
+				'status' => $row->status
+			);
+
+		}
+
+
+		// drop the temporary table to contain memory consumption as it's no longer required
+		$this->db->query('DROP TEMPORARY TABLE IF EXISTS ' . $this->db->dbprefix('sales_items_temp'));
+
+		return $suggestions;
+	}
+
+	/*
+	Determines if a given person_id is a customer
+	*/
+	public function exists_access($person_id,$datein)
+	{
+		$this->db->from('customer_access_control');
+		$this->db->where('customer_id', $person_id);
+		$this->db->where('DATE_FORMAT(datein,\'%Y-%m-%d\')', date('Y-m-d',strtotime($datein)));
+		$this->db->where('dateout IS NULL', null, false);
+
+		return ($this->db->get()->num_rows() == 1);
+	}
+
+	public function save_access_control($data_access, $customer_id, $insert = FALSE)
+	{
+		$success = FALSE;
+
+		//Run these queries as a transaction, we want to make sure we do all or nothing
+		$this->db->trans_start();
+
+		$this->set_log("ID To Send: ".$customer_id);
+
+		if($insert)
+		{
+			$this->set_log($this->db->last_query());
+			$success = $this->db->insert('customer_access_control', $data_access);
+			$this->set_log($this->db->last_query());
+		}
+		else
+		{
+			$this->db->where('customer_id', $customer_id);
+			$this->db->where('DATE_FORMAT(datein,\'%Y-%m-%d\')', date('Y-m-d',strtotime($data_access['dateout'])));
+			$this->db->where('dateout IS NULL', null, false);
+			$success = $this->db->update('customer_access_control', $data_access);
+			$this->set_log($this->db->last_query());
+		}
+
+		$this->db->trans_complete();
+
+		$success &= $this->db->trans_status();
+
+		return $success;
 	}
 }
 ?>

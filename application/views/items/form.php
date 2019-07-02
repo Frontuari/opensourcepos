@@ -46,6 +46,34 @@
 			</div>
 		</div>
 
+		<div class="form-group form-group-sm">
+			<?php echo form_label($this->lang->line('items_is_membership'), 'is_membership', array('class'=>'control-label col-xs-3')); ?>
+			<div class='col-xs-1'>
+				<?php echo form_checkbox(array(
+						'name'=>'is_membership',
+						'id'=>'is_membership',
+						'value'=>1,
+						'checked'=>($item_info->is_membership) ? 1 : 0)
+						);?>
+			</div>
+		</div>
+
+		<div class="form-group form-group-sm" id="div_frequency" style="display:none;">
+			<?php echo form_label($this->lang->line('items_frequency'), 'frequency', array('class'=>'control-label col-xs-3', 'id' => 'frequency')); ?>
+			<div class='col-xs-8'>
+				<?php 
+					$options = array(
+						'0' => $this->lang->line('items_frequency_none'),
+						'1' => $this->lang->line('items_frequency_daily'),
+						'2' => $this->lang->line('items_frequency_monthly'),
+						'3' => $this->lang->line('items_frequency_quarterly'),
+						'4' => $this->lang->line('items_frequency_annually')
+						);
+					echo form_dropdown('frequency', $options, (!empty($item_info->frequency) ? $item_info->frequency : '0'), array('class'=>'form-control', 'id' => 'frequency')); 
+				?>
+			</div>
+		</div>
+
 		<div id="attributes">
 			<script type="text/javascript">
 				$('#attributes').load('<?php echo site_url("items/attributes/$item_info->item_id");?>');
@@ -623,6 +651,24 @@ $(document).ready(function()
 			}
 		}
 	}, form_support.error));
+
+	$('#is_membership').click(function(){
+		if( $(this).is(':checked') ){
+			$('#div_frequency').show();
+		}
+		else{
+			$('#div_frequency').hide();
+			$('#frequency').val('0');
+		}
+	});
+
+	if( $('#is_membership').is(':checked') ){
+		$('#div_frequency').show();
+	}
+	else{
+		$('#div_frequency').hide();
+	}
+
 });
 </script>
 

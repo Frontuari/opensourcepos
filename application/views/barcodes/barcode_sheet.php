@@ -20,7 +20,7 @@
 				{
 					echo '</tr><tr>';
 				}
-				echo '<td>' . $this->barcode_lib->display_barcode($item, $barcode_config) . '</td>';
+				echo '<td>' . $this->barcode_lib->display_barcode($item, $barcode_config, $customer_barcode) . '</td>';
 				++$count;
 			}
 			?>

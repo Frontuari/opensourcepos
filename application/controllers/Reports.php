@@ -107,6 +107,43 @@ class Reports extends Secure_Controller
 		$this->load->view('reports/tabular', $data);
 	}
 
+	//Summary Access by Item report
+	public function summary_access_customers($start_date, $end_date, $item_id)
+	{
+
+		$inputs = array('start_date' => $start_date, 'end_date' => $end_date, 'item_id' => $item_id);
+
+		$this->load->model('reports/Summary_access_customers');
+		$model = $this->Summary_access_customers;
+
+		$report_data = $model->getData($inputs);
+		$summary = $this->xss_clean($model->getSummaryData($inputs));
+
+		$tabular_data = array();
+		foreach($report_data as $row)
+		{
+			$tabular_data[] = $this->xss_clean(array(
+				'item' => $row['item'],
+				'dni' => $row['dni'],
+				'name' => $row['name'],
+				'datein' => $row['datein'],
+				'dateout' => $row['dateout'],
+				'duration' => $row['duration']." ".$this->lang->line('common_hours'),
+				'status' => ($row['status']==0 ? $this->lang->line('customers_status_0') : ($row['status']==1 ? $this->lang->line('customers_status_1') : $this->lang->line('customers_status_2')))
+			));
+		}
+
+		$data = array(
+			'title' => $this->lang->line('reports_access_customers_summary_report'),
+			'subtitle' => $this->_get_subtitle_report(array('start_date' => $start_date, 'end_date' => $end_date)),
+			'headers' => $this->xss_clean($model->getDataColumns()),
+			'data' => $tabular_data,
+			'summary_data' => $summary
+		);
+
+		$this->load->view('reports/tabular', $data);
+	}
+
 	//Summary Expenses by Categories report
 	public function summary_expenses_categories($start_date, $end_date, $sale_type)
 	{
@@ -474,6 +511,18 @@ class Reports extends Secure_Controller
 		$data = array();
 
 		$this->load->view('reports/date_input', $data);
+	}
+
+	//Input for reports that require only a date range. (see routes.php to see that all graphical summary reports route here)
+	public function date_input_item()
+	{
+		$data = array();
+
+		$item_memberships = $this->xss_clean($this->Item->get_item_memberships());
+		$item_memberships['all'] =  $this->lang->line('reports_all');
+		$data['item_memberships'] = array_reverse($item_memberships, TRUE);
+		
+		$this->load->view('reports/specific_access_customer_input', $data);
 	}
 
 	//Input for reports that require only a date range. (see routes.php to see that all graphical summary reports route here)

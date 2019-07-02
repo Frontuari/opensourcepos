@@ -82,6 +82,11 @@ class Customers extends Persons
 			}
 
 			$data_rows[] = $this->xss_clean(get_customer_data_row($person, $stats));
+
+			if($person->pic_filename!='')
+			{
+				$this->_update_pic_filename($person);
+			}
 		}
 
 		echo json_encode(array('total' => $total_rows, 'rows' => $data_rows));
@@ -220,6 +225,21 @@ class Customers extends Persons
 			}
 		}
 
+		$data['logo_exists'] = $info->pic_filename != '';
+		$ext = pathinfo($info->pic_filename, PATHINFO_EXTENSION);
+		if($ext == '')
+		{
+			// if file extension is not found guess it (legacy)
+			$images = glob('./uploads/customer_pics/' . $info->pic_filename . '.*');
+		}
+		else
+		{
+			// else just pick that file
+			$images = glob('./uploads/customer_pics/' . $info->pic_filename);
+		}
+		$data['image_path'] = sizeof($images) > 0 ? base_url($images[0]) : '';
+
+
 		$this->load->view("customers/form", $data);
 	}
 
@@ -228,6 +248,12 @@ class Customers extends Persons
 	*/
 	public function save($customer_id = -1)
 	{
+
+		$this->Customer->set_log("<< Start Log >>");
+
+		$upload_success = $this->_handle_image_upload();
+		$upload_data = $this->upload->data();
+
 		$first_name = $this->xss_clean($this->input->post('first_name'));
 		$last_name = $this->xss_clean($this->input->post('last_name'));
 		$email = $this->xss_clean(strtolower($this->input->post('email')));
@@ -237,6 +263,7 @@ class Customers extends Persons
 		$last_name = $this->nameize($last_name);
 
 		$person_data = array(
+			'dni' => $this->input->post('dni'),
 			'first_name' => $first_name,
 			'last_name' => $last_name,
 			'gender' => $this->input->post('gender'),
@@ -264,8 +291,18 @@ class Customers extends Persons
 			'taxable' => $this->input->post('taxable') != NULL,
 			'date' => $date_formatter->format('Y-m-d H:i:s'),
 			'employee_id' => $this->input->post('employee_id'),
-			'sales_tax_code_id' => $this->input->post('sales_tax_code_id') == '' ? NULL : $this->input->post('sales_tax_code_id')
+			'sales_tax_code_id' => $this->input->post('sales_tax_code_id') == '' ? NULL : $this->input->post('sales_tax_code_id'),
+			'customer_number' => $this->input->post('customer_number') == '' ? NULL : $this->input->post('customer_number'),
 		);
+
+		if(!empty($upload_data['orig_name']))
+		{
+			// XSS file image sanity check
+			if($this->xss_clean($upload_data['raw_name'], TRUE) === TRUE)
+			{
+				$customer_data['pic_filename'] = $upload_data['raw_name'];
+			}
+		}
 
 		if($this->Customer->save_customer($person_data, $customer_data, $customer_id))
 		{
@@ -288,6 +325,9 @@ class Customers extends Persons
 		}
 		else // Failure
 		{
+			$this->Customer->set_log("<< End Log >>");
+			//	Use get_log method for debugg
+			// --> $this->Customer->get_log().'<br>'.
 			echo json_encode(array('success' => FALSE,
 							'message' => $this->lang->line('customers_error_adding_updating') . ' ' . $first_name . ' ' . $last_name,
 							'id' => -1));
@@ -460,6 +500,126 @@ class Customers extends Persons
 				echo json_encode(array('success' => FALSE, 'message' => $this->lang->line('customers_excel_import_nodata_wrongformat')));
 			}
 		}
+	}
+
+	public function pic_thumb($pic_filename)
+	{
+		$this->load->helper('file');
+		$this->load->library('image_lib');
+
+		// in this context, $pic_filename always has .ext
+		$ext = pathinfo($pic_filename, PATHINFO_EXTENSION);
+		$images = glob('./uploads/customer_pics/' . $pic_filename);
+
+		// make sure we pick only the file name, without extension
+		$base_path = './uploads/customer_pics/' . pathinfo($pic_filename, PATHINFO_FILENAME);
+		if(sizeof($images) > 0)
+		{
+			$image_path = $images[0];
+			$thumb_path = $base_path . $this->image_lib->thumb_marker . '.' . $ext;
+			if(sizeof($images) < 2)
+			{
+				$config['image_library'] = 'gd2';
+				$config['source_image']  = $image_path;
+				$config['maintain_ratio'] = TRUE;
+				$config['create_thumb'] = TRUE;
+				$config['width'] = 52;
+				$config['height'] = 32;
+				$this->image_lib->initialize($config);
+				$image = $this->image_lib->resize();
+				$thumb_path = $this->image_lib->full_dst_path;
+			}
+			$this->output->set_content_type(get_mime_by_extension($thumb_path));
+			$this->output->set_output(file_get_contents($thumb_path));
+		}
+	}
+
+	public function generate_barcodes($customer_ids)
+	{
+		$this->load->library('barcode_lib');
+
+		$customer_ids = explode(':', $customer_ids);
+		$result = $this->Customer->get_multiple_info($customer_ids)->result_array();
+		$config = $this->barcode_lib->get_barcode_config();
+
+		$data['barcode_config'] = $config;
+
+		// check the list of items to see if any item_number field is empty
+		foreach($result as &$customer)
+		{
+			$customer = $this->xss_clean($customer);
+			// update the barcode field if empty / NULL with the newly generated barcode
+			if(empty($customer['customer_number']) && $this->config->item('barcode_generate_if_empty'))
+			{
+				// get the newly generated barcode
+				$barcode_instance = Barcode_lib::barcode_instance($customer, $config, TRUE);
+				$customer['customer_number'] = $barcode_instance->getData();
+
+				$save_customer = array('customer_number' => $customer['customer_number']);
+				// update the item in the database in order to save the barcode field
+				$this->Customer->save($save_customer, $customer['person_id']);
+			}
+		}
+		$data['items'] = $result;
+		$data['customer_barcode'] = TRUE;
+
+		// display barcodes
+		$this->load->view('barcodes/barcode_sheet', $data);
+	}
+
+	private function _handle_image_upload()
+	{
+		/* Let files be uploaded with their original name */
+
+		// load upload library
+		$config = array('upload_path' => './uploads/customer_pics/',
+			'allowed_types' => 'gif|jpg|jpeg|png',
+			'max_size' => '100',
+			'max_width' => '640',
+			'max_height' => '480'
+		);
+		$this->load->library('upload', $config);
+		$this->upload->do_upload('customer_image');
+
+		$this->Customer->set_log($this->upload->display_errors());
+
+		return strlen($this->upload->display_errors()) == 0 || !strcmp($this->upload->display_errors(), '<p>'.$this->lang->line('upload_no_file_selected').'</p>');
+	}
+
+	/**
+	 * Guess whether file extension is not in the table field, if it isn't, then it's an old-format (formerly pic_id) field, so we guess the right filename and update the table
+	 *
+	 * @param $item the item to update
+	 */
+	private function _update_pic_filename($customer)
+	{
+		$filename = pathinfo($customer->pic_filename, PATHINFO_FILENAME);
+
+		// if the field is empty there's nothing to check
+		if(!empty($filename))
+		{
+			$ext = pathinfo($customer->pic_filename, PATHINFO_EXTENSION);
+			if(empty($ext))
+			{
+				$images = glob('./uploads/customer_pics/' . $customer->pic_filename . '.*');
+				if(sizeof($images) > 0)
+				{
+					$new_pic_filename = pathinfo($images[0], PATHINFO_BASENAME);
+					$customer_data = array('pic_filename' => $new_pic_filename);
+					$this->Customer->save($customer_data, $customer->person_id);
+				}
+			}
+		}
+	}
+
+	/*
+	Gives search suggestions based on what is being searched for
+	*/
+	public function get_status($person_id)
+	{
+		$suggestions = $this->xss_clean($this->Customer->get_status($person_id));
+
+		echo json_encode($suggestions);
 	}
 }
 ?>

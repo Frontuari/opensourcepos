@@ -183,6 +183,7 @@ function get_people_manage_table_headers()
 
 	$headers = array(
 		array('people.person_id' => $CI->lang->line('common_id')),
+		array('dni' => $CI->lang->line('common_dni')),
 		array('last_name' => $CI->lang->line('common_last_name')),
 		array('first_name' => $CI->lang->line('common_first_name')),
 		array('email' => $CI->lang->line('common_email')),
@@ -207,6 +208,7 @@ function get_person_data_row($person)
 
 	return array (
 		'people.person_id' => $person->person_id,
+		'dni' => $person->dni,
 		'last_name' => $person->last_name,
 		'first_name' => $person->first_name,
 		'email' => empty($person->email) ? '' : mailto($person->email, $person->email),
@@ -229,12 +231,16 @@ function get_customer_manage_table_headers()
 
 	$headers = array(
 		array('people.person_id' => $CI->lang->line('common_id')),
+		array('dni' => $CI->lang->line('common_dni')),
 		array('last_name' => $CI->lang->line('common_last_name')),
 		array('first_name' => $CI->lang->line('common_first_name')),
 		array('email' => $CI->lang->line('common_email')),
 		array('phone_number' => $CI->lang->line('common_phone_number')),
 		array('total' => $CI->lang->line('common_total_spent'), 'sortable' => FALSE)
 	);
+
+	$headers[] = array('customer_pic' => $CI->lang->line('customers_image'), 'sortable' => FALSE);
+
 
 	if($CI->Employee->has_grant('messages', $CI->session->userdata('person_id')))
 	{
@@ -253,13 +259,38 @@ function get_customer_data_row($person, $stats)
 
 	$controller_name = strtolower(get_class($CI));
 
+
+	$image = NULL;
+	if($person->pic_filename != '')
+	{
+		$ext = pathinfo($person->pic_filename, PATHINFO_EXTENSION);
+		if($ext == '')
+		{
+			// legacy
+			$images = glob('./uploads/customer_pics/' . $person->pic_filename . '.*');
+		}
+		else
+		{
+			// preferred
+			$images = glob('./uploads/customer_pics/' . $person->pic_filename);
+		}
+
+		if(sizeof($images) > 0)
+		{
+			$image .= '<a class="rollover" href="'. base_url($images[0]) .'"><img src="'.site_url('customers/pic_thumb/' . pathinfo($images[0], PATHINFO_BASENAME)) . '"></a>';
+		}
+	}
+
+
 	return array (
 		'people.person_id' => $person->person_id,
+		'dni' => $person->dni,
 		'last_name' => $person->last_name,
 		'first_name' => $person->first_name,
 		'email' => empty($person->email) ? '' : mailto($person->email, $person->email),
 		'phone_number' => $person->phone_number,
 		'total' => to_currency($stats->total),
+		'customer_pic' => $image,
 		'messages' => empty($person->phone_number) ? '' : anchor("Messages/view/$person->person_id", '<span class="glyphicon glyphicon-phone"></span>',
 			array('class'=>'modal-dlg', 'data-btn-submit' => $CI->lang->line('common_submit'), 'title'=>$CI->lang->line('messages_sms_send'))),
 		'edit' => anchor($controller_name."/view/$person->person_id", '<span class="glyphicon glyphicon-edit"></span>',

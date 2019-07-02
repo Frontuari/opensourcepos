@@ -62,6 +62,7 @@ $route['reports/(summary_:any)/([^/]+)/([^/]+)'] = 'reports/$1/$2/$3/$4';
 $route['reports/summary_expenses_categories'] = 'reports/date_input_only';
 $route['reports/summary_payments'] = 'reports/date_input_only';
 $route['reports/summary_discounts'] = 'reports/summary_discounts_input';
+$route['reports/summary_access_customers'] = 'reports/date_input_item';
 $route['reports/summary_:any'] = 'reports/date_input';
 
 $route['reports/(graphical_:any)/([^/]+)/([^/]+)'] = 'reports/$1/$2/$3/$4';

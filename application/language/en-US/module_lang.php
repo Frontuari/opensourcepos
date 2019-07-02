@@ -1,5 +1,7 @@
 <?php 
 
+$lang["module_access_control"] = "Access Control";
+$lang["module_access_control_desc"] = "Search customers for validate status and allow access.";
 $lang["module_attributes"] = "Attributes";
 $lang["module_attributes_desc"] = "Add, Update, Delete, and Search attributes.";
 $lang["module_both"] = "Both";

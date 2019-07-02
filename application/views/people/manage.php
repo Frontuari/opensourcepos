@@ -3,6 +3,15 @@
 <script type="text/javascript">
 $(document).ready(function()
 {
+
+	$('#generate_barcodes').click(function()
+    {
+        window.open(
+            'index.php/customers/generate_barcodes/'+table_support.selected_ids().join(':'),
+            '_blank' // <- This is what makes it open in a new window.
+        );
+    });
+
 	<?php $this->load->view('partial/bootstrap_tables_locale'); ?>
 
 	table_support.init({
@@ -14,7 +23,13 @@ $(document).ready(function()
 		{
 			var email_disabled = $("td input:checkbox:checked").parents("tr").find("td a[href^='mailto:']").length == 0;
 			$("#email").prop('disabled', email_disabled);
-		}
+		},
+        onLoadSuccess: function(response) {
+            $('a.rollover').imgPreview({
+				imgCSS: { width: 200 },
+				distanceFromCursor: { top:10, left:-210 }
+			})
+        }
 	});
 
 	$("#email").click(function(event)
@@ -54,6 +69,11 @@ $(document).ready(function()
 		<button id="email" class="btn btn-default btn-sm">
 			<span class="glyphicon glyphicon-envelope">&nbsp</span><?php echo $this->lang->line("common_email");?>
 		</button>
+		<?php if($controller_name == 'customers') : ?>
+	        <button id="generate_barcodes" class="btn btn-default btn-sm print_hide" data-href='<?php echo site_url($controller_name."/generate_barcodes"); ?>' title='<?php echo $this->lang->line('customers_generate_barcodes');?>'>
+	            <span class="glyphicon glyphicon-barcode">&nbsp</span><?php echo $this->lang->line("customers_generate_barcodes"); ?>
+	        </button>
+    	<?php endif;?>
 	</div>
 </div>
 

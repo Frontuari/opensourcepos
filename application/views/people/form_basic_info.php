@@ -1,4 +1,16 @@
 <div class="form-group form-group-sm">	
+	<?php echo form_label($this->lang->line('common_dni'), 'dni', array('class'=>'control-label col-xs-3')); ?>
+	<div class='col-xs-8'>
+		<?php echo form_input(array(
+				'name'=>'dni',
+				'id'=>'dni',
+				'class'=>'form-control input-sm',
+				'value'=>$person_info->dni)
+				);?>
+	</div>
+</div>
+
+<div class="form-group form-group-sm">	
 	<?php echo form_label($this->lang->line('common_first_name'), 'first_name', array('class'=>'required control-label col-xs-3')); ?>
 	<div class='col-xs-8'>
 		<?php echo form_input(array(
