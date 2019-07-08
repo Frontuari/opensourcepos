@@ -261,6 +261,13 @@ class Sales extends Secure_Controller
 		$data = array();
 
 		$payment_type = $this->input->post('payment_type');
+
+		if($payment_type == $this->lang->line('sales_deposit'))
+		{
+			$this->form_validation->set_rules('bankname', 'lang:sales_bankname', 'trim|required');
+			$this->form_validation->set_rules('referenceno', 'lang:sales_referenceno', 'trim|required');
+		}
+
 		if($payment_type != $this->lang->line('sales_giftcard'))
 		{
 			$this->form_validation->set_rules('amount_tendered', 'lang:sales_amount_tendered', 'trim|required|callback_numeric');
@@ -349,7 +356,9 @@ class Sales extends Secure_Controller
 			else
 			{
 				$amount_tendered = $this->input->post('amount_tendered');
-				$this->sale_lib->add_payment($payment_type, $amount_tendered);
+				$bankname = $this->input->post('bankname');
+				$referenceno = $this->input->post('referenceno');
+				$this->sale_lib->add_payment($payment_type, $amount_tendered,$bankname,$referenceno);
 			}
 		}
 

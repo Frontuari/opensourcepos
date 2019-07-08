@@ -292,7 +292,9 @@ class Config extends Secure_Controller
 			'giftcard_number' => $this->input->post('giftcard_number'),
 			'derive_sale_quantity' => $this->input->post('derive_sale_quantity') != NULL,
 			'multi_pack_enabled' => $this->input->post('multi_pack_enabled') != NULL,
-			'include_hsn' => $this->input->post('include_hsn') != NULL
+			'include_hsn' => $this->input->post('include_hsn') != NULL,
+			'mandatory_password' => $this->input->post('mandatory_password') != NULL,
+			'password_discipline' => $this->input->post('password_discipline')
 		);
 		
 		$this->Module->set_show_office_group($this->input->post('show_office_group') != NULL);

@@ -24,3 +24,13 @@ INSERT INTO `ospos_modules` (`name_lang_key`, `desc_lang_key`, `sort`, `module_i
 INSERT INTO `ospos_permissions` (`permission_id`, `module_id`, `location_id`) VALUES ('access_control', 'access_control', NULL);
 
 INSERT INTO `sealboxdb`.`ospos_permissions` (`permission_id`, `module_id`, `location_id`) VALUES ('reports_access_customers', 'reports', NULL);
+
+-- Cambios 08-07-2019
+
+ALTER TABLE `ospos_customers` ADD `discipline_id` INT(10) NULL DEFAULT NULL AFTER `customer_number`;
+ALTER TABLE `ospos_customers` ADD `service_duedate` DATE NULL DEFAULT NULL AFTER `customer_number`;
+ALTER TABLE `ospos_customers` ADD INDEX(`discipline_id`);
+ALTER TABLE `ospos_customers` ADD CONSTRAINT `ospos_customers_ibfk_4` FOREIGN KEY (`discipline_id`) REFERENCES `ospos_items`(`item_id`);
+
+ALTER TABLE `ospos_sales_payments` ADD `bankname` VARCHAR(255) NULL DEFAULT NULL AFTER `reference_code`, ADD `referenceno` VARCHAR(100) NULL DEFAULT NULL AFTER `bankname`;
+ALTER TABLE `ospos_sales_payments` ADD `transfer_status` INT(1) NULL DEFAULT '0' AFTER `referenceno`;

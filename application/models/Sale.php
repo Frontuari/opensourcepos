@@ -663,6 +663,9 @@ class Sale extends CI_Model
 				'payment_type'	 => $payment['payment_type'],
 				'payment_amount' => $payment['payment_amount'],
 				'cash_refund'    => $payment['cash_refund'],
+				'bankname'    	 => $payment['bankname'],
+				'referenceno'    => $payment['referenceno'],
+				'transfer_status'=> (!empty($payment['referenceno']) ? 0 : NULL),
 				'employee_id'	 => $employee_id
 			);
 

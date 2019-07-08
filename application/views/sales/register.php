@@ -465,6 +465,18 @@ if(isset($success))
 									<?php echo form_dropdown('payment_type', $payment_options, $selected_payment_type, array('id'=>'payment_types', 'class'=>'selectpicker show-menu-arrow', 'data-style'=>'btn-default btn-sm', 'data-width'=>'auto', 'disabled'=>'disabled')); ?>
 								</td>
 							</tr>
+							<tr id="bankname_row" style="display: none;">
+								<td><span id="bankname_label"><?php echo $this->lang->line('sales_bankname'); ?></span></td>
+								<td>
+									<?php echo form_input(array('name'=>'bankname', 'id'=>'bankname', 'class'=>'form-control input-sm non-giftcard-input', 'size'=>'5', 'tabindex'=>++$tabindex)); ?>
+								</td>
+							</tr>
+							<tr id="referenceno_row" style="display: none;">
+								<td><span id="referenceno_label"><?php echo $this->lang->line('sales_referenceno'); ?></span></td>
+								<td>
+									<?php echo form_input(array('name'=>'referenceno', 'id'=>'referenceno', 'class'=>'form-control input-sm non-giftcard-input', 'size'=>'5', 'tabindex'=>++$tabindex)); ?>
+								</td>
+							</tr>
 							<tr>
 								<td><span id="amount_tendered_label"><?php echo $this->lang->line('sales_amount_tendered'); ?></span></td>
 								<td>
@@ -505,6 +517,18 @@ if(isset($success))
 									<?php echo form_dropdown('payment_type', $payment_options,  $selected_payment_type, array('id'=>'payment_types', 'class'=>'selectpicker show-menu-arrow', 'data-style'=>'btn-default btn-sm', 'data-width'=>'fit')); ?>
 								</td>
 							</tr>
+							<tr id="bankname_row" style="display: none;">
+								<td><span id="bankname_label"><?php echo $this->lang->line('sales_bankname'); ?></span></td>
+								<td>
+									<?php echo form_input(array('name'=>'bankname', 'id'=>'bankname', 'class'=>'form-control input-sm non-giftcard-input', 'size'=>'5', 'tabindex'=>++$tabindex)); ?>
+								</td>
+							</tr>
+							<tr id="referenceno_row" style="display: none;">
+								<td><span id="referenceno_label"><?php echo $this->lang->line('sales_referenceno'); ?></span></td>
+								<td>
+									<?php echo form_input(array('name'=>'referenceno', 'id'=>'referenceno', 'class'=>'form-control input-sm non-giftcard-input', 'size'=>'5', 'tabindex'=>++$tabindex)); ?>
+								</td>
+							</tr>
 							<tr>
 								<td><span id="amount_tendered_label"><?php echo $this->lang->line('sales_amount_tendered'); ?></span></td>
 								<td>
@@ -528,9 +552,11 @@ if(isset($success))
 					<table class="sales_table_100" id="register">
 						<thead>
 							<tr>
-								<th style="width: 10%;"><?php echo $this->lang->line('common_delete'); ?></th>
-								<th style="width: 60%;"><?php echo $this->lang->line('sales_payment_type'); ?></th>
-								<th style="width: 20%;"><?php echo $this->lang->line('sales_payment_amount'); ?></th>
+								<th style="width: 5%;"><?php echo $this->lang->line('common_delete'); ?></th>
+								<th style="width: 50%;"><?php echo $this->lang->line('sales_payment_type'); ?></th>
+								<th style="width: 15%;"><?php echo $this->lang->line('sales_bankname'); ?></th>
+								<th style="width: 15%;"><?php echo $this->lang->line('sales_referenceno'); ?></th>
+								<th style="width: 15%;"><?php echo $this->lang->line('sales_payment_amount'); ?></th>
 							</tr>
 						</thead>
 
@@ -542,6 +568,8 @@ if(isset($success))
 								<tr>
 									<td><?php echo anchor($controller_name."/delete_payment/$payment_id", '<span class="glyphicon glyphicon-trash"></span>'); ?></td>
 									<td><?php echo $payment['payment_type']; ?></td>
+									<td><?php echo $payment['bankname']; ?></td>
+									<td><?php echo $payment['referenceno']; ?></td>
 									<td style="text-align: right;"><?php echo to_currency( $payment['payment_amount'] ); ?></td>
 								</tr>
 							<?php
@@ -928,6 +956,8 @@ function check_payment_type()
 
 	if($("#payment_types").val() == "<?php echo $this->lang->line('sales_giftcard'); ?>")
 	{
+		$('#bankname_row').hide();
+		$('#referenceno_row').hide();
 		$("#sale_total").html("<?php echo to_currency($total); ?>");
 		$("#sale_amount_due").html("<?php echo to_currency($amount_due); ?>");
 		$("#amount_tendered_label").html("<?php echo $this->lang->line('sales_giftcard_number'); ?>");
@@ -938,6 +968,8 @@ function check_payment_type()
 	}
 	else if($("#payment_types").val() == "<?php echo $this->lang->line('sales_cash'); ?>" && cash_rounding)
 	{
+		$('#bankname_row').hide();
+		$('#referenceno_row').hide();
 		$("#sale_total").html("<?php echo to_currency($cash_total); ?>");
 		$("#sale_amount_due").html("<?php echo to_currency($cash_amount_due); ?>");
 		$("#amount_tendered_label").html("<?php echo $this->lang->line('sales_amount_tendered'); ?>");
@@ -945,8 +977,21 @@ function check_payment_type()
 		$(".giftcard-input").attr('disabled', true);
 		$(".non-giftcard-input").attr('disabled', false);
 	}
+	else if($("#payment_types").val() == "<?php echo $this->lang->line('sales_deposit'); ?>")
+	{
+		$('#bankname_row').show();
+		$('#referenceno_row').show();
+		$("#sale_total").html("<?php echo to_currency($non_cash_total); ?>");
+		$("#sale_amount_due").html("<?php echo to_currency($non_cash_amount_due); ?>");
+		$("#amount_tendered_label").html("<?php echo $this->lang->line('sales_amount_tendered'); ?>");
+		$("#amount_tendered:enabled").val("<?php echo to_currency_no_money($non_cash_amount_due); ?>");
+		$(".giftcard-input").attr('disabled', true);
+		$(".non-giftcard-input").attr('disabled', false);
+	}
 	else
 	{
+		$('#bankname_row').hide();
+		$('#referenceno_row').hide();
 		$("#sale_total").html("<?php echo to_currency($non_cash_total); ?>");
 		$("#sale_amount_due").html("<?php echo to_currency($non_cash_amount_due); ?>");
 		$("#amount_tendered_label").html("<?php echo $this->lang->line('sales_amount_tendered'); ?>");

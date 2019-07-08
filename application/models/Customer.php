@@ -465,6 +465,7 @@ class Customer extends Person
 				SELECT
 					MAX(sales.sale_id) AS sale_id,
 					MAX(sales_items.item_id) AS item_id,
+					MAX(sales.sale_time) AS sale_time,
 					MAX(CASE 
 						WHEN items.frequency = ' . FREQUENCY_DAILY . ' 
 							THEN (CASE WHEN DATEDIFF(CURDATE(),DATE_FORMAT(sales.sale_time,\'%Y-%m-%d\')) > 1 THEN 0 ELSE 1 END)
@@ -492,11 +493,17 @@ class Customer extends Person
 			people.gender,
 			customers.company_name,
 			customers.pic_filename,
+			customers.service_duedate,
 			people.phone_number,
 			sales_items_temp.item_id,
+			items.name AS item_name,
 			CASE 
 				WHEN (sales.sale_status = ' . COMPLETED . ' AND sales_payments.payment_amount > 0) 
-					THEN sales_items_temp.status 
+					THEN 
+					(CASE 
+						WHEN customers.service_duedate IS NOT NULL AND service_duedate>=CURDATE() THEN 1 
+						WHEN customers.service_duedate IS NOT NULL AND service_duedate<CURDATE() THEN 0 
+						ELSE sales_items_temp.status END)
 				ELSE 2 
 			END AS status');
 
@@ -504,7 +511,8 @@ class Customer extends Person
 		$this->db->join('people AS people', 'customers.person_id = people.person_id');
 		$this->db->join('sales AS sales','sales.customer_id = customers.person_id');
 		$this->db->join('sales_payments AS sales_payments', 'sales.sale_id = sales_payments.sale_id');
-		$this->db->join('sales_items_temp AS sales_items_temp', 'sales.sale_id = sales_items_temp.sale_id');
+		$this->db->join('sales_items_temp AS sales_items_temp', 'sales.sale_id = sales_items_temp.sale_id AND customers.discipline_id = sales_items_temp.item_id');
+		$this->db->join('items AS items', 'items.item_id = sales_items_temp.item_id');
 		$this->db->where('customers.person_id', $person_id);
 
 		$query = $this->db->get();
@@ -515,6 +523,8 @@ class Customer extends Person
 				'item_id' => $row->item_id, 
 				'dni' => $row->dni, 
 				'gender' => $row->gender, 
+				'item_name' => $row->item_name, 
+				'service_duedate' => $row->service_duedate, 
 				'name' => $row->first_name . ' ' . $row->last_name . (!empty($row->company_name) ? ' [' . $row->company_name . ']' : ''). (!empty($row->phone_number) ? ' [' . $row->phone_number . ']' : ''),
 				'pic_filename' => $row->pic_filename, 
 				'status' => $row->status

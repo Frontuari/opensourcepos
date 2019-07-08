@@ -243,6 +243,31 @@ class Customers extends Persons
 		$this->load->view("customers/form", $data);
 	}
 
+	public function discipline($customer_id)
+	{
+		$info = $this->Customer->get_info($customer_id);
+		foreach(get_object_vars($info) as $property => $value)
+		{
+			$info->$property = $this->xss_clean($value);
+		}
+		$data['person_info'] = $info;
+
+		if(empty($info->person_id) || empty($info->date) || empty($info->employee_id))
+		{
+			$data['person_info']->date = date('Y-m-d H:i:s');
+			$data['person_info']->employee_id = $this->Employee->get_logged_in_employee_info()->person_id;
+		}
+
+		$employee_info = $this->Employee->get_info($info->employee_id);
+		$data['employee'] = $this->xss_clean($employee_info->first_name . ' ' . $employee_info->last_name);
+
+		$items = $this->Item->get_item_memberships();
+		$data['items'] = $items;
+		$data['selected_item'] = $info->discipline_id;
+
+		$this->load->view("customers/form_discipline", $data);
+	}
+
 	/*
 	Inserts/updates a customer
 	*/
@@ -331,6 +356,42 @@ class Customers extends Persons
 			echo json_encode(array('success' => FALSE,
 							'message' => $this->lang->line('customers_error_adding_updating') . ' ' . $first_name . ' ' . $last_name,
 							'id' => -1));
+		}
+	}
+
+	public function save_discipline($customer_id)
+	{
+		$this->Customer->set_log("<< Start Log >>");
+
+		$first_name = $this->xss_clean($this->input->post('first_name'));
+		$last_name = $this->xss_clean($this->input->post('last_name'));
+
+		// format first and last name properly
+		$first_name = $this->nameize($first_name);
+		$last_name = $this->nameize($last_name);
+
+		$duedate_formatter = date_create_from_format($this->config->item('dateformat') . ' ' . $this->config->item('timeformat'), $this->input->post('service_duedate'));
+
+		$customer_data = array(
+			'discipline_id' => $this->input->post('discipline_id'),
+			'service_duedate' => $duedate_formatter->format('Y-m-d H:i:s'),
+			'employee_id' => $this->input->post('employee_id')
+		);
+
+		if($this->Customer->save($customer_data, $customer_id))
+		{
+			echo json_encode(array('success' => TRUE,
+								'message' => $this->lang->line('customers_successful_updating') . ' ' . $first_name . ' ' . $last_name,
+								'id' => $customer_id));
+		}
+		else // Failure
+		{
+			$this->Customer->set_log("<< End Log >>");
+			//	Use get_log method for debugg
+			// --> $this->Customer->get_log().'<br>'.
+			echo json_encode(array('success' => FALSE,
+							'message' => $this->lang->line('customers_error_adding_updating') . ' ' . $first_name . ' ' . $last_name,
+							'id' => $customer_id));
 		}
 	}
 

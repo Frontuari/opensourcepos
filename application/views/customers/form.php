@@ -524,6 +524,7 @@ $(document).ready(function()
 
 		rules:
 		{
+			dni: 'required',
 			first_name: 'required',
 			last_name: 'required',
 			consent: 'required',
@@ -555,6 +556,7 @@ $(document).ready(function()
 
 		messages:
 		{
+			dni: "<?php echo $this->lang->line('common_dni_required'); ?>",
 			first_name: "<?php echo $this->lang->line('common_first_name_required'); ?>",
 			last_name: "<?php echo $this->lang->line('common_last_name_required'); ?>",
 			consent: "<?php echo $this->lang->line('customers_consent_required'); ?>",

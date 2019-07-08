@@ -374,7 +374,7 @@ class Sale_lib
 	}
 
 	// Multiple Payments
-	public function add_payment($payment_id, $payment_amount)
+	public function add_payment($payment_id, $payment_amount, $bankname = FALSE, $referenceno = FALSE)
 	{
 		$payments = $this->get_payments();
 		if(isset($payments[$payment_id]))
@@ -385,7 +385,7 @@ class Sale_lib
 		else
 		{
 			//add to existing array
-			$payment = array($payment_id => array('payment_type' => $payment_id, 'payment_amount' => $payment_amount, 'cash_refund' => 0));
+			$payment = array($payment_id => array('payment_type' => $payment_id, 'payment_amount' => $payment_amount, 'cash_refund' => 0, 'bankname' => $bankname, 'referenceno' => $referenceno));
 
 			$payments += $payment;
 		}

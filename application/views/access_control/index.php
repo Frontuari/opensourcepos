@@ -20,16 +20,22 @@
 		<div id="lb_name"></div>
 	</div>
 	<div class="panel-body">
-		<img id="pic_filename" src="">
-		<br>
-		<br>
-		<div id="lb_dni"></div>
-		<br>
-		<div id="lb_dateaccess"></div>
-		<br>
-	</div>
-	<div class="panel-footer">
-		<div id="lb_status"></div>
+		<div class="row">
+            <div class="col-md-6">
+				<img id="pic_filename" src="">
+				<br>
+				<br>
+				<div id="lb_dni"></div>
+				<div id="lb_discipline"></div>
+				<div id="lb_duedate"></div>
+				<div id="lb_dateaccess"></div>
+            </div>
+            <div class="col-md-6">
+				<br>
+				<br>
+            	<div id="lb_status"></div>
+            </div>
+        </div>
 	</div>
 </div>
 
@@ -59,7 +65,12 @@ $(document).ready(function()
 					var now = new Date();
 					var day = ("0" + now.getDate()).slice(-2);
 					var month = ("0" + (now.getMonth() + 1)).slice(-2);
-					var today = now.getFullYear()+"-"+(month)+"-"+(day)+"T"+now.getHours()+":"+now.getMinutes()+":"+now.getSeconds();
+					var today = (day)+"-"+(month)+"-"+now.getFullYear()+"T"+now.getHours()+":"+now.getMinutes()+":"+now.getSeconds();
+					//	DueDate
+					var duedate = new Date(resp[0].service_duedate);
+					var dueday = ("0" + duedate.getDate()).slice(-2);
+					var duemonth = ("0" + (duedate.getMonth() + 1)).slice(-2);
+					var service_duedate = (dueday)+"-"+(duemonth)+"-"+duedate.getFullYear()+"T"+duedate.getHours()+":"+duedate.getMinutes()+":"+duedate.getSeconds();
 					//	Hidden Fields
 		            $('#customer_id').val(resp[0].id);
 		            $('#dateaccess').val(today);
@@ -67,10 +78,12 @@ $(document).ready(function()
 		            $('#item_id').val(resp[0].item_id);
 		            //	V-Card
 		            $('#lb_name').html("<b><?php echo $this->lang->line('common_first_name');?>:</b> "+resp[0].name);
+		            $('#lb_discipline').html("<b><?php echo $this->lang->line('customers_discipline_id');?>:</b> "+resp[0].item_name);
 		            $('#lb_dateaccess').html("<b><?php echo $this->lang->line('common_date');?>:</b> "+today);
+		            $('#lb_duedate').html("<b><?php echo $this->lang->line('customers_service_duedate');?>:</b> "+service_duedate);
 		            $('#lb_dni').html("<b><?php echo $this->lang->line('common_dni');?>:</b> "+resp[0].dni);
 		            var status = (resp[0].status == 0 ? "<?php echo $this->lang->line('customers_status_0');?>" : (resp[0].status == 1 ? "<?php echo $this->lang->line('customers_status_1');?>" : "<?php echo $this->lang->line('customers_status_2');?>"));
-		            var span = (resp[0].status == 0 ? "<span style='font-size: 135%;' class='label label-danger'>"+status.toUpperCase()+"</span>" : (resp[0].status == 1 ? "<span style='font-size: 135%;' class='label label-success'>"+status.toUpperCase()+"</span>" : "<span style='font-size: 135%;' class='label label-warning'>"+status.toUpperCase()+"</span>"));
+		            var span = (resp[0].status == 0 ? "<span style='font-size: 500%;' class='label label-bs label-danger'>"+status.toUpperCase()+"</span>" : (resp[0].status == 1 ? "<span style='font-size: 500%;' class='label label-bs label-success'>"+status.toUpperCase()+"</span>" : "<span style='font-size: 500%;' class='label label-bs label-warning'>"+status.toUpperCase()+"</span>"));
 		            $('#lb_status').html("<b><?php echo $this->lang->line('common_state');?>:</b> "+span);
 		            if(resp[0].pic_filename.length > 0)
 		            {

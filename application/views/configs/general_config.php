@@ -275,6 +275,33 @@
 			</div>
 
 			<div class="form-group form-group-sm">
+				<?php echo form_label($this->lang->line('config_mandatory_password'), 'mandatory_password', array('class' => 'control-label col-xs-2')); ?>
+				<div class='col-xs-1'>
+					<?php echo form_checkbox(array(
+						'name' => 'mandatory_password',
+						'id' => 'mandatory_password',
+						'value' => 'mandatory_password',
+						'checked' => $this->config->item('mandatory_password'))); ?>
+					&nbsp
+					<label class="control-label">
+						<span class="glyphicon glyphicon-info-sign" data-toggle="tooltip" data-placement="right" title="<?php echo $this->lang->line('config_mandatory_password_tooltip'); ?>"></span>
+					</label>
+				</div>
+			</div>
+
+			<div class="form-group form-group-sm">
+				<?php echo form_label($this->lang->line('config_password_discipline'), 'config_password_discipline', array('class' => 'required control-label col-xs-2','id' => 'config_gcaptcha_secret_key')); ?>
+				<div class='col-xs-4'>
+					<?php echo form_input(array(
+						'name' => 'password_discipline',
+						'id' => 'password_discipline',
+						'type' => 'password',
+						'class' => 'form-control input-sm required',
+						'value' => $this->config->item('password_discipline'))); ?>
+				</div>
+			</div>
+
+			<div class="form-group form-group-sm">
 				<?php echo form_label($this->lang->line('config_backup_database'), 'config_backup_database', array('class' => 'control-label col-xs-2')); ?>
 				<div class='col-xs-2'>
 					<div id="backup_db" class="btn btn-default btn-sm">
@@ -314,6 +341,24 @@ $(document).ready(function()
 
 	$("#gcaptcha_enable").change(enable_disable_gcaptcha_enable);
 
+	var enable_disable_mandatory_password = (function() {
+		var mandatory_password = $("#mandatory_password").is(":checked");
+		if(mandatory_password)
+		{
+			$("#password_discipline").prop("disabled", !mandatory_password).addClass("required");
+			$("#config_password_discipline").addClass("required");
+		}
+		else
+		{
+			$("#password_discipline").prop("disabled", mandatory_password).removeClass("required");
+			$("#config_password_discipline").removeClass("required");
+		}
+
+		return arguments.callee;
+	})();
+
+	$("#mandatory_password").change(enable_disable_mandatory_password);
+
 	$("#backup_db").click(function() {
 		window.location='<?php echo site_url('config/backup_db') ?>';
 	});
@@ -341,6 +386,10 @@ $(document).ready(function()
 			gcaptcha_secret_key:
 			{
 				required: "#gcaptcha_enable:checked"
+			},
+			password_discipline:
+			{
+				required: "#mandatory_password:checked"
 			}
 		},
 
@@ -363,6 +412,10 @@ $(document).ready(function()
 			gcaptcha_secret_key:
 			{
 				required: "<?php echo $this->lang->line('config_gcaptcha_secret_key_required'); ?>"
+			},
+			password_discipline:
+			{
+				required: "<?php echo $this->lang->line('config_password_discipline_required'); ?>"
 			}
 		},
 
