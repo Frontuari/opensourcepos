@@ -733,6 +733,61 @@ class Sale extends CI_Model
 			}
 
 			$this->Attribute->copy_attribute_links($item['item_id'], 'sale_id', $sale_id);
+
+			//	Update Discipline Customer
+			if($cur_item_info->is_membership == 1 && $customer_id != -1)
+			{
+				switch ($cur_item_info->frequency) {
+					case 1:
+						$service_duedate = date('Y-m-d H:i:s', mktime(0,0,0,date("m"),date("d"),date("Y")));
+						break;
+					case 2:
+						if(empty($customer->service_duedate))
+						{
+							$service_duedate = date('Y-m-d H:i:s', mktime(0,0,0,date("m"),date("d")+7,date("Y")));
+						}
+						else
+						{
+							$service_duedate = date('Y-m-d H:i:s', strtotime($customer->service_duedate . ' +7 day'));
+						}
+						break;
+					case 3:
+						if(empty($customer->service_duedate))
+						{
+							$service_duedate = date('Y-m-d H:i:s', mktime(0,0,0,date("m")+1,date("d"),date("Y")));
+						}
+						else
+						{
+							$service_duedate = date('Y-m-d H:i:s', strtotime($customer->service_duedate . ' +1 month'));
+						}
+						break;
+					case 4:
+						if(empty($customer->service_duedate))
+						{
+							$service_duedate = date('Y-m-d H:i:s', mktime(0,0,0,date("m")+3,date("d"),date("Y")));
+						}
+						else
+						{
+							$service_duedate = date('Y-m-d H:i:s', strtotime($customer->service_duedate . ' +3 month'));
+						}
+						break;
+					case 5:
+						if(empty($customer->service_duedate))
+						{
+							$service_duedate = date('Y-m-d H:i:s', mktime(0,0,0,date("m"),date("d"),date("Y")+1));
+						}
+						else
+						{
+							$service_duedate = date('Y-m-d H:i:s', strtotime($customer->service_duedate . ' +1 year'));
+						}
+						break;
+				}
+				$discipline_data = array(
+					'discipline_id' => $cur_item_info->item_id,
+					'service_duedate' => (($customer->service_duedate != NULL && $customer->service_duedate < $service_duedate) ? $service_duedate : $customer->service_duedate));
+				//	Save
+				$this->Customer->Save($discipline_data,$customer_id);
+			}
 		}
 
 		if($customer_id == -1 || $customer->taxable)

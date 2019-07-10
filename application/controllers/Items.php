@@ -67,9 +67,21 @@ class Items extends Secure_Controller
 
 		$total_rows = $this->Item->get_found_rows($search, $filters);
 
+
+		//	Check if used Price Conversion
+		$use_price_conversion = (boolean)$this->config->item('use_price_conversion');
+		//	Get Last Price Conversion
+		$price_conversion = $this->Price_conversion->get_lastprice();
+
 		$data_rows = array();
 		foreach($items->result() as $item)
 		{
+			if($use_price_conversion)
+			{
+				$item->cost_price = $item->cost_price * $price_conversion->price;
+				$item->unit_price = $item->unit_price * $price_conversion->price;
+			}
+
 			$data_rows[] = $this->xss_clean(get_item_data_row($item));
 			if($item->pic_filename!='')
 			{

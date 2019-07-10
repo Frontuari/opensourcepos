@@ -65,9 +65,10 @@
 					$options = array(
 						'0' => $this->lang->line('items_frequency_none'),
 						'1' => $this->lang->line('items_frequency_daily'),
-						'2' => $this->lang->line('items_frequency_monthly'),
-						'3' => $this->lang->line('items_frequency_quarterly'),
-						'4' => $this->lang->line('items_frequency_annually')
+						'2' => $this->lang->line('items_frequency_weekly'),
+						'3' => $this->lang->line('items_frequency_monthly'),
+						'4' => $this->lang->line('items_frequency_quarterly'),
+						'5' => $this->lang->line('items_frequency_annually')
 						);
 					echo form_dropdown('frequency', $options, (!empty($item_info->frequency) ? $item_info->frequency : '0'), array('class'=>'form-control', 'id' => 'frequency')); 
 				?>
@@ -173,7 +174,7 @@
 			<div class="col-xs-4">
 				<div class="input-group input-group-sm">
 					<?php if (!currency_side()): ?>
-						<span class="input-group-addon input-sm"><b><?php echo $this->config->item('currency_symbol'); ?></b></span>
+						<span class="input-group-addon input-sm"><b><?php echo (!empty($this->config->item('use_price_conversion')) ? $this->config->item('currency_to_convert') : $this->config->item('currency_symbol')); ?></b></span>
 					<?php endif; ?>
 					<?php echo form_input(array(
 							'name'=>'cost_price',
@@ -182,7 +183,7 @@
 							'value'=>to_currency_no_money($item_info->cost_price))
 							);?>
 					<?php if (currency_side()): ?>
-						<span class="input-group-addon input-sm"><b><?php echo $this->config->item('currency_symbol'); ?></b></span>
+						<span class="input-group-addon input-sm"><b><?php echo (!empty($this->config->item('use_price_conversion')) ? $this->config->item('currency_to_convert') : $this->config->item('currency_symbol')); ?></b></span>
 					<?php endif; ?>
 				</div>
 			</div>
@@ -193,7 +194,7 @@
 			<div class='col-xs-4'>
 				<div class="input-group input-group-sm">
 					<?php if (!currency_side()): ?>
-						<span class="input-group-addon input-sm"><b><?php echo $this->config->item('currency_symbol'); ?></b></span>
+						<span class="input-group-addon input-sm"><b><?php echo (!empty($this->config->item('use_price_conversion')) ? $this->config->item('currency_to_convert') : $this->config->item('currency_symbol')); ?></b></span>
 					<?php endif; ?>
 					<?php echo form_input(array(
 							'name'=>'unit_price',
@@ -202,7 +203,7 @@
 							'value'=>to_currency_no_money($item_info->unit_price))
 							);?>
 					<?php if (currency_side()): ?>
-						<span class="input-group-addon input-sm"><b><?php echo $this->config->item('currency_symbol'); ?></b></span>
+						<span class="input-group-addon input-sm"><b><?php echo (!empty($this->config->item('use_price_conversion')) ? $this->config->item('currency_to_convert') : $this->config->item('currency_symbol')); ?></b></span>
 					<?php endif; ?>
 				</div>
 			</div>

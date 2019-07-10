@@ -355,7 +355,9 @@ class Config extends Secure_Controller
 			'date_or_time_format' => $this->input->post('date_or_time_format'),
 			'cash_decimals' => $this->input->post('cash_decimals'),
 			'cash_rounding_code' => $this->input->post('cash_rounding_code'),
-			'financial_year' => $this->input->post('financial_year')
+			'financial_year' => $this->input->post('financial_year'),
+			'use_price_conversion' => $this->input->post('use_price_conversion'),
+			'currency_to_convert' => $this->input->post('currency_to_convert')
 		);
 		
 		$result = $this->Appconfig->batch_save($batch_save_data);

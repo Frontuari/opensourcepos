@@ -26,9 +26,10 @@ define('PRICE_OPTION_KIT_STOCK', 2);
 define('NAME_SEPARATOR', ' | ');
 
 define('FREQUENCY_DAILY', 1);
-define('FREQUENCY_MONTHLY', 2);
-define('FREQUENCY_QUARTERLY', 3);
-define('FREQUENCY_ANNUALLY', 4);
+define('FREQUENCY_WEEKLY', 2);
+define('FREQUENCY_MONTHLY', 3);
+define('FREQUENCY_QUARTERLY', 4);
+define('FREQUENCY_ANNUALLY', 5);
 
 
 /**

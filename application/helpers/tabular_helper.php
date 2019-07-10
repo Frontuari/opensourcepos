@@ -834,4 +834,41 @@ function get_cash_up_data_row($cash_up)
 		)
 	);
 }
+
+/*
+Get the header for the price conversions tabular view
+*/
+function get_price_conversion_manage_table_headers()
+{
+	$CI =& get_instance();
+
+	$headers = array(
+		array('price_id' => $CI->lang->line('price_conversions_price_id')),
+		array('currency_code' => $CI->lang->line('price_conversions_currency')),
+		array('valid_from' => $CI->lang->line('price_conversions_valid_from')),
+		array('price' => $CI->lang->line('price_conversions_price'))
+	);
+
+	return transform_headers($headers);
+}
+
+/*
+Gets the html data row for the expenses category
+*/
+function get_price_conversion_data_row($price_conversion)
+{
+	$CI =& get_instance();
+
+	$controller_name = strtolower(get_class($CI));
+
+	return array (
+		'price_id' => $price_conversion->price_id,
+		'currency_code' => $price_conversion->currency_code,
+		'valid_from' => to_datetime(strtotime($price_conversion->valid_from)),
+		'price' => to_currency($price_conversion->price),
+		'edit' => anchor($controller_name."/view/$price_conversion->price_id", '<span class="glyphicon glyphicon-edit"></span>',
+			array('class'=>'modal-dlg', 'data-btn-submit' => $CI->lang->line('common_submit'), 'title'=>$CI->lang->line($controller_name.'_update'))
+		)
+	);
+}
 ?>

@@ -469,6 +469,8 @@ class Customer extends Person
 					MAX(CASE 
 						WHEN items.frequency = ' . FREQUENCY_DAILY . ' 
 							THEN (CASE WHEN DATEDIFF(CURDATE(),DATE_FORMAT(sales.sale_time,\'%Y-%m-%d\')) > 1 THEN 0 ELSE 1 END)
+						WHEN items.frequency = ' . FREQUENCY_WEEKLY . ' 
+							THEN (CASE WHEN DATEDIFF(CURDATE(),DATE_FORMAT(sales.sale_time,\'%Y-%m-%d\')) > 7 THEN 0 ELSE 1 END)
 						WHEN items.frequency = ' . FREQUENCY_MONTHLY . ' 
 							THEN (CASE WHEN DATEDIFF(CURDATE(),DATE_FORMAT(sales.sale_time,\'%Y-%m-%d\')) > 30 THEN 0 ELSE 1 END)
 						WHEN items.frequency = ' . FREQUENCY_QUARTERLY . ' 

@@ -40,6 +40,7 @@ $lang["items_generate_barcodes"] = "Generate Barcodes";
 $lang["items_frequency"] = "Frequency";
 $lang["items_frequency_none"] = "None Selected";
 $lang["items_frequency_daily"] = "Daily";
+$lang["items_frequency_weekly"] = "Weekly";
 $lang["items_frequency_monthly"] = "Monthly";
 $lang["items_frequency_quarterly"] = "Quarterly";
 $lang["items_frequency_annually"] = "Annually";

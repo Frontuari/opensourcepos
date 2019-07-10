@@ -60,6 +60,7 @@ $(document).ready(function()
 			url: "<?php echo site_url('customers/get_status/"+ui.item.value+"'); ?>",
 			dataType: 'json',
 			success: function(resp){
+				console.log(resp);
 				if(resp.length > 0){
 					//	CurDate
 					var now = new Date();
@@ -138,6 +139,8 @@ $(document).ready(function()
         $('#lb_dateaccess').html("");
         $('#lb_dni').html("");
         $('#lb_status').html("");
+        $('#lb_discipline').html("");
+        $('#lb_duedate').html("");
         $('#pic_filename').attr("src","");
     	$('#pic_filename').css('width','');
     	$('#pic_filename').css('height','');

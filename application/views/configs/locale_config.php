@@ -55,6 +55,32 @@
 						'value'=>$this->config->item('currency_code'))); ?>
 				</div>
 			</div>
+
+			<div class="form-group form-group-sm">
+				<?php echo form_label($this->lang->line('config_use_price_conversion'), 'use_price_conversion', array('class' => 'control-label col-xs-2')); ?>
+				<div class='col-xs-2'>
+					<?php echo form_checkbox(array(
+						'name' => 'use_price_conversion',
+						'id' => 'use_price_conversion',
+						'value' => 'use_price_conversion',
+						'checked'=>$this->config->item('use_price_conversion'))); ?>
+					&nbsp
+					<label class="control-label">
+						<span class="glyphicon glyphicon-info-sign" data-toggle="tooltip" data-placement="right" title="<?php echo $this->lang->line('config_use_price_conversion_tooltip'); ?>"></span>
+					</label>
+				</div>
+			</div>
+
+			<div class="form-group form-group-sm">
+				<?php echo form_label($this->lang->line('config_currency_to_convert'), 'config_currency_to_convert', array('class' => 'control-label col-xs-2')); ?>
+				<div class='col-xs-2'>
+					<?php echo form_input(array(
+						'name' => 'currency_to_convert',
+						'id' => 'currency_to_convert',
+						'class' => 'form-control input-sm number_locale',
+						'value'=>$this->config->item('currency_to_convert'))); ?>
+				</div>
+			</div>
 			
 			<div class="form-group form-group-sm">
 				<?php echo form_label($this->lang->line('config_currency_decimals'), 'currency_decimals', array('class' => 'control-label col-xs-2')); ?>
@@ -256,6 +282,25 @@ $(document).ready(function()
 		);
 	});
 
+	var enable_disable_use_price_conversion = (function() {
+		var use_price_conversion = $("#use_price_conversion").is(":checked");
+		if(use_price_conversion)
+		{
+			$("#currency_to_convert").prop("disabled", !use_price_conversion).addClass("required");
+			$("#config_currency_to_convert").addClass("required");
+		}
+		else
+		{
+			$("#currency_to_convert").prop("disabled", use_price_conversion).removeClass("required");
+			$('#currency_to_convert').val("");
+			$("#config_currency_to_convert").removeClass("required");
+		}
+
+		return arguments.callee;
+	})();
+
+	$("#use_price_conversion").change(enable_disable_use_price_conversion);
+
 	$('#locale_config_form').validate($.extend(form_support.handler, {
 		rules:
 		{
@@ -280,6 +325,10 @@ $(document).ready(function()
 						return response.success;
 					}
 				}
+			},
+			currency_to_convert:
+			{
+				required: "#use_price_conversion:checked"
 			}
 		},
 
@@ -288,6 +337,10 @@ $(document).ready(function()
 			number_locale: {
 				required: "<?php echo $this->lang->line('config_number_locale_required') ?>",
 				number_locale: "<?php echo $this->lang->line('config_number_locale_invalid') ?>"
+			},
+			currency_to_convert:
+			{
+				required: "<?php echo $this->lang->line('config_currency_to_convert_required'); ?>"
 			}
 		},
 

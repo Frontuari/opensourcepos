@@ -725,6 +725,17 @@ class Sale_lib
 		$item_type = $item_info->item_type;
 		$stock_type = $item_info->stock_type;
 
+		//	Check if used Price Conversion
+		$use_price_conversion = (boolean)get_instance()->config->item('use_price_conversion');
+		//	Get Last Price Conversion
+		$price_conversion = get_instance()->Price_conversion->get_lastprice();
+
+		if($use_price_conversion)
+		{
+			$item_info->cost_price = $item_info->cost_price * $price_conversion->price;
+			$item_info->unit_price = $item_info->unit_price * $price_conversion->price;
+		}
+
 		if($price_mode == PRICE_MODE_STANDARD)
 		{
 			$price = $item_info->unit_price;

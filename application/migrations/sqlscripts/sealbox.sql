@@ -34,3 +34,18 @@ ALTER TABLE `ospos_customers` ADD CONSTRAINT `ospos_customers_ibfk_4` FOREIGN KE
 
 ALTER TABLE `ospos_sales_payments` ADD `bankname` VARCHAR(255) NULL DEFAULT NULL AFTER `reference_code`, ADD `referenceno` VARCHAR(100) NULL DEFAULT NULL AFTER `bankname`;
 ALTER TABLE `ospos_sales_payments` ADD `transfer_status` INT(1) NULL DEFAULT '0' AFTER `referenceno`;
+
+
+CREATE TABLE `ospos_price_conversions` (
+ `price_id` int(10) NOT NULL AUTO_INCREMENT,
+ `valid_from` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+ `price` decimal(10,2) NOT NULL DEFAULT 0.00,
+ `currency_code` char(3) NOT NULL DEFAULT 'VES',
+ `deleted` tinyint(1) NOT NULL DEFAULT '0',
+ PRIMARY KEY (`price_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+INSERT INTO `ospos_modules` (`name_lang_key`, `desc_lang_key`, `sort`, `module_id`) VALUES ('module_price_conversions', 'module_price_conversions_desc', '55', 'price_conversions');
+INSERT INTO `ospos_permissions` (`permission_id`, `module_id`, `location_id`) VALUES ('price_conversions', 'price_conversions', NULL);
+INSERT INTO `ospos_grants` (`permission_id`, `person_id`, `menu_group`) VALUES ('price_conversions', '1', 'office');
+
