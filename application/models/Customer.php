@@ -505,16 +505,18 @@ class Customer extends Person
 					(CASE 
 						WHEN customers.service_duedate IS NOT NULL AND service_duedate>=CURDATE() THEN 1 
 						WHEN customers.service_duedate IS NOT NULL AND service_duedate<CURDATE() THEN 0 
-						ELSE sales_items_temp.status END)
+						ELSE sales_items_temp.status END) 
+				WHEN customers.service_duedate IS NOT NULL AND service_duedate>=CURDATE() THEN 1 
+				WHEN customers.service_duedate IS NOT NULL AND service_duedate<CURDATE() THEN 0 
 				ELSE 2 
 			END AS status');
 
 		$this->db->from('customers AS customers');
 		$this->db->join('people AS people', 'customers.person_id = people.person_id');
-		$this->db->join('sales AS sales','sales.customer_id = customers.person_id');
-		$this->db->join('sales_payments AS sales_payments', 'sales.sale_id = sales_payments.sale_id');
-		$this->db->join('sales_items_temp AS sales_items_temp', 'sales.sale_id = sales_items_temp.sale_id AND customers.discipline_id = sales_items_temp.item_id');
-		$this->db->join('items AS items', 'items.item_id = sales_items_temp.item_id');
+		$this->db->join('sales AS sales','sales.customer_id = customers.person_id','left');
+		$this->db->join('sales_payments AS sales_payments', 'sales.sale_id = sales_payments.sale_id','left');
+		$this->db->join('sales_items_temp AS sales_items_temp', 'sales.sale_id = sales_items_temp.sale_id AND customers.discipline_id = sales_items_temp.item_id','left');
+		$this->db->join('items AS items', 'items.item_id = COALESCE(sales_items_temp.item_id,customers.discipline_id)','left');
 		$this->db->where('customers.person_id', $person_id);
 
 		$query = $this->db->get();
