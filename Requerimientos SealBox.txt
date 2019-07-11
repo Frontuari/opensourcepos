@@ -1,0 +1,7 @@
+Requerimientos SealBox:
+
+1- Soporte para agregar establecer la fecha de vencimiento según la inscripción del servicio.
+2- Soporte para modificar la fecha de vencimiento del cliente bajo clave de autorización.
+3- Campo DNI Obligatorio.
+4- Control de Acceso aumentar considerablemente el estado del cliente y agregar datos adicionales: Información del Producto, Fecha de Vencimiento del cliente.
+5- Agregar numero de referencia de pago, con estado En proceso, Procesada, Declinada.

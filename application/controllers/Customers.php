@@ -635,9 +635,9 @@ class Customers extends Persons
 		// load upload library
 		$config = array('upload_path' => './uploads/customer_pics/',
 			'allowed_types' => 'gif|jpg|jpeg|png',
-			'max_size' => '100',
-			'max_width' => '640',
-			'max_height' => '480'
+			'max_size' => '0', // 100
+			'max_width' => '0', // 640
+			'max_height' => '0' // 480
 		);
 		$this->load->library('upload', $config);
 		$this->upload->do_upload('customer_image');
