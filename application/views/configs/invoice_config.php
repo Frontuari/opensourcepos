@@ -15,6 +15,46 @@
 				</div>
 			</div>
 
+			<div class="form-group form-group-sm">	
+				<?php echo form_label($this->lang->line('config_fiscal_invoice_enable'), 'fiscal_invoice_enable', array('class' => 'control-label col-xs-2')); ?>
+				<div class='col-xs-1'>
+					<?php echo form_checkbox(array(
+						'name' => 'fiscal_invoice_enable',
+						'value' => 'fiscal_invoice_enable',
+						'id' => 'fiscal_invoice_enable',
+						'checked' => $this->config->item('fiscal_invoice_enable')));?>
+				</div>
+			</div>
+
+			<div class="form-group form-group-sm" id="fiscal_remote_printer" style="display: none;">
+				<?php echo form_label($this->lang->line('config_remote_ip_address'), 'remote_ip_address', array('class' => 'control-label col-xs-2')); ?>
+				<div class='col-xs-2'>
+					<?php echo form_input(array(
+						'name' => 'remote_ip_address',
+						'id' => 'remote_ip_address',
+						'class' => 'form-control input-sm',
+						'value' => $this->config->item('remote_ip_address'))); ?>
+				</div>
+
+				<?php echo form_label($this->lang->line('config_remote_port_service'), 'remote_port_service', array('class' => 'control-label col-xs-2')); ?>
+				<div class='col-xs-2'>
+					<?php echo form_input(array(
+						'name' => 'remote_port_service',
+						'id' => 'remote_port_service',
+						'class' => 'form-control input-sm',
+						'value' => $this->config->item('remote_port_service'))); ?>
+				</div>
+
+				<?php echo form_label($this->lang->line('config_remote_fiscal_printer_serial'), 'remote_fiscal_printer_serial', array('class' => 'control-label col-xs-2')); ?>
+				<div class='col-xs-2'>
+					<?php echo form_input(array(
+						'name' => 'remote_fiscal_printer_serial',
+						'id' => 'remote_fiscal_printer_serial',
+						'class' => 'form-control input-sm',
+						'value' => $this->config->item('remote_fiscal_printer_serial'))); ?>
+				</div>
+			</div>
+
 			<div class="form-group form-group-sm">
 				<?php echo form_label($this->lang->line('config_invoice_type'), 'invoice_type', array('class' => 'control-label col-xs-2')); ?>
 				<div class='col-xs-3'>
@@ -185,6 +225,20 @@ $(document).ready(function()
 		return arguments.callee;
 	})();
 
+	var enable_disable_fiscal_invoice_enable = (function() {
+		var fiscal_invoice_enabled = $("#fiscal_invoice_enable").is(":checked");
+
+		if(fiscal_invoice_enabled) {
+			$("#fiscal_remote_printer").show();
+		} else {
+			$("#fiscal_remote_printer").hide();
+			$('#remote_ip_address').val("");
+			$('#remote_port_service').val("");
+			$('#remote_fiscal_printer_serial').val("");
+		}
+		return arguments.callee;
+	})();
+
 	var enable_disable_work_order_enable = (function() {
 		var work_order_enabled = $("#work_order_enable").is(":checked");
 		var invoice_enabled = $("#invoice_enable").is(":checked");
@@ -196,6 +250,8 @@ $(document).ready(function()
 
 	$("#invoice_enable").change(enable_disable_invoice_enable);
 
+	$("#fiscal_invoice_enable").change(enable_disable_fiscal_invoice_enable);
+
 	$("#work_order_enable").change(enable_disable_work_order_enable);
 
 	$("#invoice_config_form").validate($.extend(form_support.handler, {
@@ -205,7 +261,7 @@ $(document).ready(function()
 		submitHandler: function(form) {
 			$(form).ajaxSubmit({
 				beforeSerialize: function(arr, $form, options) {
-					$("#sales_invoice_format, #sales_quote_format, #recv_invoice_format, #invoice_default_comments, #invoice_email_message, #last_used_invoice_number, #last_used_quote_number, #quote_default_comments, #work_order_enable, #work_order_format, #last_used_work_order_number").prop("disabled", false);
+					$("#sales_invoice_format, #sales_quote_format, #recv_invoice_format, #invoice_default_comments, #invoice_email_message, #last_used_invoice_number, #last_used_quote_number, #quote_default_comments, #work_order_enable, #work_order_format, #last_used_work_order_number, #fiscal_invoice_enabled").prop("disabled", false);
 					return true;
 				},
 				success: function(response) {

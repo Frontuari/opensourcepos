@@ -492,6 +492,55 @@ class Reports extends Secure_Controller
 		$this->load->view('reports/tabular', $data);
 	}
 
+	//Detailed Payments report
+	public function detailed_payments($start_date, $end_date, $sale_type = 'complete', $location_id = 'all', $payment_type)
+	{
+		$inputs = array('start_date' => $start_date, 'end_date' => $end_date, 'sale_type' => 'complete', 'location_id' => 'all', 'payment_type' => $payment_type);
+
+		$this->load->model('reports/Detailed_payments');
+		$model = $this->Detailed_payments;
+
+		$model->create($inputs);
+
+		$report_data = $model->getData($inputs);
+		$summary = $this->xss_clean($model->getSummaryData($inputs));
+
+		$summary_data = array();
+		foreach($report_data as $row)
+		{
+			$summary_data[] = $this->xss_clean(array(
+				'id' => $row['sale_id'],
+				'type_code' => $row['type_code'],
+				'sale_date' => to_date(strtotime($row['sale_date'])),
+				'employee_name' => $row['employee_name'],
+				'customer_name' => $row['customer_name'],
+				'subtotal' => to_currency($row['subtotal']),
+				'tax' => to_currency_tax($row['tax']),
+				'total' => to_currency($row['total']),
+				'payment_type' => $row['payment_type'],
+				'payment_amount' => to_currency($row['payment_amount']),
+				'bankname' => $row['bankname'],
+				'referenceno' => $row['referenceno'],
+				'transfer_status' => strtoupper($row['transfer_status']),
+				'edit' => anchor('sales/edit/'.$row['sale_id'], '<span class="glyphicon glyphicon-edit"></span>',
+					array('class' => 'modal-dlg print_hide', $button_key => $button_label, 'data-btn-submit' => $this->lang->line('common_submit'), 'title' => $this->lang->line('sales_update')))
+			));
+		}
+
+		$subtitle = $this->_get_subtitle_report(array('start_date' => $start_date, 'end_date' => $end_date));
+		$subtitle.= "<br>".rawurldecode($payment_type);
+
+		$data = array(
+			'title' => $this->lang->line('reports_payments_detailed_report'),
+			'subtitle' => $subtitle,
+			'headers' => $this->xss_clean($model->getDataColumns()),
+			'summary_data' => $summary_data,
+			'overall_summary_data' => $this->xss_clean($model->getSummaryData($inputs))
+		);
+
+		$this->load->view('reports/tabular_details', $data);
+	}
+
 	//Input for reports that require only a date range. (see routes.php to see that all graphical summary reports route here)
 	public function date_input()
 	{
@@ -523,6 +572,18 @@ class Reports extends Secure_Controller
 		$data['item_memberships'] = array_reverse($item_memberships, TRUE);
 		
 		$this->load->view('reports/specific_access_customer_input', $data);
+	}
+
+	//Input for reports that require only a date range. (see routes.php to see that all graphical summary reports route here)
+	public function date_input_payment()
+	{
+		$data = array();
+
+		$payment_types = get_payment_options();
+		$payment_types['all'] =  $this->lang->line('reports_all');
+		$data['payment_types'] = array_reverse($payment_types, TRUE);
+		
+		$this->load->view('reports/date_input', $data);
 	}
 
 	//Input for reports that require only a date range. (see routes.php to see that all graphical summary reports route here)
@@ -915,8 +976,11 @@ class Reports extends Secure_Controller
 		{
 			$row = $this->xss_clean($row);
 
-			$labels[] = $row['payment_type'];
-			$series[] = array('meta' => $row['payment_type'] . ' ' . round($row['payment_amount'] / $summary['total'] * 100, 2) . '%', 'value' => $row['payment_amount']);
+			if($row['trans_group'] == $this->lang->line('reports_trans_payments'))
+			{
+				$labels[] = $row['trans_type'];
+				$series[] = array('meta' => $row['trans_type'] . ' ' . round($row['trans_payments'] / $summary['total'] * 100, 2) . '%', 'value' => $row['trans_payments']);
+			}
 		}
 
 		$data = array(
@@ -1292,6 +1356,9 @@ class Reports extends Secure_Controller
 			$button_label = $this->lang->line('common_delete');
 		}
 
+		$type_printer = (empty($report_data['sale_fiscalprinter_status']) ? "/I" : ($report_data['sale_fiscalprinter_status'] == "I" ? "/NC" : "/ND"));
+		$layaout_printer = (empty($report_data['sale_fiscalprinter_status']) ? "Facturar" : ($report_data['sale_fiscalprinter_status'] == "I" ? "Nota de Crédito" : "Nota de Dédito"));
+
 		$summary_data = $this->xss_clean(array(
 			'sale_id' => $report_data['sale_id'],
 			'sale_date' => to_date(strtotime($report_data['sale_date'])),
@@ -1305,6 +1372,8 @@ class Reports extends Secure_Controller
 			'profit' => to_currency($report_data['profit']),
 			'payment_type' => $report_data['payment_type'],
 			'comment' => $report_data['comment'],
+			'fiscal_printer' => anchor('sales/fiscal_printer/'. $report_data['sale_id'].$type_printer, $layaout_printer,
+				array('title' => $this->lang->line('common_print'))),
 			'edit' => anchor('sales/edit/'. $report_data['sale_id'], '<span class="glyphicon glyphicon-edit"></span>',
 				array('class'=>'modal-dlg print_hide', $button_key => $button_label, 'data-btn-submit' => $this->lang->line('common_submit'), 'title' => $this->lang->line('sales_update')))
 		));
@@ -1367,6 +1436,9 @@ class Reports extends Secure_Controller
 				$button_label = $this->lang->line('common_delete');
 			}
 
+			$type_printer = (empty($row['sale_fiscalprinter_status']) ? "/I" : ($row['sale_fiscalprinter_status'] == "I" ? "/NC" : "/ND"));
+			$layaout_printer = (empty($row['sale_fiscalprinter_status']) ? "Facturar" : ($row['sale_fiscalprinter_status'] == "I" ? "Nota de Crédito" : "Nota de Dédito"));
+
 			$summary_data[] = $this->xss_clean(array(
 				'id' => $row['sale_id'],
 				'type_code' => $row['type_code'],
@@ -1381,6 +1453,8 @@ class Reports extends Secure_Controller
 				'profit' => to_currency($row['profit']),
 				'payment_type' => $row['payment_type'],
 				'comment' => $row['comment'],
+				'fiscal_printer' => anchor('sales/fiscal_printer/'. $row['sale_id'].$type_printer, $layaout_printer,
+					array('title' => $this->lang->line('common_print'))),
 				'edit' => anchor('sales/edit/'.$row['sale_id'], '<span class="glyphicon glyphicon-edit"></span>',
 					array('class' => 'modal-dlg print_hide', $button_key => $button_label, 'data-btn-submit' => $this->lang->line('common_submit'), 'title' => $this->lang->line('sales_update')))
 			));

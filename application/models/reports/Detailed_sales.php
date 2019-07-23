@@ -26,7 +26,8 @@ class Detailed_sales extends Report
 				array('cost' => $this->lang->line('reports_cost'), 'sorter' => 'number_sorter'),
 				array('profit' => $this->lang->line('reports_profit'), 'sorter' => 'number_sorter'),
 				array('payment_type' => $this->lang->line('reports_payment_type'), 'sortable' => FALSE),
-				array('comment' => $this->lang->line('reports_comments'))),
+				array('comment' => $this->lang->line('reports_comments')),
+				array('fiscal_printer' => $this->lang->line('common_print'))),
 			'details' => array(
 				$this->lang->line('reports_name'),
 				$this->lang->line('reports_category'),
@@ -59,7 +60,8 @@ class Detailed_sales extends Report
 			SUM(profit) AS profit,
 			MAX(payment_type) AS payment_type,
 			MAX(sale_status) AS sale_status,
-			comment');
+			comment,
+			sale_fiscalprinter_status');
 		$this->db->from('sales_items_temp');
 		$this->db->where('sale_id', $sale_id);
 
@@ -89,7 +91,8 @@ class Detailed_sales extends Report
 			SUM(cost) AS cost,
 			SUM(profit) AS profit,
 			MAX(payment_type) AS payment_type,
-			MAX(comment) AS comment');
+			MAX(comment) AS comment,
+			MAX(sale_fiscalprinter_status) AS sale_fiscalprinter_status');
 		$this->db->from('sales_items_temp');
 
 		if($inputs['location_id'] != 'all')

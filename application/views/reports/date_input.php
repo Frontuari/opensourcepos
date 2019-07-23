@@ -97,6 +97,20 @@ if(isset($error))
 	}
 	?>
 
+	<?php	
+	if (!empty($payment_types) && count($payment_types) > 1)
+	{
+	?>
+		<div class="form-group form-group-sm">
+			<?php echo form_label($this->lang->line('sales_payment'), 'payment_type', array('class'=>'required control-label col-xs-2')); ?>
+			<div id='report_item_membership' class="col-xs-3">
+				<?php echo form_dropdown('payment_type', $payment_types, 'all', array('id'=>'payment_type', 'class'=>'form-control')); ?>
+			</div>
+		</div>
+	<?php
+	}
+	?>
+
 	<?php
 	echo form_button(array(
 		'name'=>'generate_report',
@@ -116,7 +130,7 @@ $(document).ready(function()
 
 	$("#generate_report").click(function()
 	{		
-		window.location = [window.location, start_date, end_date, $("#input_type").val() || 0, $("#location_id").val(), $("#discount_type_id").val() || 0, $("#item_id").val() ].join("/");
+		window.location = [window.location, start_date, end_date, $("#input_type").val() || 0, $("#location_id").val(), $("#discount_type_id").val() || 0, $("#item_id").val(), $('#payment_type').val() ].join("/");
 	});
 });
 </script>

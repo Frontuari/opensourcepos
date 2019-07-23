@@ -11,6 +11,10 @@ define('SALE_TYPE_WORK_ORDER', 2);
 define('SALE_TYPE_QUOTE', 3);
 define('SALE_TYPE_RETURN', 4);
 
+define('PAYMENT_STATUS_IP', 0);
+define('PAYMENT_STATUS_CO', 1);
+define('PAYMENT_STATUS_VO', 2);
+
 define('PERCENT', 0);
 define('FIXED', 1);
 /**
@@ -110,6 +114,23 @@ class Sale extends CI_Model
 
 		$this->db->group_by('sale_id');
 		$this->db->order_by('sale_time', 'asc');
+
+		return $this->db->get();
+	}
+
+	public function get_items_info($sale_id)
+	{
+		$this->db->select('sales_items.line,
+			COALESCE(sales_items_taxes.percent,0) AS tax,
+			sales_items.item_unit_price AS price,
+			sales_items.quantity_purchased AS quantity,
+			items.item_number AS code,
+			items.name AS description');
+		$this->db->from('sales_items AS sales_items');
+		$this->db->join('items AS items','sales_items.item_id = items.item_id');
+		$this->db->join('sales_items_taxes AS sales_items_taxes','sales_items.item_id = sales_items_taxes.item_id AND sales_items.sale_id = sales_items_taxes.sale_id','LEFT');
+		$this->db->where('sales_items.sale_id',$sale_id);
+		$this->db->order_by('sales_items.line');
 
 		return $this->db->get();
 	}
@@ -546,6 +567,7 @@ class Sale extends CI_Model
 				$payment_id = $payment['payment_id'];
 				$payment_type = $payment['payment_type'];
 				$payment_amount = $payment['payment_amount'];
+				$transfer_status = $payment['transfer_status'];
 				$cash_refund = $payment['cash_refund'];
 				$employee_id = $payment['employee_id'];
 
@@ -556,6 +578,7 @@ class Sale extends CI_Model
 						'sale_id' => $sale_id,
 						'payment_type' => $payment_type,
 						'payment_amount' => $payment_amount,
+						'transfer_status' => $transfer_status,
 						'cash_refund' => $cash_refund,
 						'employee_id' => $employee_id
 					);
@@ -568,7 +591,8 @@ class Sale extends CI_Model
 					{
 						// Update existing payment transactions (payment_type only)
 						$sales_payments_data = array(
-							'payment_type' => $payment_type
+							'payment_type' => $payment_type,
+							'transfer_status' => $transfer_status 
 						);
 						$this->db->where('payment_id',$payment_id);
 						$success = $this->db->update('sales_payments', $sales_payments_data);
@@ -1217,6 +1241,7 @@ class Sale extends CI_Model
 					MAX(sales.sale_status) AS sale_status,
 					MAX(sales.sale_type) AS sale_type,
 					MAX(sales.comment) AS comment,
+					MAX(sales.sale_fiscalprinter_status) AS sale_fiscalprinter_status,
 					MAX(sales.invoice_number) AS invoice_number,
 					MAX(sales.quote_number) AS quote_number,
 					MAX(sales.customer_id) AS customer_id,

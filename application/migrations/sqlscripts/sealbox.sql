@@ -49,3 +49,6 @@ INSERT INTO `ospos_modules` (`name_lang_key`, `desc_lang_key`, `sort`, `module_i
 INSERT INTO `ospos_permissions` (`permission_id`, `module_id`, `location_id`) VALUES ('price_conversions', 'price_conversions', NULL);
 INSERT INTO `ospos_grants` (`permission_id`, `person_id`, `menu_group`) VALUES ('price_conversions', '1', 'office');
 
+-- Cambios 23-07-2019
+
+ALTER TABLE `ospos_sales` ADD `sale_fiscalprinter_status` CHAR(2) NULL DEFAULT NULL AFTER `sale_type`;

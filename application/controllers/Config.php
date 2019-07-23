@@ -793,7 +793,11 @@ class Config extends Secure_Controller
 			'work_order_enable' => $this->input->post('work_order_enable') != NULL,
 			'work_order_format' => $this->input->post('work_order_format'),
 			'last_used_work_order_number' => $this->input->post('last_used_work_order_number'),
-			'invoice_type' => $this->input->post('invoice_type')
+			'invoice_type' => $this->input->post('invoice_type'),
+			'fiscal_invoice_enable' => $this->input->post('fiscal_invoice_enable') != NULL,
+			'remote_ip_address' => $this->input->post('remote_ip_address'),
+			'remote_port_service' => $this->input->post('remote_port_service'),
+			'remote_fiscal_printer_serial' => $this->input->post('remote_fiscal_printer_serial')
 		);
 		
 		$result = $this->Appconfig->batch_save($batch_save_data);

@@ -1302,12 +1302,13 @@ class Sales extends Secure_Controller
 			$payment_id = $this->input->post('payment_id_' . $i);
 			$payment_amount = $this->input->post('payment_amount_' . $i);
 			$payment_type = $this->input->post('payment_type_' . $i);
+			$transfer_status = $this->input->post('payment_status_' . $i);
 			$cash_refund = 0.00;
 
 			// To maintain tradition we will also delete any payments with 0 amount assuming these are mistakes
 			// introduced at sale time.  This is now done in Sale.php
 
-			$payments[] = array('payment_id' => $payment_id, 'payment_type' => $payment_type, 'payment_amount' => $payment_amount, 'cash_refund' => $cash_refund, 'employee_id' => $employee_id);
+			$payments[] = array('payment_id' => $payment_id, 'payment_type' => $payment_type, 'payment_amount' => $payment_amount, 'cash_refund' => $cash_refund, 'employee_id' => $employee_id, 'transfer_status' => $transfer_status);
 		}
 
 		$payment_id = -1;
@@ -1519,6 +1520,87 @@ class Sales extends Secure_Controller
 			}
 		}
 		return NULL;
+	}
+
+	function fiscal_printer($sale_id,$action = "I")
+	{
+		$this->load->model('Tfhka');
+
+		$Tfhka = $this->Tfhka;
+
+		$error = "";
+
+		$sale_info = $this->Sale->get_info($sale_id)->row();
+		// check printer
+		if($Tfhka->CheckFprinter())
+		{
+			//	Send Customer Data
+			if(!empty($sale_info->customer_id))
+			{
+				$customer = $this->Customer->get_info($sale_info->customer_id)->row();
+
+				if(!$Tfhka->SendCmd(transform_cmd_fiscal_printer(array($customer->dni),'RIF')))
+				{
+					$error .= "Error al enviar el Nro RIF: ".$customer->dni."<br>";
+				}
+				if(!$Tfhka->SendCmd(transform_cmd_fiscal_printer(array((!empty($customer->company_name) ? $customer->company_name : $customer->first_name." ".$customer->last_name)),'RS')))
+				{
+					$error .= "Error al enviar la Razon Social: ".(!empty($customer->company_name) ? $customer->company_name : $customer->first_name." ".$customer->last_name)."<br>";
+				}
+			}
+			if($action == "NC" || $action == "ND")
+			{
+				if(!$Tfhka->SendCmd(transform_cmd_fiscal_printer(array($sale_info->invoice_number),'AI')))
+				{
+					$error .= "Error al enviar Nro Factura: ".$sale_info->invoice_number."<br>";
+				}
+
+				if(!$Tfhka->SendCmd(transform_cmd_fiscal_printer(array($sale_info->sale_date),'DI')))
+				{
+					$error .= "Error al enviar Fecha Factura: ".$sale_info->sale_date."<br>";
+				}
+
+				if(!$Tfhka->SendCmd(transform_cmd_fiscal_printer(array($this->config->item('remote_fiscal_printer_serial')),'FP')))
+				{
+					$error .= "Error al enviar Nro Serial Impresora Fiscal: ".$this->config->item('remote_fiscal_printer_serial')."<br>";
+				}
+			}
+			//	Send Comment
+			if(!empty($sale_info->comment))
+			{
+				if(!$Tfhka->SendCmd(transform_cmd_fiscal_printer(array(($action == "I" ? "@" : ($action == "NC" ? "A" : "B")),"## ".$sale_info->comment." ##"),'CM','00')))
+				{
+					$error .= "Error al enviar Comentario: ".$sale_info->comment."<br>";
+				}
+			}
+			//	Send Producto Data
+			$item_sales_info = $this->Sale->get_items_info($sale_id);
+
+			$type_cmd = ($action == "I" ? "PR" : ($action == "NC" ? "NCPR" : "NDPR"));
+
+			foreach ($item_sales_info->result() as $items) {
+				if(!$Tfhka->SendCmd(transform_cmd_fiscal_printer(array($items->tax,$items->price,$items->quantity,$items->code,$items->description),$type_cmd)))
+				{
+					$error .= "Error al enviar Producto: ".$items->description." Linea: ".$items->line."<br>";
+				}
+			}
+
+		}
+		else
+		{
+			$error = $Tfhka->log;
+		}
+
+		if(!empty($error))
+		{
+			echo json_encode(array('success' => FALSE, 'message' => $error, 'id' => $sale_id));
+		}
+		else
+		{
+			$this->Sale->update($sale_id,array('sale_fiscalprinter_status' => $action),array());
+			echo json_encode(array('success' => TRUE, 'message' => 'Factura Impresa correctamente', 'id' => $sale_id));
+		}
+
 	}
 }
 ?>

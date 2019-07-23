@@ -88,6 +88,18 @@
 					</div>
 				</div>
 			</div>
+			<?php if($row->payment_type == $this->lang->line('sales_deposit') && !empty($row->referenceno)): ?>
+			<div class="form-group form-group-sm">
+				<?php echo form_label($this->lang->line('reports_payment_status'), 'payment_status_'.$i, array('class'=>'control-label col-xs-3')); ?>
+				<div class='col-xs-4'>
+					<?php echo form_dropdown('payment_status_'.$i, array(
+						null => $this->lang->line('reports_payment_status_na'),
+						PAYMENT_STATUS_IP => $this->lang->line('reports_payment_status_ip'),
+						PAYMENT_STATUS_CO => $this->lang->line('reports_payment_status_co'),
+						PAYMENT_STATUS_VO => $this->lang->line('reports_payment_status_vo')), $row->transfer_status, array('id'=>'payment_status_'.$i, 'class'=>'form-control')); ?>
+				</div>
+			</div>
+			<?php endif;?>
 		<?php 
 			++$i;
 		}
