@@ -1534,44 +1534,26 @@ class Sales extends Secure_Controller
 		// check printer
 		if($Tfhka->CheckFprinter())
 		{
+			$lines = 0;
+			$filename = ($action=="I" ? "Invoice.txt" : ($action=="NC" ? "CreditNote.txt" : "DebitNote.txt"));
+			$invoice = array();
 			//	Send Customer Data
 			if(!empty($sale_info->customer_id))
 			{
-				$customer = $this->Customer->get_info($sale_info->customer_id)->row();
-
-				if(!$Tfhka->SendCmd(transform_cmd_fiscal_printer(array($customer->dni),'RIF')))
-				{
-					$error .= "Error al enviar el Nro RIF: ".$customer->dni."<br>";
-				}
-				if(!$Tfhka->SendCmd(transform_cmd_fiscal_printer(array((!empty($customer->company_name) ? $customer->company_name : $customer->first_name." ".$customer->last_name)),'RS')))
-				{
-					$error .= "Error al enviar la Razon Social: ".(!empty($customer->company_name) ? $customer->company_name : $customer->first_name." ".$customer->last_name)."<br>";
-				}
+				$customer = $this->Customer->get_info($sale_info->customer_id);
+				array_push($invoice,transform_cmd_fiscal_printer(array((!empty($customer->company_name) ? $customer->company_name."\n" : $customer->first_name." ".$customer->last_name."\n")),'RS'));
+				array_push($invoice,transform_cmd_fiscal_printer(array($customer->dni."\n"),'RIF'));
 			}
 			if($action == "NC" || $action == "ND")
 			{
-				if(!$Tfhka->SendCmd(transform_cmd_fiscal_printer(array($sale_info->invoice_number),'AI')))
-				{
-					$error .= "Error al enviar Nro Factura: ".$sale_info->invoice_number."<br>";
-				}
-
-				if(!$Tfhka->SendCmd(transform_cmd_fiscal_printer(array($sale_info->sale_date),'DI')))
-				{
-					$error .= "Error al enviar Fecha Factura: ".$sale_info->sale_date."<br>";
-				}
-
-				if(!$Tfhka->SendCmd(transform_cmd_fiscal_printer(array($this->config->item('remote_fiscal_printer_serial')),'FP')))
-				{
-					$error .= "Error al enviar Nro Serial Impresora Fiscal: ".$this->config->item('remote_fiscal_printer_serial')."<br>";
-				}
+				array_push($invoice,transform_cmd_fiscal_printer(array($sale_info->invoice_number),'AI'));
+				array_push($invoice,transform_cmd_fiscal_printer(array($sale_info->sale_date),'DI'));
+				array_push($invoice,transform_cmd_fiscal_printer(array($this->config->item('remote_fiscal_printer_serial')),'FP'));
 			}
 			//	Send Comment
 			if(!empty($sale_info->comment))
 			{
-				if(!$Tfhka->SendCmd(transform_cmd_fiscal_printer(array(($action == "I" ? "@" : ($action == "NC" ? "A" : "B")),"## ".$sale_info->comment." ##"),'CM','00')))
-				{
-					$error .= "Error al enviar Comentario: ".$sale_info->comment."<br>";
-				}
+				array_push($invoice,array($i => transform_cmd_fiscal_printer(array(($action == "I" ? "@" : ($action == "NC" ? "A" : "B")),"## ".$sale_info->comment." ##"."\n"),'CM','00')));
 			}
 			//	Send Producto Data
 			$item_sales_info = $this->Sale->get_items_info($sale_id);
@@ -1579,12 +1561,39 @@ class Sales extends Secure_Controller
 			$type_cmd = ($action == "I" ? "PR" : ($action == "NC" ? "NCPR" : "NDPR"));
 
 			foreach ($item_sales_info->result() as $items) {
-				if(!$Tfhka->SendCmd(transform_cmd_fiscal_printer(array($items->tax,$items->price,$items->quantity,$items->code,$items->description),$type_cmd)))
-				{
-					$error .= "Error al enviar Producto: ".$items->description." Linea: ".$items->line."<br>";
+				array_push($invoice,transform_cmd_fiscal_printer(array($items->tax,$items->price,$items->quantity,$items->code,$items->description."\n"),$type_cmd));
+			}
+
+			$fp = fopen($filename, "w+");
+			$write = fputs($fp, "");
+
+			foreach($invoice as $campo => $cmd)
+			{
+				$write = fputs($fp, $cmd);
+				$lines++;
+			}
+			$write = fputs($fp, "101");
+			$lines ++;
+
+			fclose($fp);
+            
+			$salida = 0;
+			//	SendFileCmd
+			$lineas = file($filename);
+			foreach($lineas as $num_linea => $linea){
+				if($Tfhka->SendCmd($linea)){
+					$salida = $salida+1;
 				}
 			}
 
+			if($salida===$lines)
+			{
+				$msg = "Factura Impresa correctamente";
+				$status =  $Tfhka->UploadStatus("S1");
+				$invoice_number = sprintf("%08d", $status[2]);
+			}else{
+				$error.= $salida." - ".$lines." - Error enviando archivo, verifique los datos y el estado de la impresora";
+			}
 		}
 		else
 		{
@@ -1597,8 +1606,8 @@ class Sales extends Secure_Controller
 		}
 		else
 		{
-			$this->Sale->update($sale_id,array('sale_fiscalprinter_status' => $action),array());
-			echo json_encode(array('success' => TRUE, 'message' => 'Factura Impresa correctamente', 'id' => $sale_id));
+			$this->Sale->update($sale_id,array('sale_fiscalprinter_status' => $action,'invoice_number' => $invoice_number),array());
+			echo json_encode(array('success' => TRUE, 'message' => $msg, 'id' => $sale_id));
 		}
 
 	}
