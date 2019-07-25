@@ -25,6 +25,19 @@ class Customers extends Persons
 	}
 
 	/*
+	Gives search suggestions based on what is being searched for
+	*/
+	public function get_row_by_dni($dni)
+	{
+		$data_row = $this->Person->get_info_by_dni($dni);
+		foreach(get_object_vars($data_row) as $property => $value)
+		{
+			$data_row->$property = $this->xss_clean($value);
+		}
+		echo json_encode($data_row);
+	}
+
+	/*
 	Gets one row for a customer manage table. This is called using AJAX to update one row.
 	*/
 	public function get_row($row_id)

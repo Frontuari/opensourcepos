@@ -13,7 +13,7 @@ class Person extends CI_Model
 	 *
 	 * @return boolean TRUE if the person exists, FALSE if not
 	 */
-	public function exists($person_id)
+	public function exists_person($person_id)
 	{
 		$this->db->from('people');
 		$this->db->where('people.person_id', $person_id);
@@ -83,6 +83,35 @@ class Person extends CI_Model
 	}
 
 	/**
+	 * Gets information about a person as an array
+	 *
+	 * @param varchar $dni identifier of the person
+	 *
+	 * @return array containing all the fields of the table row
+	 */
+	public function get_info_by_dni($dni)
+	{
+		$query = $this->db->get_where('people', array('dni' => $dni), 1);
+
+		if($query->num_rows() == 1)
+		{
+			return $query->row();
+		}
+		else
+		{
+			//create object with empty properties.
+			$person_obj = new stdClass;
+
+			foreach($this->db->list_fields('people') as $field)
+			{
+				$person_obj->$field = '';
+			}
+
+			return $person_obj;
+		}
+	}
+
+	/**
 	 * Gets information about people as an array of rows
 	 *
 	 * @param array $person_ids array of people identifiers
@@ -109,7 +138,7 @@ class Person extends CI_Model
 	 */
 	public function save(&$person_data, $person_id = FALSE)
 	{
-		if(!$person_id || !$this->exists($person_id))
+		if(!$person_id || !$this->exists_person($person_id))
 		{
 			if($this->db->insert('people', $person_data))
 			{

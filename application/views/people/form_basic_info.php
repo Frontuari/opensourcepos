@@ -66,7 +66,7 @@
 			<span class="input-group-addon input-sm"><span class="glyphicon glyphicon-envelope"></span></span>
 			<?php echo form_input(array(
 					'name'=>'email',
-					'id'=>'email',
+					'id'=>'email_person',
 					'class'=>'form-control input-sm',
 					'value'=>$person_info->email)
 					);?>
@@ -204,6 +204,36 @@ $(document).ready(function()
 		},
 		language : '<?php echo current_language_code();?>',
 		country_codes: '<?php echo $this->config->item('country_codes'); ?>'
+	});
+
+	$('#dni').change(function(){
+		$.ajax({
+			type: 'GET',
+			url: "<?php echo site_url($controller_name.'/get_row_by_dni/"+$(this).val()+"'); ?>",
+			dataType: 'json',
+			success: function(resp){
+	            $('#first_name').val(resp.first_name);
+	            $('#last_name').val(resp.last_name);
+	            if(resp.gender == 1){
+	            	$('#genderM').prop("checked", true);
+	            }else if(resp.gender == 0){
+	            	$('#genderF').prop("checked", true);
+	            }
+	            $('#email_person').val(resp.email);
+	            $('#phone_number').val(resp.phone_number);
+	            $('#address_1').val(resp.address_1);
+	            $('#address_2').val(resp.address_2);
+	            $('#city').val(resp.city);
+	            $('#state').val(resp.state);
+	            $('#zip').val(resp.zip);
+	            $('#country').val(resp.country);
+	            $('#comments').val(resp.comments);
+	            $('form').attr("action","<?php echo site_url($controller_name.'/save/"+resp.person_id+"'); ?>");
+	        },
+	        error: function(jqXHR, textStatus, errorThrown){
+	            console.log(jqXHR);
+	        }
+		});
 	});
 });
 </script>

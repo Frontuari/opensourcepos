@@ -25,6 +25,19 @@ class Suppliers extends Persons
 
 		echo json_encode($data_row);
 	}
+
+	/*
+	Gives search suggestions based on what is being searched for
+	*/
+	public function get_row_by_dni($dni)
+	{
+		$data_row = $this->Person->get_info_by_dni($dni);
+		foreach(get_object_vars($data_row) as $property => $value)
+		{
+			$data_row->$property = $this->xss_clean($value);
+		}
+		echo json_encode($data_row);
+	}
 	
 	/*
 	Returns Supplier table data rows. This will be called with AJAX.
@@ -98,6 +111,7 @@ class Suppliers extends Persons
 		$last_name = $this->nameize($last_name);
 
 		$person_data = array(
+			'dni' => $this->input->post('dni'),
 			'first_name' => $first_name,
 			'last_name' => $last_name,
 			'gender' => $this->input->post('gender'),

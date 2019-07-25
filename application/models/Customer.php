@@ -207,7 +207,7 @@ class Customer extends Person
 			if(!$customer_id || !$this->exists($customer_id))
 			{
 				$this->set_log($this->db->last_query());
-				$customer_data['person_id'] = $person_data['person_id'];
+				$customer_data['person_id'] = (!empty($person_data['person_id']) ? $person_data['person_id'] : $customer_id);
 				$success = $this->db->insert('customers', $customer_data);
 				$this->set_log($this->db->last_query());
 			}

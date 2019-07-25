@@ -107,7 +107,7 @@ class Supplier extends Person
 		{
 			if(!$supplier_id || !$this->exists($supplier_id))
 			{
-				$supplier_data['person_id'] = $person_data['person_id'];
+				$supplier_data['person_id'] = (!empty($person_data['person_id']) ? $person_data['person_id'] : $supplier_id);
 				$success = $this->db->insert('suppliers', $supplier_data);
 			}
 			else
