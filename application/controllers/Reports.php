@@ -13,7 +13,7 @@ class Reports extends Secure_Controller
 
 		if(sizeof($exploder) > 1)
 		{
-			preg_match('/(?:inventory)|([^_.]*)(?:_graph|_row)?$/', $method_name, $matches);
+			preg_match('/(?:inventory)|(?:fiscalprinter)|([^_.]*)(?:_graph|_row)?$/', $method_name, $matches);
 			preg_match('/^(.*?)([sy])?$/', array_pop($matches), $matches);
 			$submodule_id = $matches[1] . ((count($matches) > 2) ? $matches[2] : 's');
 
@@ -126,9 +126,9 @@ class Reports extends Secure_Controller
 				'item' => $row['item'],
 				'dni' => $row['dni'],
 				'name' => $row['name'],
-				'datein' => $row['datein'],
-				'dateout' => $row['dateout'],
-				'duration' => $row['duration']." ".$this->lang->line('common_hours'),
+				'datein' => to_datetime(strtotime($row['datein'])),
+				'dateout' => (!empty($row['dateout']) ? to_datetime(strtotime($row['dateout'])) : ""),
+				'duration' => (!empty($row['duration']) ? $row['duration'] : 0)." ".$this->lang->line('common_hours'),
 				'status' => ($row['status']==0 ? $this->lang->line('customers_status_0') : ($row['status']==1 ? $this->lang->line('customers_status_1') : $this->lang->line('customers_status_2')))
 			));
 		}
@@ -1689,6 +1689,139 @@ class Reports extends Secure_Controller
 		);
 
 		$this->load->view('reports/tabular', $data);
+	}
+
+	public function fiscalprinter_checkprinter()
+	{
+		$this->load->model('Tfhka');
+
+		$Tfhka = $this->Tfhka;
+
+		if($Tfhka->CheckFprinter()){
+			$subtitle = "<div align = 'center'><B>Impresora Disponible</B></div>";
+
+            $out = $Tfhka->ReadFpStatus();
+
+            $subtitle .= "<br><div align = 'center'><B>Estado y Error: ".$out."</B></div>";
+		}
+		else
+		{
+			$subtitle = "<div align = 'center'><B><font color = 'red'>No se pudo conectar con la impresora</font></B></div>";
+		}
+
+		$data = array(
+			'title' => $this->lang->line('reports_fiscalprinter_checkprinter'),
+			'subtitle' => $subtitle
+		);
+
+		$this->load->view('reports/fiscalprinter', $data);
+
+	}
+
+	public function fiscalprinter_statuss1()
+	{
+		$this->load->model('Tfhka');
+
+		$Tfhka = $this->Tfhka;
+
+		if($Tfhka->CheckFprinter()){
+			$out = $Tfhka->UploadStatus("S1");
+			if(!empty($out))
+			{
+				$subtitle = "<div align = 'center'><B>Numero de cajero asignado: ".$out[0]."<br>
+				Total de ventas diarias: ".$out[1]."<br>
+				Número de la última Factura: ".$out[2]."<br>
+				Catidad de Facturas emitidas en el día: ".$out[3]."<br>
+				Número de la última Nota de Débito: ".$out[4]."<br>
+				Cantidad de Notas de Débito emitidas en el día: ".$out[5]."<br>
+				Número de la última Nota de Crédito: ".$out[6]."<br>
+				Cantidad de Notas de Crédito emitidas en el día: ".$out[7]."<br>
+				Núimero del último Documento No Fiscal: ".$out[8]."<br>
+				Cantidad de Documentos No Fiscales emitidos en el día: ".$out[9]."<br>
+				Contador de Reportes de Memoria Fiscal: ".$out[10]."<br>
+				Contador de Cierres Diarios: ".$out[11]."<br>
+				RIF: ".$out[12]."<br>
+				Número de Registro de la Máquina: ".$out[13]."<br>
+				Hora Actual de la impresora: ".$out[14]."<br>
+				Hora Actual de la impresora: ".$out[15]."</B></div>";
+			}
+			else
+			{
+				$subtitle = "<div align = 'center'><B><font color = 'green'>No se pudo imprimir el Reporte solicitado</font></B></div>";
+			}
+		}
+		else
+		{
+			$subtitle = "<div align = 'center'><B><font color = 'red'>No se pudo conectar con la impresora</font></B></div>";
+		}
+
+		$data = array(
+			'title' => $this->lang->line('reports_fiscalprinter_checkprinter'),
+			'subtitle' => $subtitle
+		);
+
+		$this->load->view('reports/fiscalprinter', $data);
+
+	}
+
+	public function fiscalprinter_x()
+	{
+		$this->load->model('Tfhka');
+
+		$Tfhka = $this->Tfhka;
+
+		if($Tfhka->CheckFprinter()){
+			if($Tfhka->PrintXReport())
+			{
+				$subtitle = "<div align = 'center'><B>Reporte Impreso</B></div>";
+			}
+			else
+			{
+				$subtitle = "<div align = 'center'><B><font color = 'green'>No se pudo imprimir el Reporte solicitado</font></B></div>";
+			}
+		}
+		else
+		{
+			$subtitle = "<div align = 'center'><B><font color = 'red'>No se pudo conectar con la impresora</font></B></div>";
+		}
+
+		$data = array(
+			'title' => $this->lang->line('reports_fiscalprinter_checkprinter'),
+			'subtitle' => $subtitle
+		);
+
+		$this->load->view('reports/fiscalprinter', $data);
+
+	}
+
+	public function fiscalprinter_z()
+	{
+		$this->load->model('Tfhka');
+
+		$Tfhka = $this->Tfhka;
+
+		if($Tfhka->CheckFprinter()){
+			if($Tfhka->PrintZReport())
+			{
+				$subtitle = "<div align = 'center'><B>Reporte Impreso</B></div>";
+			}
+			else
+			{
+				$subtitle = "<div align = 'center'><B><font color = 'green'>No se pudo imprimir el Reporte solicitado</font></B></div>";
+			}
+		}
+		else
+		{
+			$subtitle = "<div align = 'center'><B><font color = 'red'>No se pudo conectar con la impresora</font></B></div>";
+		}
+
+		$data = array(
+			'title' => $this->lang->line('reports_fiscalprinter_checkprinter'),
+			'subtitle' => $subtitle
+		);
+
+		$this->load->view('reports/fiscalprinter', $data);
+
 	}
 
 	//	Returns subtitle for the reports

@@ -236,6 +236,7 @@ function get_customer_manage_table_headers()
 		array('first_name' => $CI->lang->line('common_first_name')),
 		array('email' => $CI->lang->line('common_email')),
 		array('phone_number' => $CI->lang->line('common_phone_number')),
+		array('discipline_id' => $CI->lang->line('customers_discipline_id')),
 		array('total' => $CI->lang->line('common_total_spent'), 'sortable' => FALSE)
 	);
 
@@ -290,6 +291,7 @@ function get_customer_data_row($person, $stats)
 		'first_name' => $person->first_name,
 		'email' => empty($person->email) ? '' : mailto($person->email, $person->email),
 		'phone_number' => $person->phone_number,
+		'discipline_id' => $person->discipline,
 		'total' => to_currency($stats->total),
 		'customer_pic' => $image,
 		'messages' => empty($person->phone_number) ? '' : anchor("Messages/view/$person->person_id", '<span class="glyphicon glyphicon-phone"></span>',

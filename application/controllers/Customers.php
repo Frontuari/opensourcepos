@@ -383,11 +383,12 @@ class Customers extends Persons
 		$first_name = $this->nameize($first_name);
 		$last_name = $this->nameize($last_name);
 
-		$duedate_formatter = date_create_from_format($this->config->item('dateformat') . ' ' . $this->config->item('timeformat'), $this->input->post('service_duedate'));
+		$duedate_formatter = date_create_from_format($this->config->item('dateformat'), $this->input->post('service_duedate'));
 
 		$customer_data = array(
 			'discipline_id' => $this->input->post('discipline_id'),
-			'service_duedate' => $duedate_formatter->format('Y-m-d H:i:s'),
+			'is_exhonerated' => $this->input->post('is_exhonerated') != NULL,
+			'service_duedate' => $duedate_formatter->format('Y-m-d'),
 			'employee_id' => $this->input->post('employee_id')
 		);
 

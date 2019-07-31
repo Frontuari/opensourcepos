@@ -262,7 +262,7 @@ class Sales extends Secure_Controller
 
 		$payment_type = $this->input->post('payment_type');
 
-		if($payment_type == $this->lang->line('sales_deposit'))
+		if($payment_type == $this->lang->line('sales_deposit') || $payment_type == $this->lang->line('sales_mobile'))
 		{
 			$this->form_validation->set_rules('bankname', 'lang:sales_bankname', 'trim|required');
 			$this->form_validation->set_rules('referenceno', 'lang:sales_referenceno', 'trim|required');
@@ -282,6 +282,12 @@ class Sales extends Secure_Controller
 			if($payment_type == $this->lang->line('sales_giftcard'))
 			{
 				$data['error'] = $this->lang->line('sales_must_enter_numeric_giftcard');
+			}
+			else if($payment_type == $this->lang->line('sales_deposit') || $payment_type == $this->lang->line('sales_mobile'))
+			{
+				$data['error'] = $this->lang->line('sales_bankname_required');
+				$data['error'] .= "<br>".$this->lang->line('sales_referenceno_required');
+				$data['error'] .= "<br>".$this->lang->line('sales_must_enter_numeric');
 			}
 			else
 			{

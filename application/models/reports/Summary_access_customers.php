@@ -23,7 +23,7 @@ class Summary_access_customers extends Summary_report
 			CONCAT(people.first_name,\' \',people.last_name) AS name,
 			cac.datein,
 			cac.dateout,
-			TIMESTAMPDIFF(HOUR, cac.datein, COALESCE(cac.dateout,CURDATE())) AS duration,
+			TIMESTAMPDIFF(HOUR, cac.datein, cac.dateout) AS duration,
 			cac.status');
 		$this->db->from('customer_access_control AS cac');
 		$this->db->join('customers AS customers', 'cac.customer_id = customers.person_id');
@@ -44,7 +44,11 @@ class Summary_access_customers extends Summary_report
 			$this->db->where('cac.item_id',$inputs['item_id']);
 		}
 
-		return $this->db->get()->result_array();
+		$query = $this->db->get();
+
+		//echo $this->db->last_query();
+
+		return $query->result_array();
 	}
 
 	public function getSummaryData(array $inputs)

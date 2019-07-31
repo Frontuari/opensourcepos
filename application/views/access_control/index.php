@@ -29,6 +29,7 @@
 				<div id="lb_discipline"></div>
 				<div id="lb_duedate"></div>
 				<div id="lb_dateaccess"></div>
+				<div id="lb_exhonerated"></div>
             </div>
             <div class="col-md-6">
 				<br>
@@ -60,31 +61,24 @@ $(document).ready(function()
 			url: "<?php echo site_url('customers/get_status/"+ui.item.value+"'); ?>",
 			dataType: 'json',
 			success: function(resp){
-				console.log(resp);
 				if(resp.length > 0){
-					//	CurDate
-					var now = new Date();
-					var day = ("0" + now.getDate()).slice(-2);
-					var month = ("0" + (now.getMonth() + 1)).slice(-2);
-					var today = (day)+"-"+(month)+"-"+now.getFullYear()+"T"+now.getHours()+":"+now.getMinutes()+":"+now.getSeconds();
-					//	DueDate
-					var duedate = new Date(resp[0].service_duedate);
-					var dueday = ("0" + duedate.getDate()).slice(-2);
-					var duemonth = ("0" + (duedate.getMonth() + 1)).slice(-2);
-					var service_duedate = (dueday)+"-"+(duemonth)+"-"+duedate.getFullYear()+"T"+duedate.getHours()+":"+duedate.getMinutes()+":"+duedate.getSeconds();
 					//	Hidden Fields
 		            $('#customer_id').val(resp[0].id);
-		            $('#dateaccess').val(today);
+		            $('#dateaccess').val(resp[0].today);
 		            $('#status').val(resp[0].status);
 		            $('#item_id').val(resp[0].item_id);
 		            //	V-Card
+		            if(resp[0].is_exhonerated == 1)
+		            {
+		            	$('#lb_exhonerated').html("<b style='color: green;font-size: x-large;'><?php echo $this->lang->line('customers_exhonerated');?></b>");	
+		            }
 		            $('#lb_name').html("<b><?php echo $this->lang->line('common_first_name');?>:</b> "+resp[0].name);
 		            $('#lb_discipline').html("<b><?php echo $this->lang->line('customers_discipline_id');?>:</b> "+resp[0].item_name);
-		            $('#lb_dateaccess').html("<b><?php echo $this->lang->line('common_date');?>:</b> "+today);
-		            $('#lb_duedate').html("<b><?php echo $this->lang->line('customers_service_duedate');?>:</b> "+service_duedate);
+		            $('#lb_dateaccess').html("<b><?php echo $this->lang->line('common_date');?>:</b> "+resp[0].today);
+		            $('#lb_duedate').html("<b><?php echo $this->lang->line('customers_service_duedate');?>:</b> "+resp[0].service_duedate);
 		            $('#lb_dni').html("<b><?php echo $this->lang->line('common_dni');?>:</b> "+resp[0].dni);
 		            var status = (resp[0].status == 0 ? "<?php echo $this->lang->line('customers_status_0');?>" : (resp[0].status == 1 ? "<?php echo $this->lang->line('customers_status_1');?>" : "<?php echo $this->lang->line('customers_status_2');?>"));
-		            var span = (resp[0].status == 0 ? "<span style='font-size: 500%;' class='label label-bs label-danger'>"+status.toUpperCase()+"</span>" : (resp[0].status == 1 ? "<span style='font-size: 500%;' class='label label-bs label-success'>"+status.toUpperCase()+"</span>" : "<span style='font-size: 500%;' class='label label-bs label-warning'>"+status.toUpperCase()+"</span>"));
+		            var span = (resp[0].status == 0 ? "<span style='font-size: 500%;' class='label label-bs label-danger'>"+status.toUpperCase()+"</span>" : (resp[0].status == 1 ? (resp[0].daysplace > 5 ? "<span style='font-size: 500%;' class='label label-bs label-success'>"+status.toUpperCase()+"</span>" : "<span style='font-size: 500%;' class='label label-bs label-warning'>"+status.toUpperCase()+"</span>") : "<span style='font-size: 400%;' class='label label-bs label-warning'>"+status.toUpperCase()+"</span>"));
 		            $('#lb_status').html("<b><?php echo $this->lang->line('common_state');?>:</b> "+span);
 		            if(resp[0].pic_filename.length > 0)
 		            {
@@ -135,6 +129,7 @@ $(document).ready(function()
 	    /* Do something with the response, here we'll just log it to the console */
 	    response = JSON.parse(response);
 	    //	Clear V-Card
+	    $('#lb_exhonerated').html("");
         $('#lb_name').html("");
         $('#lb_dateaccess').html("");
         $('#lb_dni').html("");

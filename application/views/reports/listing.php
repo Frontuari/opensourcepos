@@ -86,6 +86,27 @@ if(isset($error))
 		<?php 
 		}
 		?>
+
+		<?php
+		if ($this->Employee->has_grant('reports_fiscalprinters', $this->session->userdata('person_id')))
+		{
+		?>
+			<div class="panel panel-primary">
+				<div class="panel-heading">
+					<h3 class="panel-title"><span class="glyphicon glyphicon-print">&nbsp</span><?php echo $this->lang->line('reports_fiscalprinter_reports'); ?></h3>
+				</div>
+				<div class="list-group">
+				<?php 
+				show_report('', 'reports_fiscalprinter_checkprinter');
+				show_report('', 'reports_fiscalprinter_statuss1');
+				show_report('', 'reports_fiscalprinter_x');
+				show_report('', 'reports_fiscalprinter_z');
+				?>
+				</div>
+			</div>
+		<?php 
+		}
+		?>
 	</div>
 </div>
 

@@ -264,6 +264,7 @@ function get_payment_options()
 
 	$payments[$lang->line('sales_due')] = $lang->line('sales_due');
 	$payments[$lang->line('sales_deposit')] = $lang->line('sales_deposit');
+	$payments[$lang->line('sales_mobile')] = $lang->line('sales_mobile');
 	$payments[$lang->line('sales_check')] = $lang->line('sales_check');
 
 	// If India (list of country codes include India) then include Unified Payment Interface

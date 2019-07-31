@@ -48,7 +48,7 @@
 									'name'=>'service_duedate',
 									'id'=>'service_duedate',
 									'class'=>'form-control input-sm datepicker',
-									'value'=>to_datetime(strtotime($person_info->service_duedate)))
+									'value'=>to_date(strtotime($person_info->service_duedate)))
 									); ?>
 						</div>
 					</div>
@@ -68,6 +68,12 @@
 					</div>
 				</div>
 
+				<div class="form-group form-group-sm">
+					<?php echo form_label($this->lang->line('customers_is_exhonerated'), 'is_exhonerated', array('class' => 'required control-label col-xs-3')); ?>
+					<div class='col-xs-1'>
+						<?php echo form_checkbox('is_exhonerated', '1', (boolean)$person_info->is_exhonerated); ?>
+					</div>
+				</div>
 
 				<div class="form-group form-group-sm" style="display: <?php echo ($this->config->item('mandatory_password') == 1 ? "block" : "none")?>;">
 					<?php echo form_label($this->lang->line('customers_password_discipline_confirm'), 'password_discipline_confirm', array('class' => 'required control-label col-xs-3')); ?>
@@ -105,34 +111,47 @@
 //validation and submit handling
 $(document).ready(function()
 {
-	<?php $this->load->view('partial/datepicker_locale'); ?>
-
-	$('#service_duedate').datetimepicker({
-		format: "<?php echo dateformat_bootstrap($this->config->item('dateformat')) . ' ' . dateformat_bootstrap($this->config->item('timeformat'));?>",
-		startDate: "<?php echo date($this->config->item('dateformat') . ' ' . $this->config->item('timeformat'), mktime(0, 0, 0, 1, 1, 2010));?>",
-		<?php
-		$t = $this->config->item('timeformat');
-		$m = $t[strlen($t)-1];
-		if( strpos($this->config->item('timeformat'), 'a') !== false || strpos($this->config->item('timeformat'), 'A') !== false )
-		{
-		?>
-			showMeridian: true,
-		<?php
+	// load the preset datarange picker
+	<?php $this->load->view('partial/daterangepicker'); ?>
+    // set the beginning of time as starting date
+    $('#service_duedate').daterangepicker({
+    	singleDatePicker: true,
+    	showDropdowns: true,
+		locale: {
+			format: '<?php echo dateformat_momentjs($this->config->item("dateformat"))?>',
+			separator: ' - ',
+			applyLabel: '<?php echo $this->lang->line("datepicker_apply"); ?>',
+			cancelLabel: '<?php echo $this->lang->line("datepicker_cancel"); ?>',
+			fromLabel: '<?php echo $this->lang->line("datepicker_from"); ?>',
+			toLabel: '<?php echo $this->lang->line("datepicker_to"); ?>',
+			customRangeLabel: '<?php echo $this->lang->line("datepicker_custom"); ?>',
+			daysOfWeek: [
+				'<?php echo $this->lang->line("cal_su"); ?>',
+				'<?php echo $this->lang->line("cal_mo"); ?>',
+				'<?php echo $this->lang->line("cal_tu"); ?>',
+				'<?php echo $this->lang->line("cal_we"); ?>',
+				'<?php echo $this->lang->line("cal_th"); ?>',
+				'<?php echo $this->lang->line("cal_fr"); ?>',
+				'<?php echo $this->lang->line("cal_sa"); ?>',
+				'<?php echo $this->lang->line("cal_su"); ?>'
+			],
+			monthNames: [
+				'<?php echo $this->lang->line("cal_january"); ?>',
+				'<?php echo $this->lang->line("cal_february"); ?>',
+				'<?php echo $this->lang->line("cal_march"); ?>',
+				'<?php echo $this->lang->line("cal_april"); ?>',
+				'<?php echo $this->lang->line("cal_may"); ?>',
+				'<?php echo $this->lang->line("cal_june"); ?>',
+				'<?php echo $this->lang->line("cal_july"); ?>',
+				'<?php echo $this->lang->line("cal_august"); ?>',
+				'<?php echo $this->lang->line("cal_september"); ?>',
+				'<?php echo $this->lang->line("cal_october"); ?>',
+				'<?php echo $this->lang->line("cal_november"); ?>',
+				'<?php echo $this->lang->line("cal_december"); ?>'
+			],
+			firstDay: '<?php echo $this->lang->line("datepicker_weekstart"); ?>'
 		}
-		else
-		{
-		?>
-			showMeridian: false,
-		<?php
-		}
-		?>
-		minuteStep: 1,
-		autoclose: true,
-		todayBtn: true,
-		todayHighlight: true,
-		bootcssVer: 3,
-		language: '<?php echo current_language_code(); ?>'
-	});
+    });
 
 
 	$('#customer_form').validate($.extend({

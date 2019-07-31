@@ -380,7 +380,15 @@ class Sale_lib
 		if(isset($payments[$payment_id]))
 		{
 			//payment_method already exists, add to payment_amount
-			$payments[$payment_id]['payment_amount'] = bcadd($payments[$payment_id]['payment_amount'], $payment_amount);
+			if($payments[$payment_id]['payment_type'] == $this->CI->lang->line('sales_deposit') || $payments[$payment_id]['payment_type'] == $this->CI->lang->line('sales_mobile'))
+			{
+				$payment = array($payment_id => array('payment_type' => $payment_id, 'payment_amount' => $payment_amount, 'cash_refund' => 0, 'bankname' => $bankname, 'referenceno' => $referenceno));
+				array_push($payments,$payment[$payment_id]);
+			}
+			else
+			{
+				$payments[$payment_id]['payment_amount'] = bcadd($payments[$payment_id]['payment_amount'], $payment_amount);	
+			}
 		}
 		else
 		{

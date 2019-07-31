@@ -52,3 +52,9 @@ INSERT INTO `ospos_grants` (`permission_id`, `person_id`, `menu_group`) VALUES (
 -- Cambios 23-07-2019
 
 ALTER TABLE `ospos_sales` ADD `sale_fiscalprinter_status` CHAR(2) NULL DEFAULT NULL AFTER `sale_type`;
+
+-- Cambios 30-07-2019
+
+ALTER TABLE `ospos_customers` ADD `is_exhonerated` TINYINT(1) NULL DEFAULT '0' AFTER `service_duedate`;
+INSERT INTO `ospos_permissions` (`permission_id`, `module_id`, `location_id`) VALUES ('reports_fiscalprinter', 'reports', NULL);
+INSERT INTO `ospos_grants` (`permission_id`, `person_id`, `menu_group`) VALUES ('reports_fiscalprinter', '1', '--');

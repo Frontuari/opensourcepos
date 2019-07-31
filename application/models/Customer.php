@@ -421,19 +421,25 @@ class Customer extends Person
 		{
 			$this->db->select('COUNT(customers.person_id) as count');
 		}
+		else
+		{
+			$this->db->select('customers.*,people.*,items.name AS discipline');
+		}
 
 		$this->db->from('customers AS customers');
-		$this->db->join('people', 'customers.person_id = people.person_id');
+		$this->db->join('people AS people', 'customers.person_id = people.person_id');
+		$this->db->join('items AS items', 'customers.discipline_id = items.item_id','LEFT');
 		$this->db->group_start();
-			$this->db->like('first_name', $search);
-			$this->db->or_like('last_name', $search);
-			$this->db->or_like('email', $search);
-			$this->db->or_like('phone_number', $search);
-			$this->db->or_like('account_number', $search);
-			$this->db->or_like('company_name', $search);
-			$this->db->or_like('CONCAT(first_name, " ", last_name)', $search);
+			$this->db->like('people.first_name', $search);
+			$this->db->or_like('people.last_name', $search);
+			$this->db->or_like('people.dni', $search);
+			$this->db->or_like('people.email', $search);
+			$this->db->or_like('people.phone_number', $search);
+			$this->db->or_like('customers.account_number', $search);
+			$this->db->or_like('customers.company_name', $search);
+			$this->db->or_like('CONCAT(people.first_name, " ", people.last_name)', $search);
 		$this->db->group_end();
-		$this->db->where('deleted', 0);
+		$this->db->where('customers.deleted', 0);
 
 		// get_found_rows case
 		if($count_only == TRUE)
@@ -496,16 +502,25 @@ class Customer extends Person
 			customers.company_name,
 			customers.pic_filename,
 			customers.service_duedate,
+			customers.is_exhonerated,
 			people.phone_number,
-			sales_items_temp.item_id,
+			COALESCE(sales_items_temp.item_id,customers.discipline_id) AS item_id,
 			items.name AS item_name,
+			CURRENT_TIMESTAMP() AS today,
+			DATEDIFF(service_duedate,CURDATE()) AS daysplace,
 			CASE 
-				WHEN (sales.sale_status = ' . COMPLETED . ' AND sales_payments.payment_amount > 0) 
+				WHEN (sales.sale_status = ' . COMPLETED . ' AND sales_payments.transfer_status = ' . PAYMENT_STATUS_CO . ') 
 					THEN 
 					(CASE 
 						WHEN customers.service_duedate IS NOT NULL AND service_duedate>=CURDATE() THEN 1 
 						WHEN customers.service_duedate IS NOT NULL AND service_duedate<CURDATE() THEN 0 
 						ELSE sales_items_temp.status END) 
+				WHEN (sales.sale_status = ' . COMPLETED . ' AND sales_payments.transfer_status = ' . PAYMENT_STATUS_IP . ') 
+					THEN 
+					(CASE 
+						WHEN customers.service_duedate IS NOT NULL AND service_duedate>=CURDATE() THEN 2 
+						WHEN customers.service_duedate IS NOT NULL AND service_duedate<CURDATE() THEN 0 
+						ELSE sales_items_temp.status END)
 				WHEN customers.service_duedate IS NOT NULL AND service_duedate>=CURDATE() THEN 1 
 				WHEN customers.service_duedate IS NOT NULL AND service_duedate<CURDATE() THEN 0 
 				ELSE 2 
@@ -527,11 +542,14 @@ class Customer extends Person
 				'item_id' => $row->item_id, 
 				'dni' => $row->dni, 
 				'gender' => $row->gender, 
-				'item_name' => $row->item_name, 
-				'service_duedate' => $row->service_duedate, 
+				'item_name' => $row->item_name,
+				'is_exhonerated' => $row->is_exhonerated,
+				'daysplace' => $row->daysplace, 
+				'today' => to_datetime(strtotime($row->today)), 
+				'service_duedate' => to_date(strtotime($row->service_duedate)), 
 				'name' => $row->first_name . ' ' . $row->last_name . (!empty($row->company_name) ? ' [' . $row->company_name . ']' : ''). (!empty($row->phone_number) ? ' [' . $row->phone_number . ']' : ''),
 				'pic_filename' => $row->pic_filename, 
-				'status' => $row->status
+				'status' => ($row->is_exhonerated ==0 ? $row->status : 1)
 			);
 
 		}

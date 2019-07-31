@@ -20,18 +20,18 @@ class Access_control extends Secure_Controller
 	public function save()
 	{
 		$customer_id = $this->input->post('customer_id');
-		$dateaccess = $this->input->post('dateaccess');
+		$dateaccess_formatter = date_create_from_format($this->config->item('dateformat'). ' ' .$this->config->item('timeformat'), $this->input->post('dateaccess'));
 		$status = $this->input->post('status');
 		$item_id = $this->input->post('item_id');
 		$insert = FALSE;
 
 		$this->Customer->set_log("<< Start Log >>");
 
-		if(!$this->Customer->exists_access($customer_id,$dateaccess))
+		if(!$this->Customer->exists_access($customer_id,$dateaccess_formatter->format('Y-m-d H:i:s')))
 		{
 			$access_data = array(
 				'customer_id' => $customer_id,
-				'datein' => $dateaccess,
+				'datein' => $dateaccess_formatter->format('Y-m-d H:i:s'),
 				'status' => $status,
 				'item_id' => $item_id
 			);
@@ -41,7 +41,7 @@ class Access_control extends Secure_Controller
 		{
 			$access_data = array(
 				'customer_id' => $customer_id,
-				'dateout' => $dateaccess,
+				'dateout' => $dateaccess_formatter->format('Y-m-d H:i:s'),
 				'status' => $status,
 				'item_id' => $item_id
 			);
@@ -52,6 +52,7 @@ class Access_control extends Secure_Controller
 
 		if($this->Customer->save_access_control($access_data, $customer_id,$insert))
 		{
+			$this->Customer->set_log("<< End Log >>");
 			if($insert)
 			{
 				$response[] = array('success' => TRUE, 'message' => $this->lang->line('customers_insert_access_control'));

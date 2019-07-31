@@ -74,6 +74,8 @@ $route['reports/(inventory_:any)/([^/]+)'] = 'reports/$1/$2';
 $route['reports/inventory_summary'] = 'reports/inventory_summary_input';
 $route['reports/(inventory_summary)/([^/]+)/([^/]+)/([^/]+)'] = 'reports/$1/$2';
 
+$route['reports/(fiscalprinter_:any)/([^/]+)'] = 'reports/$1/$2';
+
 $route['reports/(detailed_sales)/([^/]+)/([^/]+)/([^/]+)'] = 'reports/$1/$2/$3$/$4';
 $route['reports/detailed_sales'] = 'reports/date_input_sales';
 $route['reports/(detailed_receivings)/([^/]+)/([^/]+)/([^/]+)'] = 'reports/$1/$2/$3/$4';
