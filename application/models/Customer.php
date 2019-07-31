@@ -469,6 +469,7 @@ class Customer extends Person
 			' (INDEX(sale_id)) ENGINE=MEMORY
 			(
 				SELECT
+					sales.customer_id,
 					MAX(sales.sale_id) AS sale_id,
 					MAX(sales_items.item_id) AS item_id,
 					MAX(sales.sale_time) AS sale_time,
@@ -491,8 +492,11 @@ class Customer extends Person
 					ON sales_items.item_id = items.item_id
 				WHERE sales.customer_id = ' . $this->db->escape($person_id) . ' 
 				AND items.is_membership = 1 
+				GROUP BY sales.customer_id 
 			)'
 		);
+
+		//echo $this->db->last_query();
 
 		$this->db->select('customers.person_id,
 			people.dni,
@@ -509,18 +513,17 @@ class Customer extends Person
 			CURRENT_TIMESTAMP() AS today,
 			DATEDIFF(service_duedate,CURDATE()) AS daysplace,
 			CASE 
-				WHEN (sales.sale_status = ' . COMPLETED . ' AND sales_payments.transfer_status = ' . PAYMENT_STATUS_CO . ') 
+				WHEN (sales.sale_status = ' . COMPLETED . ')
 					THEN 
 					(CASE 
-						WHEN customers.service_duedate IS NOT NULL AND service_duedate>=CURDATE() THEN 1 
-						WHEN customers.service_duedate IS NOT NULL AND service_duedate<CURDATE() THEN 0 
-						ELSE sales_items_temp.status END) 
-				WHEN (sales.sale_status = ' . COMPLETED . ' AND sales_payments.transfer_status = ' . PAYMENT_STATUS_IP . ') 
-					THEN 
-					(CASE 
-						WHEN customers.service_duedate IS NOT NULL AND service_duedate>=CURDATE() THEN 2 
-						WHEN customers.service_duedate IS NOT NULL AND service_duedate<CURDATE() THEN 0 
-						ELSE sales_items_temp.status END)
+						WHEN sales_payments.transfer_status = ' . PAYMENT_STATUS_CO . ' THEN 
+						(CASE 
+							WHEN customers.service_duedate IS NOT NULL AND service_duedate>=CURDATE() THEN 1 
+							WHEN customers.service_duedate IS NOT NULL AND service_duedate<CURDATE() THEN 0 
+							ELSE sales_items_temp.status END) 
+						WHEN sales_payments.transfer_status = ' . PAYMENT_STATUS_IP . ' THEN 2 
+						WHEN sales_payments.transfer_status = ' . PAYMENT_STATUS_VO . ' THEN 0 
+					END)
 				WHEN customers.service_duedate IS NOT NULL AND service_duedate>=CURDATE() THEN 1 
 				WHEN customers.service_duedate IS NOT NULL AND service_duedate<CURDATE() THEN 0 
 				ELSE 2 
@@ -528,13 +531,14 @@ class Customer extends Person
 
 		$this->db->from('customers AS customers');
 		$this->db->join('people AS people', 'customers.person_id = people.person_id');
-		$this->db->join('sales AS sales','sales.customer_id = customers.person_id','left');
-		$this->db->join('sales_payments AS sales_payments', 'sales.sale_id = sales_payments.sale_id','left');
-		$this->db->join('sales_items_temp AS sales_items_temp', 'sales.sale_id = sales_items_temp.sale_id AND customers.discipline_id = sales_items_temp.item_id','left');
+		$this->db->join('sales_items_temp AS sales_items_temp', 'sales_items_temp.customer_id = customers.person_id AND customers.discipline_id = sales_items_temp.item_id','left');
+		$this->db->join('sales_payments AS sales_payments', 'sales_items_temp.sale_id = sales_payments.sale_id','left');
+		$this->db->join('sales AS sales','sales.sale_id = sales_items_temp.sale_id','left');
 		$this->db->join('items AS items', 'items.item_id = COALESCE(sales_items_temp.item_id,customers.discipline_id)','left');
 		$this->db->where('customers.person_id', $person_id);
 
 		$query = $this->db->get();
+		//echo "<br>".$this->db->last_query();
 		foreach($query->result() as $row)
 		{
 			$suggestions[] = array(
