@@ -73,7 +73,7 @@
 						<?php if( !empty(strstr($row->payment_type, $this->lang->line('sales_giftcard'))) ): ?>
 							<?php echo form_input(array('name'=>'payment_type_'.$i, 'value'=>$row->payment_type, 'id'=>'payment_type_'.$i, 'class'=>'form-control input-sm', 'readonly'=>'true'));?>
 						<?php else: ?>
-							<?php echo form_dropdown('payment_type_'.$i, $payment_options, $row->payment_type, array('id'=>'payment_types_'.$i, 'class'=>'form-control')); ?>
+							<?php echo form_dropdown('payment_type_'.$i, $payment_options, $row->payment_type, array('id'=>'payment_types_'.$i, 'class'=>'form-control', 'onChange' => 'show_detail('.$i.',this.value)')); ?>
 						<?php endif; ?>
 				</div>
 				<div class='col-xs-4'>
@@ -88,18 +88,32 @@
 					</div>
 				</div>
 			</div>
-			<?php if($row->payment_type == $this->lang->line('sales_deposit') && !empty($row->referenceno)): ?>
-			<div class="form-group form-group-sm">
-				<?php echo form_label($this->lang->line('reports_payment_status'), 'payment_status_'.$i, array('class'=>'control-label col-xs-3')); ?>
-				<div class='col-xs-4'>
-					<?php echo form_dropdown('payment_status_'.$i, array(
-						null => $this->lang->line('reports_payment_status_na'),
-						PAYMENT_STATUS_IP => $this->lang->line('reports_payment_status_ip'),
-						PAYMENT_STATUS_CO => $this->lang->line('reports_payment_status_co'),
-						PAYMENT_STATUS_VO => $this->lang->line('reports_payment_status_vo')), $row->transfer_status, array('id'=>'payment_status_'.$i, 'class'=>'form-control')); ?>
+			
+			<div id="payment_detail_<?php echo $i;?>" style="display:<?php echo (($row->payment_type==$this->lang->line('sales_deposit') || $row->payment_type==$this->lang->line('sales_mobile')) ? "block" : "none");?>;">
+				<div class="form-group form-group-sm">
+					<?php echo form_label($this->lang->line('sales_bankname').' / '.$this->lang->line('sales_bankreceptor'), 'bankname_'.$i, array('class'=>'control-label col-xs-3')); ?>
+					<div class='col-xs-4'>
+						<?php echo form_input(array('name'=>'bankname_'.$i, 'value'=>$row->bankname, 'id'=>'bankname_'.$i, 'class'=>'form-control input-sm'));?>
+					</div>
+					<div class='col-xs-4'>
+						<?php echo form_input(array('name'=>'bankreceptor_'.$i, 'value'=>$row->bankreceptor, 'id'=>'bankreceptor_'.$i, 'class'=>'form-control input-sm'));?>
+					</div>
+				</div>
+				
+				<div class="form-group form-group-sm">
+					<?php echo form_label($this->lang->line('sales_referenceno').' / '.$this->lang->line('reports_payment_status'), 'referenceno_'.$i, array('class'=>'control-label col-xs-3')); ?>
+					<div class='col-xs-4'>
+						<?php echo form_input(array('name'=>'referenceno_'.$i, 'value'=>$row->referenceno, 'id'=>'referenceno_'.$i, 'class'=>'form-control input-sm'));?>
+					</div>
+					<div class='col-xs-4'>
+						<?php echo form_dropdown('payment_status_'.$i, array(
+							null => $this->lang->line('reports_payment_status_na'),
+							PAYMENT_STATUS_IP => $this->lang->line('reports_payment_status_ip'),
+							PAYMENT_STATUS_CO => $this->lang->line('reports_payment_status_co'),
+							PAYMENT_STATUS_VO => $this->lang->line('reports_payment_status_vo')), $row->transfer_status, array('id'=>'payment_status_'.$i, 'class'=>'form-control')); ?>
+					</div>
 				</div>
 			</div>
-			<?php endif;?>
 		<?php 
 			++$i;
 		}
@@ -215,4 +229,16 @@ $(document).ready(function()
 		}
 	}, form_support.error));
 });
+
+function show_detail(pos,value)
+{
+	if(value=="<?php echo $this->lang->line('sales_deposit'); ?>" || value=="<?php echo $this->lang->line('sales_mobile'); ?>")
+	{
+		$('#payment_detail_'+pos).show();
+	}
+	else
+	{
+		$('#payment_detail_'+pos).hide();
+	}
+}
 </script>

@@ -108,10 +108,10 @@ class Reports extends Secure_Controller
 	}
 
 	//Summary Access by Item report
-	public function summary_access_customers($start_date, $end_date, $item_id)
+	public function summary_access_customers($start_date, $end_date, $item_id, $customer_id)
 	{
 
-		$inputs = array('start_date' => $start_date, 'end_date' => $end_date, 'item_id' => $item_id);
+		$inputs = array('start_date' => $start_date, 'end_date' => $end_date, 'item_id' => $item_id, 'customer_id' => $customer_id);
 
 		$this->load->model('reports/Summary_access_customers');
 		$model = $this->Summary_access_customers;
@@ -493,9 +493,9 @@ class Reports extends Secure_Controller
 	}
 
 	//Detailed Payments report
-	public function detailed_payments($start_date, $end_date, $sale_type = 'complete', $location_id = 'all', $payment_type)
+	public function detailed_payments($start_date, $end_date, $sale_type = 'complete', $location_id = 'all', $payment_type, $cash_options)
 	{
-		$inputs = array('start_date' => $start_date, 'end_date' => $end_date, 'sale_type' => 'complete', 'location_id' => 'all', 'payment_type' => $payment_type);
+		$inputs = array('start_date' => $start_date, 'end_date' => $end_date, 'sale_type' => 'complete', 'location_id' => 'all', 'payment_type' => $payment_type, 'cash_options' => $cash_options);
 
 		$this->load->model('reports/Detailed_payments');
 		$model = $this->Detailed_payments;
@@ -529,7 +529,8 @@ class Reports extends Secure_Controller
 		}
 
 		$subtitle = $this->_get_subtitle_report(array('start_date' => $start_date, 'end_date' => $end_date));
-		$subtitle.= "<br>".rawurldecode($payment_type);
+		$subtitle.= "<br>".$this->lang->line('sales_payment').": ".(rawurldecode($payment_type) == "all" ? $this->lang->line('reports_all') : rawurldecode($payment_type));
+		$subtitle.= "<br>".$this->lang->line('reports_only_cash').": ".($cash_options == "all" ? $this->lang->line('reports_all') : ($cash_options == "Y" ? $this->lang->line('common_yes') : $this->lang->line('common_no')));
 
 		$data = array(
 			'title' => $this->lang->line('reports_payments_detailed_report'),
@@ -571,6 +572,21 @@ class Reports extends Secure_Controller
 		$item_memberships = $this->xss_clean($this->Item->get_item_memberships());
 		$item_memberships['all'] =  $this->lang->line('reports_all');
 		$data['item_memberships'] = array_reverse($item_memberships, TRUE);
+
+		$data['specific_input_name'] = $this->lang->line('reports_customer');
+		$customers = array();
+		foreach($this->Customer->get_all()->result() as $customer)
+		{
+			if(isset($customer->company_name))
+			{
+				$customers[$customer->person_id] = $this->xss_clean($customer->first_name . ' ' . $customer->last_name. ' ' . ' [ '.$customer->company_name.' ] ');
+			}
+			else
+			{
+				$customers[$customer->person_id] = $this->xss_clean($customer->first_name . ' ' . $customer->last_name);
+			}
+		}
+		$data['specific_input_data'] = $customers;
 		
 		$this->load->view('reports/specific_access_customer_input', $data);
 	}
@@ -583,6 +599,13 @@ class Reports extends Secure_Controller
 		$payment_types = get_payment_options();
 		$payment_types['all'] =  $this->lang->line('reports_all');
 		$data['payment_types'] = array_reverse($payment_types, TRUE);
+
+		$data['cash_options'] = array(
+			'all' => $this->lang->line('reports_all'),
+			'Y' => $this->lang->line('common_yes'),
+			'N' => $this->lang->line('common_no'));
+
+		$data['only_cash'] = TRUE;
 		
 		$this->load->view('reports/date_input', $data);
 	}

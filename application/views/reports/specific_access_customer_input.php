@@ -36,6 +36,13 @@ if(isset($error))
 	}
 	?>
 
+	<div class="form-group form-group-sm" id="report_specific_input_data">
+		<?php echo form_label($specific_input_name, 'specific_input_name_label', array('class'=>'required control-label col-xs-2')); ?>
+		<div class="col-xs-3">
+			<?php echo form_dropdown('specific_input_data', $specific_input_data, '', 'id="specific_input_data" class="form-control selectpicker" data-live-search="true"'); ?>
+		</div>
+	</div>
+
 	<?php
 	echo form_button(array(
 		'name'=>'generate_report',
@@ -55,7 +62,7 @@ $(document).ready(function()
 
 	$("#generate_report").click(function()
 	{		
-		window.location = [window.location, start_date, end_date, $("#item_id").val(), $("#input_type").val() || 0, $("#discount_type_id").val() || 0 ].join("/");
+		window.location = [window.location, start_date, end_date, $("#item_id").val(), $('#specific_input_data').val()].join("/");
 	});
 });
 </script>

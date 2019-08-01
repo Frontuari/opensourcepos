@@ -85,6 +85,7 @@ $lang["reports_low_sell_quantity"] = "Cantidad de Venta Baja";
 $lang["reports_more_than_zero"] = "Mayores a Cero";
 $lang["reports_name"] = "Nombre";
 $lang["reports_no_reports_to_display"] = "No hay artículos que mostrar.";
+$lang["reports_only_cash"] = "Pago de Contado";
 $lang["reports_payment_amount"] = "Monto Pagado";
 $lang["reports_payment_status"] = "Estado del Pago";
 $lang["reports_payment_status_co"] = "Procesada";

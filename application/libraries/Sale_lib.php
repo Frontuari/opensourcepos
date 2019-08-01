@@ -398,8 +398,6 @@ class Sale_lib
 			$payments += $payment;
 		}
 
-		print_r($payments);
-
 		$this->set_payments($payments);
 	}
 

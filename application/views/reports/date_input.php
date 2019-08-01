@@ -103,8 +103,22 @@ if(isset($error))
 	?>
 		<div class="form-group form-group-sm">
 			<?php echo form_label($this->lang->line('sales_payment'), 'payment_type', array('class'=>'required control-label col-xs-2')); ?>
-			<div id='report_item_membership' class="col-xs-3">
+			<div class="col-xs-3">
 				<?php echo form_dropdown('payment_type', $payment_types, 'all', array('id'=>'payment_type', 'class'=>'form-control')); ?>
+			</div>
+		</div>
+	<?php
+	}
+	?>
+
+	<?php	
+	if ($only_cash)
+	{
+	?>
+		<div class="form-group form-group-sm">
+			<?php echo form_label($this->lang->line('reports_only_cash'), 'cash_options', array('class'=>'required control-label col-xs-2')); ?>
+			<div class="col-xs-3">
+				<?php echo form_dropdown('cash_options', $cash_options, 'all', array('id'=>'cash_options', 'class'=>'form-control')); ?>
 			</div>
 		</div>
 	<?php
@@ -130,7 +144,7 @@ $(document).ready(function()
 
 	$("#generate_report").click(function()
 	{		
-		window.location = [window.location, start_date, end_date, $("#input_type").val() || 0, $("#location_id").val(), $("#discount_type_id").val() || 0, $("#item_id").val(), $('#payment_type').val() ].join("/");
+		window.location = [window.location, start_date, end_date, $("#input_type").val() || 0, $("#location_id").val(), $("#discount_type_id").val() || 0, $("#item_id").val(), $('#payment_type').val(), $('#cash_options').val() ].join("/");
 	});
 });
 </script>

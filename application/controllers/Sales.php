@@ -1309,13 +1309,16 @@ class Sales extends Secure_Controller
 			$payment_id = $this->input->post('payment_id_' . $i);
 			$payment_amount = $this->input->post('payment_amount_' . $i);
 			$payment_type = $this->input->post('payment_type_' . $i);
+			$bankname = $this->input->post('bankname_' . $i);
+			$bankreceptor = $this->input->post('bankreceptor_' . $i);
+			$referenceno = $this->input->post('referenceno_' . $i);
 			$transfer_status = $this->input->post('payment_status_' . $i);
 			$cash_refund = 0.00;
 
 			// To maintain tradition we will also delete any payments with 0 amount assuming these are mistakes
 			// introduced at sale time.  This is now done in Sale.php
 
-			$payments[] = array('payment_id' => $payment_id, 'payment_type' => $payment_type, 'payment_amount' => $payment_amount, 'cash_refund' => $cash_refund, 'employee_id' => $employee_id, 'transfer_status' => $transfer_status);
+			$payments[] = array('payment_id' => $payment_id, 'payment_type' => $payment_type, 'payment_amount' => $payment_amount, 'cash_refund' => $cash_refund, 'employee_id' => $employee_id, 'bankname' => $bankname, 'bankreceptor' => $bankreceptor, 'referenceno' => $referenceno, 'transfer_status' => $transfer_status);
 		}
 
 		$payment_id = -1;

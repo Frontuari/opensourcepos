@@ -113,6 +113,27 @@ class Detailed_payments extends Report
 			$this->db->like('sales_items_temp.payment_type', rawurldecode($inputs['payment_type']));
 		}
 
+		if(!empty($inputs['cash_options']) && $inputs['cash_options'] != 'all')
+		{
+			if($inputs['cash_options'] == 'N')
+			{
+				$this->db->group_start();
+				$this->db->where_in('sales_payments.transfer_status', array(PAYMENT_STATUS_IP,PAYMENT_STATUS_VO));
+				$this->db->or_where('sales_payments.payment_type', $this->lang->line('sales_due'));
+				$this->db->group_end();
+			}
+			else
+			{
+				$this->db->group_start();
+				$this->db->group_start();
+				$this->db->where('sales_payments.transfer_status',PAYMENT_STATUS_CO);
+				$this->db->or_where('sales_payments.transfer_status IS NULL',NULL,FALSE);
+				$this->db->group_end();
+				$this->db->where('sales_payments.payment_type != ', $this->lang->line('sales_due'));
+				$this->db->group_end();
+			}
+		}
+
 		$this->db->group_by(array('sales_items_temp.sale_id','sales_payments.payment_type','sales_payments.payment_amount'
 			,'sales_payments.bankname','sales_payments.referenceno','sales_payments.transfer_status'));
 		$this->db->order_by('MAX(sales_items_temp.sale_date)');
@@ -126,8 +147,9 @@ class Detailed_payments extends Report
 
 	public function getSummaryData(array $inputs)
 	{
-		$this->db->select('SUM(subtotal) AS subtotal, SUM(tax) AS tax, SUM(total) AS total');
+		$this->db->select('SUM(sales_payments.payment_amount) AS total');
 		$this->db->from('sales_items_temp');
+		$this->db->join('sales_payments AS sales_payments', 'sales_items_temp.sale_id = sales_payments.sale_id');
 
 		if($inputs['location_id'] != 'all')
 		{
@@ -174,6 +196,27 @@ class Detailed_payments extends Report
 		if(!empty($inputs['payment_type']) && $inputs['payment_type'] != 'all')
 		{
 			$this->db->like('sales_items_temp.payment_type',rawurldecode($inputs['payment_type']));
+		}
+
+		if(!empty($inputs['cash_options']) && $inputs['cash_options'] != 'all')
+		{
+			if($inputs['cash_options'] == 'N')
+			{
+				$this->db->group_start();
+				$this->db->where_in('sales_payments.transfer_status', array(PAYMENT_STATUS_IP,PAYMENT_STATUS_VO));
+				$this->db->or_where('sales_payments.payment_type', $this->lang->line('sales_due'));
+				$this->db->group_end();
+			}
+			else
+			{
+				$this->db->group_start();
+				$this->db->group_start();
+				$this->db->where('sales_payments.transfer_status',PAYMENT_STATUS_CO);
+				$this->db->or_where('sales_payments.transfer_status IS NULL',NULL,FALSE);
+				$this->db->group_end();
+				$this->db->where('sales_payments.payment_type != ', $this->lang->line('sales_due'));
+				$this->db->group_end();
+			}
 		}
 
 		return $this->db->get()->row_array();

@@ -122,7 +122,7 @@ class Sale extends CI_Model
 	{
 		$this->db->select('sales_items.line,
 			COALESCE(sales_items_taxes.percent,0) AS tax,
-			sales_items.item_unit_price AS price,
+			COALESCE(sales_items_taxes.item_tax_amount,sales_items.item_unit_price) AS price,
 			sales_items.quantity_purchased AS quantity,
 			items.item_number AS code,
 			items.name AS description');
@@ -690,7 +690,7 @@ class Sale extends CI_Model
 				'bankname'    	 => $payment['bankname'],
 				'bankreceptor'    	 => $payment['bankreceptor'],
 				'referenceno'    => $payment['referenceno'],
-				'transfer_status'=> (!empty($payment['referenceno']) ? 0 : NULL),
+				'transfer_status'=> (($payment['payment_type'] == $this->lang->line('sales_deposit')) ? 0 : NULL),
 				'employee_id'	 => $employee_id
 			);
 
@@ -937,6 +937,8 @@ class Sale extends CI_Model
 
 		$sale_status = $this->get_sale_status($sale_id);
 
+		$customer = $this->get_customer($sale_id);
+
 		if($update_inventory && $sale_status == COMPLETED)
 		{
 			// defect, not all item deletions will be undone??
@@ -963,6 +965,65 @@ class Sale extends CI_Model
 					// update quantities
 					$this->Item_quantity->change_quantity($item['item_id'], $item['item_location'], $item['quantity_purchased']);
 				}
+
+				//	Update Discipline Customer
+				if($cur_item_info->is_membership == 1 && $customer->person_id != -1)
+				{
+					switch ($cur_item_info->frequency) {
+						case 1:
+							$service_duedate = date('Y-m-d', mktime(0,0,0,date("m"),date("d")-1,date("Y")));
+							break;
+						case 2:
+							if(empty($customer->service_duedate))
+							{
+								$service_duedate = date('Y-m-d', mktime(0,0,0,date("m"),date("d")-7,date("Y")));
+							}
+							else
+							{
+								$service_duedate = date('Y-m-d', strtotime($customer->service_duedate . ' -7 day'));
+							}
+							break;
+						case 3:
+							if(empty($customer->service_duedate))
+							{
+								$service_duedate = date('Y-m-d', mktime(0,0,0,date("m")-1,date("d"),date("Y")));
+							}
+							else
+							{
+								$service_duedate = date('Y-m-d', strtotime($customer->service_duedate . ' -1 month'));
+							}
+							break;
+						case 4:
+							if(empty($customer->service_duedate))
+							{
+								$service_duedate = date('Y-m-d', mktime(0,0,0,date("m")-3,date("d"),date("Y")));
+							}
+							else
+							{
+								$service_duedate = date('Y-m-d', strtotime($customer->service_duedate . ' -3 month'));
+							}
+							break;
+						case 5:
+							if(empty($customer->service_duedate))
+							{
+								$service_duedate = date('Y-m-d', mktime(0,0,0,date("m"),date("d"),date("Y")-1));
+							}
+							else
+							{
+								$service_duedate = date('Y-m-d', strtotime($customer->service_duedate . ' -1 year'));
+							}
+							break;
+					}
+
+					$discipline_data = array(
+						'discipline_id' => $cur_item_info->item_id,
+						'service_duedate' => $service_duedate
+					);
+					//	Save
+					$this->Customer->Save($discipline_data,$customer->person_id); 
+					//echo $this->Customer->get_log();
+				}
+
 			}
 		}
 
