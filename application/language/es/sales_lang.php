@@ -8,6 +8,7 @@ $lang["sales_amount_due"] = "Monto Adeudado";
 $lang["sales_amount_tendered"] = "Cantidad Recibida";
 $lang["sales_authorized_signature"] = "Firma Autorizada";
 $lang["sales_bankname"] = "Banco";
+$lang["sales_bankreceptor"] = "Banco Receptor";
 $lang["sales_bankname_required"] = "Banco es un campo requerido";
 $lang["sales_cancel_sale"] = "Cancelar Venta";
 $lang["sales_cash"] = "Efectivo";

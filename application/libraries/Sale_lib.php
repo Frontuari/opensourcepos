@@ -374,7 +374,7 @@ class Sale_lib
 	}
 
 	// Multiple Payments
-	public function add_payment($payment_id, $payment_amount, $bankname = FALSE, $referenceno = FALSE)
+	public function add_payment($payment_id, $payment_amount, $bankname = FALSE, $bankreceptor = FALSE, $referenceno = FALSE)
 	{
 		$payments = $this->get_payments();
 		if(isset($payments[$payment_id]))
@@ -382,7 +382,7 @@ class Sale_lib
 			//payment_method already exists, add to payment_amount
 			if($payments[$payment_id]['payment_type'] == $this->CI->lang->line('sales_deposit') || $payments[$payment_id]['payment_type'] == $this->CI->lang->line('sales_mobile'))
 			{
-				$payment = array($payment_id => array('payment_type' => $payment_id, 'payment_amount' => $payment_amount, 'cash_refund' => 0, 'bankname' => $bankname, 'referenceno' => $referenceno));
+				$payment = array($payment_id => array('payment_type' => $payment_id, 'payment_amount' => $payment_amount, 'cash_refund' => 0, 'bankname' => $bankname, 'bankreceptor' => $bankreceptor, 'referenceno' => $referenceno));
 				array_push($payments,$payment[$payment_id]);
 			}
 			else
@@ -393,10 +393,12 @@ class Sale_lib
 		else
 		{
 			//add to existing array
-			$payment = array($payment_id => array('payment_type' => $payment_id, 'payment_amount' => $payment_amount, 'cash_refund' => 0, 'bankname' => $bankname, 'referenceno' => $referenceno));
+			$payment = array($payment_id => array('payment_type' => $payment_id, 'payment_amount' => $payment_amount, 'cash_refund' => 0, 'bankname' => $bankname, 'bankreceptor' => $bankreceptor, 'referenceno' => $referenceno));
 
 			$payments += $payment;
 		}
+
+		print_r($payments);
 
 		$this->set_payments($payments);
 	}

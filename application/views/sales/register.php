@@ -471,6 +471,12 @@ if(isset($success))
 									<?php echo form_input(array('name'=>'bankname', 'id'=>'bankname', 'class'=>'form-control input-sm non-giftcard-input', 'size'=>'5', 'tabindex'=>++$tabindex)); ?>
 								</td>
 							</tr>
+							<tr id="bankreceptor_row" style="display: none;">
+								<td><span id="bankreceptor_label"><?php echo $this->lang->line('sales_bankreceptor'); ?></span></td>
+								<td>
+									<?php echo form_input(array('name'=>'bankreceptor', 'id'=>'bankreceptor', 'class'=>'form-control input-sm non-giftcard-input', 'size'=>'5', 'tabindex'=>++$tabindex)); ?>
+								</td>
+							</tr>
 							<tr id="referenceno_row" style="display: none;">
 								<td><span id="referenceno_label"><?php echo $this->lang->line('sales_referenceno'); ?></span></td>
 								<td>
@@ -523,6 +529,12 @@ if(isset($success))
 									<?php echo form_input(array('name'=>'bankname', 'id'=>'bankname', 'class'=>'form-control input-sm non-giftcard-input', 'size'=>'5', 'tabindex'=>++$tabindex)); ?>
 								</td>
 							</tr>
+							<tr id="bankreceptor_row" style="display: none;">
+								<td><span id="bankreceptor_label"><?php echo $this->lang->line('sales_bankreceptor'); ?></span></td>
+								<td>
+									<?php echo form_input(array('name'=>'bankreceptor', 'id'=>'bankreceptor', 'class'=>'form-control input-sm non-giftcard-input', 'size'=>'5', 'tabindex'=>++$tabindex)); ?>
+								</td>
+							</tr>
 							<tr id="referenceno_row" style="display: none;">
 								<td><span id="referenceno_label"><?php echo $this->lang->line('sales_referenceno'); ?></span></td>
 								<td>
@@ -555,6 +567,7 @@ if(isset($success))
 								<th style="width: 5%;"><?php echo $this->lang->line('common_delete'); ?></th>
 								<th style="width: 50%;"><?php echo $this->lang->line('sales_payment_type'); ?></th>
 								<th style="width: 15%;"><?php echo $this->lang->line('sales_bankname'); ?></th>
+								<th style="width: 15%;"><?php echo $this->lang->line('sales_bankreceptor'); ?></th>
 								<th style="width: 15%;"><?php echo $this->lang->line('sales_referenceno'); ?></th>
 								<th style="width: 15%;"><?php echo $this->lang->line('sales_payment_amount'); ?></th>
 							</tr>
@@ -569,6 +582,7 @@ if(isset($success))
 									<td><?php echo anchor($controller_name."/delete_payment/$payment_id", '<span class="glyphicon glyphicon-trash"></span>'); ?></td>
 									<td><?php echo $payment['payment_type']; ?></td>
 									<td><?php echo $payment['bankname']; ?></td>
+									<td><?php echo $payment['bankreceptor']; ?></td>
 									<td><?php echo $payment['referenceno']; ?></td>
 									<td style="text-align: right;"><?php echo to_currency( $payment['payment_amount'] ); ?></td>
 								</tr>
@@ -957,6 +971,7 @@ function check_payment_type()
 	if($("#payment_types").val() == "<?php echo $this->lang->line('sales_giftcard'); ?>")
 	{
 		$('#bankname_row').hide();
+		$('#bankreceptor_row').hide();
 		$('#referenceno_row').hide();
 		$("#sale_total").html("<?php echo to_currency($total); ?>");
 		$("#sale_amount_due").html("<?php echo to_currency($amount_due); ?>");
@@ -969,6 +984,7 @@ function check_payment_type()
 	else if($("#payment_types").val() == "<?php echo $this->lang->line('sales_cash'); ?>" && cash_rounding)
 	{
 		$('#bankname_row').hide();
+		$('#bankreceptor_row').hide();
 		$('#referenceno_row').hide();
 		$("#sale_total").html("<?php echo to_currency($cash_total); ?>");
 		$("#sale_amount_due").html("<?php echo to_currency($cash_amount_due); ?>");
@@ -980,6 +996,7 @@ function check_payment_type()
 	else if($("#payment_types").val() == "<?php echo $this->lang->line('sales_deposit'); ?>")
 	{
 		$('#bankname_row').show();
+		$('#bankreceptor_row').show();
 		$('#referenceno_row').show();
 		$("#sale_total").html("<?php echo to_currency($non_cash_total); ?>");
 		$("#sale_amount_due").html("<?php echo to_currency($non_cash_amount_due); ?>");
@@ -991,6 +1008,7 @@ function check_payment_type()
 	else if($("#payment_types").val() == "<?php echo $this->lang->line('sales_mobile'); ?>")
 	{
 		$('#bankname_row').show();
+		$('#bankreceptor_row').show();
 		$('#referenceno_row').show();
 		$("#sale_total").html("<?php echo to_currency($non_cash_total); ?>");
 		$("#sale_amount_due").html("<?php echo to_currency($non_cash_amount_due); ?>");
@@ -1002,6 +1020,7 @@ function check_payment_type()
 	else
 	{
 		$('#bankname_row').hide();
+		$('#bankreceptor_row').hide();
 		$('#referenceno_row').hide();
 		$("#sale_total").html("<?php echo to_currency($non_cash_total); ?>");
 		$("#sale_amount_due").html("<?php echo to_currency($non_cash_amount_due); ?>");

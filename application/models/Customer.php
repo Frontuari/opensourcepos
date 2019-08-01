@@ -516,13 +516,13 @@ class Customer extends Person
 				WHEN (sales.sale_status = ' . COMPLETED . ')
 					THEN 
 					(CASE 
-						WHEN sales_payments.transfer_status = ' . PAYMENT_STATUS_CO . ' THEN 
+						WHEN sales_payments.payment_type = \'' . $this->lang->line('sales_deposit') . '\' AND sales_payments.transfer_status = ' . PAYMENT_STATUS_CO . ' THEN 
 						(CASE 
 							WHEN customers.service_duedate IS NOT NULL AND service_duedate>=CURDATE() THEN 1 
 							WHEN customers.service_duedate IS NOT NULL AND service_duedate<CURDATE() THEN 0 
 							ELSE sales_items_temp.status END) 
-						WHEN sales_payments.transfer_status = ' . PAYMENT_STATUS_IP . ' THEN 2 
-						WHEN sales_payments.transfer_status = ' . PAYMENT_STATUS_VO . ' THEN 0 
+						WHEN sales_payments.payment_type = \'' . $this->lang->line('sales_deposit') . '\' AND sales_payments.transfer_status = ' . PAYMENT_STATUS_IP . ' THEN 2 
+						WHEN sales_payments.payment_type = \'' . $this->lang->line('sales_deposit') . '\' AND sales_payments.transfer_status = ' . PAYMENT_STATUS_VO . ' THEN 0 
 					END)
 				WHEN customers.service_duedate IS NOT NULL AND service_duedate>=CURDATE() THEN 1 
 				WHEN customers.service_duedate IS NOT NULL AND service_duedate<CURDATE() THEN 0 

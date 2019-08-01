@@ -363,8 +363,9 @@ class Sales extends Secure_Controller
 			{
 				$amount_tendered = $this->input->post('amount_tendered');
 				$bankname = $this->input->post('bankname');
+				$bankreceptor = $this->input->post('bankreceptor');
 				$referenceno = $this->input->post('referenceno');
-				$this->sale_lib->add_payment($payment_type, $amount_tendered,$bankname,$referenceno);
+				$this->sale_lib->add_payment($payment_type, $amount_tendered,$bankname,$bankreceptor,$referenceno);
 			}
 		}
 

@@ -9,6 +9,7 @@ $lang["sales_amount_due"] = "Amount Due";
 $lang["sales_amount_tendered"] = "Amount Tendered";
 $lang["sales_authorized_signature"] = "Authorized Signature";
 $lang["sales_bankname"] = "Bank";
+$lang["sales_bankreceptor"] = "Bank Receipt";
 $lang["sales_bankname_required"] = "Bank is a field required.";
 $lang["sales_cancel_sale"] = "Cancel";
 $lang["sales_cash"] = "Cash";

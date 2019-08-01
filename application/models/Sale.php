@@ -688,6 +688,7 @@ class Sale extends CI_Model
 				'payment_amount' => $payment['payment_amount'],
 				'cash_refund'    => $payment['cash_refund'],
 				'bankname'    	 => $payment['bankname'],
+				'bankreceptor'    	 => $payment['bankreceptor'],
 				'referenceno'    => $payment['referenceno'],
 				'transfer_status'=> (!empty($payment['referenceno']) ? 0 : NULL),
 				'employee_id'	 => $employee_id
@@ -763,54 +764,56 @@ class Sale extends CI_Model
 			{
 				switch ($cur_item_info->frequency) {
 					case 1:
-						$service_duedate = date('Y-m-d H:i:s', mktime(0,0,0,date("m"),date("d"),date("Y")));
+						$service_duedate = date('Y-m-d', mktime(0,0,0,date("m"),date("d"),date("Y")));
 						break;
 					case 2:
 						if(empty($customer->service_duedate))
 						{
-							$service_duedate = date('Y-m-d H:i:s', mktime(0,0,0,date("m"),date("d")+7,date("Y")));
+							$service_duedate = date('Y-m-d', mktime(0,0,0,date("m"),date("d")+7,date("Y")));
 						}
 						else
 						{
-							$service_duedate = date('Y-m-d H:i:s', strtotime($customer->service_duedate . ' +7 day'));
+							$service_duedate = date('Y-m-d', strtotime($customer->service_duedate . ' +7 day'));
 						}
 						break;
 					case 3:
 						if(empty($customer->service_duedate))
 						{
-							$service_duedate = date('Y-m-d H:i:s', mktime(0,0,0,date("m")+1,date("d"),date("Y")));
+							$service_duedate = date('Y-m-d', mktime(0,0,0,date("m")+1,date("d"),date("Y")));
 						}
 						else
 						{
-							$service_duedate = date('Y-m-d H:i:s', strtotime($customer->service_duedate . ' +1 month'));
+							$service_duedate = date('Y-m-d', strtotime($customer->service_duedate . ' +1 month'));
 						}
 						break;
 					case 4:
 						if(empty($customer->service_duedate))
 						{
-							$service_duedate = date('Y-m-d H:i:s', mktime(0,0,0,date("m")+3,date("d"),date("Y")));
+							$service_duedate = date('Y-m-d', mktime(0,0,0,date("m")+3,date("d"),date("Y")));
 						}
 						else
 						{
-							$service_duedate = date('Y-m-d H:i:s', strtotime($customer->service_duedate . ' +3 month'));
+							$service_duedate = date('Y-m-d', strtotime($customer->service_duedate . ' +3 month'));
 						}
 						break;
 					case 5:
 						if(empty($customer->service_duedate))
 						{
-							$service_duedate = date('Y-m-d H:i:s', mktime(0,0,0,date("m"),date("d"),date("Y")+1));
+							$service_duedate = date('Y-m-d', mktime(0,0,0,date("m"),date("d"),date("Y")+1));
 						}
 						else
 						{
-							$service_duedate = date('Y-m-d H:i:s', strtotime($customer->service_duedate . ' +1 year'));
+							$service_duedate = date('Y-m-d', strtotime($customer->service_duedate . ' +1 year'));
 						}
 						break;
 				}
+
 				$discipline_data = array(
 					'discipline_id' => $cur_item_info->item_id,
-					'service_duedate' => (($customer->service_duedate != NULL && $customer->service_duedate < $service_duedate) ? $service_duedate : $customer->service_duedate));
+					'service_duedate' => (empty($customer->service_duedate) ? $service_duedate : ((!empty($customer->service_duedate) && $customer->service_duedate < $service_duedate) ? $service_duedate : $customer->service_duedate))
+				);
 				//	Save
-				$this->Customer->Save($discipline_data,$customer_id);
+				$this->Customer->Save($discipline_data,$customer_id); 
 			}
 		}
 

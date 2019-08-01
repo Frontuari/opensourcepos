@@ -58,3 +58,5 @@ ALTER TABLE `ospos_sales` ADD `sale_fiscalprinter_status` CHAR(2) NULL DEFAULT N
 ALTER TABLE `ospos_customers` ADD `is_exhonerated` TINYINT(1) NULL DEFAULT '0' AFTER `service_duedate`;
 INSERT INTO `ospos_permissions` (`permission_id`, `module_id`, `location_id`) VALUES ('reports_fiscalprinters', 'reports', NULL);
 INSERT INTO `ospos_grants` (`permission_id`, `person_id`, `menu_group`) VALUES ('reports_fiscalprinters', '1', '--');
+
+ALTER TABLE `ospos_sales_payments` ADD `bankreceptor` VARCHAR(255) NULL DEFAULT NULL AFTER `bankname`;
