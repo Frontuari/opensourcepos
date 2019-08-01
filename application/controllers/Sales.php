@@ -1532,94 +1532,108 @@ class Sales extends Secure_Controller
 		return NULL;
 	}
 
+	function view_fiscal_printer($sale_id,$action)
+	{
+		$data['sale_id'] = $sale_id;
+		$data['action'] = $action;
+
+		$this->load->view("sales/printer", $data);
+	}
+
 	function fiscal_printer($sale_id,$action = "I")
 	{
-		$this->load->model('Tfhka');
-
-		$Tfhka = $this->Tfhka;
-
-		$error = "";
-
-		$sale_info = $this->Sale->get_info($sale_id)->row();
-		// check printer
-		if($Tfhka->CheckFprinter())
+		if($this->input->post('confirm')=="Y")
 		{
-			$lines = 0;
-			$filename = ($action=="I" ? "Invoice.txt" : ($action=="NC" ? "CreditNote.txt" : "DebitNote.txt"));
-			$invoice = array();
-			//	Send Customer Data
-			if(!empty($sale_info->customer_id))
+			$this->load->model('Tfhka');
+
+			$Tfhka = $this->Tfhka;
+
+			$error = "";
+
+			$sale_info = $this->Sale->get_info($sale_id)->row();
+			// check printer
+			if($Tfhka->CheckFprinter())
 			{
-				$customer = $this->Customer->get_info($sale_info->customer_id);
-				array_push($invoice,transform_cmd_fiscal_printer(array((!empty($customer->company_name) ? $customer->company_name."\n" : $customer->first_name." ".$customer->last_name."\n")),'RS'));
-				array_push($invoice,transform_cmd_fiscal_printer(array($customer->dni."\n"),'RIF'));
-			}
-			if($action == "NC" || $action == "ND")
-			{
-				array_push($invoice,transform_cmd_fiscal_printer(array($sale_info->invoice_number),'AI'));
-				array_push($invoice,transform_cmd_fiscal_printer(array($sale_info->sale_date),'DI'));
-				array_push($invoice,transform_cmd_fiscal_printer(array($this->config->item('remote_fiscal_printer_serial')),'FP'));
-			}
-			//	Send Comment
-			if(!empty($sale_info->comment))
-			{
-				array_push($invoice,array($i => transform_cmd_fiscal_printer(array(($action == "I" ? "@" : ($action == "NC" ? "A" : "B")),"## ".$sale_info->comment." ##"."\n"),'CM','00')));
-			}
-			//	Send Producto Data
-			$item_sales_info = $this->Sale->get_items_info($sale_id);
+				$lines = 0;
+				$filename = ($action=="I" ? "Invoice.txt" : ($action=="NC" ? "CreditNote.txt" : "DebitNote.txt"));
+				$invoice = array();
+				//	Send Customer Data
+				if(!empty($sale_info->customer_id))
+				{
+					$customer = $this->Customer->get_info($sale_info->customer_id);
+					array_push($invoice,transform_cmd_fiscal_printer(array((!empty($customer->company_name) ? $customer->company_name."\n" : $customer->first_name." ".$customer->last_name."\n")),'RS'));
+					array_push($invoice,transform_cmd_fiscal_printer(array($customer->dni."\n"),'RIF'));
+				}
+				if($action == "NC" || $action == "ND")
+				{
+					array_push($invoice,transform_cmd_fiscal_printer(array($sale_info->invoice_number),'AI'));
+					array_push($invoice,transform_cmd_fiscal_printer(array($sale_info->sale_date),'DI'));
+					array_push($invoice,transform_cmd_fiscal_printer(array($this->config->item('remote_fiscal_printer_serial')),'FP'));
+				}
+				//	Send Comment
+				if(!empty($sale_info->comment))
+				{
+					array_push($invoice,array($i => transform_cmd_fiscal_printer(array(($action == "I" ? "@" : ($action == "NC" ? "A" : "B")),"## ".$sale_info->comment." ##"."\n"),'CM','00')));
+				}
+				//	Send Producto Data
+				$item_sales_info = $this->Sale->get_items_info($sale_id);
 
-			$type_cmd = ($action == "I" ? "PR" : ($action == "NC" ? "NCPR" : "NDPR"));
+				$type_cmd = ($action == "I" ? "PR" : ($action == "NC" ? "NCPR" : "NDPR"));
 
-			foreach ($item_sales_info->result() as $items) {
-				array_push($invoice,transform_cmd_fiscal_printer(array($items->tax,$items->price,$items->quantity,$items->code,$items->description."\n"),$type_cmd));
-			}
+				foreach ($item_sales_info->result() as $items) {
+					array_push($invoice,transform_cmd_fiscal_printer(array($items->tax,$items->price,$items->quantity,$items->code,$items->description."\n"),$type_cmd));
+				}
 
-			$fp = fopen($filename, "w+");
-			$write = fputs($fp, "");
+				$fp = fopen($filename, "w+");
+				$write = fputs($fp, "");
 
-			foreach($invoice as $campo => $cmd)
-			{
-				$write = fputs($fp, $cmd);
-				$lines++;
-			}
-			$write = fputs($fp, "101");
-			$lines ++;
+				foreach($invoice as $campo => $cmd)
+				{
+					$write = fputs($fp, $cmd);
+					$lines++;
+				}
+				$write = fputs($fp, "101");
+				$lines ++;
 
-			fclose($fp);
-            
-			$salida = 0;
-			//	SendFileCmd
-			$lineas = file($filename);
-			foreach($lineas as $num_linea => $linea){
-				if($Tfhka->SendCmd($linea)){
-					$salida = $salida+1;
+				fclose($fp);
+	            
+				$salida = 0;
+				//	SendFileCmd
+				$lineas = file($filename);
+				foreach($lineas as $num_linea => $linea){
+					if($Tfhka->SendCmd($linea)){
+						$salida = $salida+1;
+					}
+				}
+
+				if($salida===$lines)
+				{
+					$status =  $Tfhka->UploadStatus("S1");
+					$invoice_number = sprintf("%08d", $status[2]);
+					$this->Sale->update($sale_id,array('sale_fiscalprinter_status' => $action,'invoice_number' => $invoice_number),array());
+					$msg = "Factura ".$invoice_number." Impresa correctamente";
+				}else{
+					$error.= $salida." - ".$lines." - Error enviando archivo, verifique los datos y el estado de la impresora";
 				}
 			}
-
-			if($salida===$lines)
+			else
 			{
-				$msg = "Factura Impresa correctamente";
-				$status =  $Tfhka->UploadStatus("S1");
-				$invoice_number = sprintf("%08d", $status[2]);
-			}else{
-				$error.= $salida." - ".$lines." - Error enviando archivo, verifique los datos y el estado de la impresora";
+				$error = $Tfhka->log;
+			}
+
+			if(!empty($error))
+			{
+				echo json_encode(array('success' => FALSE, 'message' => $error, 'id' => $sale_id));
+			}
+			else
+			{
+				echo json_encode(array('success' => TRUE, 'message' => $msg, 'id' => $sale_id));
 			}
 		}
 		else
 		{
-			$error = $Tfhka->log;
+			echo json_encode(array('success' => TRUE, 'message' => "No se imprimió el documento", 'id' => $sale_id));
 		}
-
-		if(!empty($error))
-		{
-			echo json_encode(array('success' => FALSE, 'message' => $error, 'id' => $sale_id));
-		}
-		else
-		{
-			$this->Sale->update($sale_id,array('sale_fiscalprinter_status' => $action,'invoice_number' => $invoice_number),array());
-			echo json_encode(array('success' => TRUE, 'message' => $msg, 'id' => $sale_id));
-		}
-
 	}
 }
 ?>

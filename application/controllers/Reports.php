@@ -1397,7 +1397,7 @@ class Reports extends Secure_Controller
 			'payment_type' => $report_data['payment_type'],
 			'comment' => $report_data['comment'],
 			'fiscal_printer' => anchor('sales/fiscal_printer/'. $report_data['sale_id'].$type_printer, $layaout_printer,
-				array('title' => $this->lang->line('common_print'))),
+				array('class'=>'modal-dlg print_hide', $button_key => $button_label, 'data-btn-submit' => $this->lang->line('common_submit'), 'title' => $this->lang->line('common_print'))),
 			'edit' => anchor('sales/edit/'. $report_data['sale_id'], '<span class="glyphicon glyphicon-edit"></span>',
 				array('class'=>'modal-dlg print_hide', $button_key => $button_label, 'data-btn-submit' => $this->lang->line('common_submit'), 'title' => $this->lang->line('sales_update')))
 		));
@@ -1477,8 +1477,8 @@ class Reports extends Secure_Controller
 				'profit' => to_currency($row['profit']),
 				'payment_type' => $row['payment_type'],
 				'comment' => $row['comment'],
-				'fiscal_printer' => anchor('sales/fiscal_printer/'. $row['sale_id'].$type_printer, $layaout_printer,
-					array('title' => $this->lang->line('common_print'))),
+				'fiscal_printer' => anchor('sales/view_fiscal_printer/'. $row['sale_id'].$type_printer, $layaout_printer,
+					array('class'=>'modal-dlg print_hide', 'data-btn-submit' => $this->lang->line('common_print'), 'title' => $this->lang->line('common_print'))),
 				'edit' => anchor('sales/edit/'.$row['sale_id'], '<span class="glyphicon glyphicon-edit"></span>',
 					array('class' => 'modal-dlg print_hide', $button_key => $button_label, 'data-btn-submit' => $this->lang->line('common_submit'), 'title' => $this->lang->line('sales_update')))
 			));
