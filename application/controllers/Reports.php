@@ -520,6 +520,7 @@ class Reports extends Secure_Controller
 				'payment_type' => $row['payment_type'],
 				'payment_amount' => to_currency($row['payment_amount']),
 				'bankname' => $row['bankname'],
+				'bankreceptor' => $row['bankreceptor'],
 				'referenceno' => $row['referenceno'],
 				'transfer_status' => strtoupper($row['transfer_status']),
 				'edit' => anchor('sales/edit/'.$row['sale_id'], '<span class="glyphicon glyphicon-edit"></span>',

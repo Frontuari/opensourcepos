@@ -25,6 +25,7 @@ class Detailed_payments extends Report
 				array('payment_type' => $this->lang->line('reports_payment_type'), 'sorter' => 'number_sorter'),
 				array('payment_amount' => $this->lang->line('reports_payment_amount')),
 				array('bankname' => $this->lang->line('sales_bankname'), 'sorter' => 'number_sorter'),
+				array('bankreceptor' => $this->lang->line('sales_bankreceptor'), 'sorter' => 'number_sorter'),
 				array('referenceno' => $this->lang->line('sales_referenceno'), 'sorter' => 'number_sorter'),
 				array('transfer_status' => $this->lang->line('reports_payment_status'), 'sorter' => 'number_sorter')
 			)
@@ -53,6 +54,7 @@ class Detailed_payments extends Report
 			sales_payments.payment_type,
 			sales_payments.payment_amount,
 			sales_payments.bankname,
+			sales_payments.bankreceptor,
 			sales_payments.referenceno,
 			CASE 
 				WHEN sales_payments.payment_type = \''. $this->lang->line('sales_deposit') .'\' AND sales_payments.transfer_status = '. PAYMENT_STATUS_IP .' THEN \'' . $this->lang->line('reports_payment_status_ip') . '\'

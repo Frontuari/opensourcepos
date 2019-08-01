@@ -237,6 +237,8 @@ function get_customer_manage_table_headers()
 		array('email' => $CI->lang->line('common_email')),
 		array('phone_number' => $CI->lang->line('common_phone_number')),
 		array('discipline_id' => $CI->lang->line('customers_discipline_id')),
+		array('service_duedate' => $CI->lang->line('customers_service_duedate')),
+		array('is_exhonerated' => $CI->lang->line('customers_is_exhonerated')),
 		array('total' => $CI->lang->line('common_total_spent'), 'sortable' => FALSE)
 	);
 
@@ -292,6 +294,8 @@ function get_customer_data_row($person, $stats)
 		'email' => empty($person->email) ? '' : mailto($person->email, $person->email),
 		'phone_number' => $person->phone_number,
 		'discipline_id' => $person->discipline,
+		'service_duedate' => to_date(strtotime($person->service_duedate)),
+		'is_exhonerated' => ($person->is_exhonerated == 1 ? $CI->lang->line('common_yes') : $CI->lang->line('common_no')),
 		'total' => to_currency($stats->total),
 		'customer_pic' => $image,
 		'messages' => empty($person->phone_number) ? '' : anchor("Messages/view/$person->person_id", '<span class="glyphicon glyphicon-phone"></span>',
