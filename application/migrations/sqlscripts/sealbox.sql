@@ -85,3 +85,9 @@ ALTER TABLE `ospos_items` ADD `is_rehabilitationservice` TINYINT(1) NULL DEFAULT
 
 ALTER TABLE `ospos_customers` ADD `rif` VARCHAR(20) NULL DEFAULT NULL AFTER `company_name`;
 ALTER TABLE `ospos_customers` ADD `rehabilitation_id` INT(10) NULL DEFAULT NULL AFTER `discipline_id`, ADD `onhand` INT(10) NULL DEFAULT NULL AFTER `rehabilitation_id`, ADD `used` INT(10) NULL DEFAULT NULL AFTER `onhand`;
+
+-- Cambios 02-08-2019 
+
+ALTER TABLE `ospos_expenses` 
+	ADD `invoiceno` VARCHAR(255) NULL DEFAULT NULL AFTER `supplier_id`, 
+	ADD `referenceno` VARCHAR(255) NULL DEFAULT NULL AFTER `invoiceno`;

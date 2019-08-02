@@ -47,6 +47,30 @@
 		</div>
 
 		<div class="form-group form-group-sm">
+			<?php echo form_label($this->lang->line('expenses_invoiceno'), 'invoiceno', array('class'=>'control-label col-xs-3')); ?>
+			<div class='col-xs-6'>
+				<?php echo form_input(array(
+						'name'=>'invoiceno',
+						'id'=>'invoiceno',
+						'class'=>'form-control input-sm',
+						'value'=>$expenses_info->invoiceno)
+						);?>
+			</div>
+		</div>
+
+		<div class="form-group form-group-sm">
+			<?php echo form_label($this->lang->line('expenses_referenceno'), 'referenceno', array('class'=>'control-label col-xs-3')); ?>
+			<div class='col-xs-6'>
+				<?php echo form_input(array(
+						'name'=>'referenceno',
+						'id'=>'referenceno',
+						'class'=>'form-control input-sm',
+						'value'=>$expenses_info->referenceno)
+						);?>
+			</div>
+		</div>
+
+		<div class="form-group form-group-sm">
 			<?php echo form_label($this->lang->line('expenses_supplier_tax_code'), 'supplier_tax_code', array('class'=>'control-label col-xs-3')); ?>
 			<div class='col-xs-6'>
 				<?php echo form_input(array(

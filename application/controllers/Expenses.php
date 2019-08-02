@@ -133,6 +133,8 @@ class Expenses extends Secure_Controller
 			'amount' => parse_decimals($this->input->post('amount')),
 			'tax_amount' => parse_decimals($this->input->post('tax_amount')),
 			'payment_type' => $this->input->post('payment_type'),
+			'referenceno' => $this->input->post('referenceno'),
+			'invoiceno' => $this->input->post('invoiceno'),
 			'expense_category_id' => $this->input->post('expense_category_id'),
 			'description' => $this->input->post('description'),
 			'employee_id' => $this->input->post('employee_id'),
