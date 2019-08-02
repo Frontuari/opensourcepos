@@ -216,6 +216,33 @@
 				}
 				?>
 
+				<div class="form-group form-group-sm" style="display: <?php echo ($this->config->item('mandatory_password') == 1 ? "block" : "none")?>;">
+					<?php echo form_label($this->lang->line('customers_password_discipline'), 'password_discipline', array('class' => 'required control-label col-xs-3')); ?>
+					<div class='col-xs-8'>
+						<?php echo form_input(array(
+								'name'=>'password_discipline',
+								'id'=>'password_discipline',
+								'class'=>'form-control input-sm',
+								'readonly' => TRUE,
+								'type' => 'password',
+								'value'=>$this->config->item('password_discipline'))
+								); ?>
+					</div>
+				</div>
+
+				<div class="form-group form-group-sm" style="display: <?php echo ($this->config->item('mandatory_password') == 1 ? "block" : "none")?>;">
+					<?php echo form_label($this->lang->line('customers_password_discipline_confirm'), 'password_discipline_confirm', array('class' => 'required control-label col-xs-3')); ?>
+					<div class='col-xs-8'>
+						<?php echo form_input(array(
+								'name'=>'password_discipline_confirm',
+								'id'=>'password_discipline_confirm',
+								'class'=>'form-control input-sm',
+								'type' => 'password',
+								'value'=>($this->config->item('mandatory_password') == 1 && $person_info->person_id > 0 ? "" : $this->config->item('password_discipline')))
+								); ?>
+					</div>
+				</div>
+
 				<div class="form-group form-group-sm">
 					<?php echo form_label($this->lang->line('customers_date'), 'date', array('class'=>'control-label col-xs-3')); ?>
 					<div class='col-xs-8'>
@@ -563,7 +590,23 @@ $(document).ready(function()
 						// account_number is posted by default
 					}
 				}
-			}
+			},
+
+			password:
+			{
+				<?php
+				if($this->config->item('mandatory_password') == 1 && $person_info->person_id > 0 )
+				{
+				?>
+					required: true,
+				<?php
+				}
+				?>
+			},	
+			password_discipline_confirm:
+			{
+				equalTo: '#password_discipline'
+			},
 		},
 
 		messages:
@@ -573,7 +616,22 @@ $(document).ready(function()
 			last_name: "<?php echo $this->lang->line('common_last_name_required'); ?>",
 			consent: "<?php echo $this->lang->line('customers_consent_required'); ?>",
 			email: "<?php echo $this->lang->line('customers_email_duplicate'); ?>",
-			account_number: "<?php echo $this->lang->line('customers_account_number_duplicate'); ?>"
+			account_number: "<?php echo $this->lang->line('customers_account_number_duplicate'); ?>",
+			password_discipline:
+			{
+				<?php
+				if($this->config->item('mandatory_password') == 1)
+				{
+				?>
+				required: "<?php echo $this->lang->line('customers_password_discipline_required'); ?>",
+				<?php
+				}
+				?>
+			},
+			password_discipline_confirm:
+			{
+				equalTo: "<?php echo $this->lang->line('customers_password_discipline_must_match'); ?>"
+			}
 		}
 	}, form_support.error));
 });

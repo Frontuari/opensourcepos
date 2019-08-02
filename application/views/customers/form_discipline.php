@@ -54,6 +54,13 @@
 					</div>
 				</div>
 
+				<div class="form-group form-group-sm">
+					<?php echo form_label($this->lang->line('customers_is_exhonerated'), 'is_exhonerated', array('class' => 'required control-label col-xs-3')); ?>
+					<div class='col-xs-1'>
+						<?php echo form_checkbox('is_exhonerated', '1', (boolean)$person_info->is_exhonerated); ?>
+					</div>
+				</div>
+
 				<div class="form-group form-group-sm" style="display: <?php echo ($this->config->item('mandatory_password') == 1 ? "block" : "none")?>;">
 					<?php echo form_label($this->lang->line('customers_password_discipline'), 'password_discipline', array('class' => 'required control-label col-xs-3')); ?>
 					<div class='col-xs-8'>
@@ -65,13 +72,6 @@
 								'type' => 'password',
 								'value'=>$this->config->item('password_discipline'))
 								); ?>
-					</div>
-				</div>
-
-				<div class="form-group form-group-sm">
-					<?php echo form_label($this->lang->line('customers_is_exhonerated'), 'is_exhonerated', array('class' => 'required control-label col-xs-3')); ?>
-					<div class='col-xs-1'>
-						<?php echo form_checkbox('is_exhonerated', '1', (boolean)$person_info->is_exhonerated); ?>
 					</div>
 				</div>
 
