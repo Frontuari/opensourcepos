@@ -40,6 +40,47 @@
 				</div>
 
 				<div class="form-group form-group-sm">
+					<?php echo form_label($this->lang->line('customers_company_name'), 'company_name', array('class' => 'control-label col-xs-3')); ?>
+					<div class='col-xs-8'>
+						<?php echo form_input(array(
+								'name'=>'company_name',
+								'id'=>'company_name',
+								'class'=>'form-control input-sm',
+								'value'=>$person_info->company_name)
+								); ?>
+					</div>
+				</div>
+
+				<div class="form-group form-group-sm">
+					<?php echo form_label($this->lang->line('customers_rif'), 'rif', array('class' => 'control-label col-xs-3')); ?>
+					<div class='col-xs-8'>
+						<?php echo form_input(array(
+								'name'=>'rif',
+								'id'=>'rif',
+								'class'=>'form-control input-sm',
+								'value'=>$person_info->rif)
+								); ?>
+					</div>
+				</div>
+
+				<div class="form-group form-group-sm">
+					<?php echo form_label($this->lang->line('customers_customer_number'), 'customer_number', array('class'=>'control-label col-xs-3')); ?>
+					<div class='col-xs-8'>
+						<div class="input-group">
+							<span class="input-group-addon input-sm"><span class="glyphicon glyphicon-barcode"></span></span>
+							<?php echo form_input(array(
+									'name'=>'customer_number',
+									'id'=>'customer_number',
+									'class'=>'form-control input-sm',
+									'value'=>$person_info->customer_number)
+									);?>
+						</div>
+					</div>
+				</div>
+
+				<?php $this->load->view("people/form_basic_info"); ?>
+
+				<div class="form-group form-group-sm">
 					<?php echo form_label($this->lang->line('customers_image'), 'customer_image', array('class'=>'control-label col-xs-3')); ?>
 					<div class='col-xs-8'>
 						<div class="fileinput <?php echo $logo_exists ? 'fileinput-exists' : 'fileinput-new'; ?>" data-provides="fileinput">
@@ -60,23 +101,6 @@
 						</div>
 					</div>
 				</div>
-
-				<div class="form-group form-group-sm">
-					<?php echo form_label($this->lang->line('customers_customer_number'), 'customer_number', array('class'=>'control-label col-xs-3')); ?>
-					<div class='col-xs-8'>
-						<div class="input-group">
-							<span class="input-group-addon input-sm"><span class="glyphicon glyphicon-barcode"></span></span>
-							<?php echo form_input(array(
-									'name'=>'customer_number',
-									'id'=>'customer_number',
-									'class'=>'form-control input-sm',
-									'value'=>$person_info->customer_number)
-									);?>
-						</div>
-					</div>
-				</div>
-
-				<?php $this->load->view("people/form_basic_info"); ?>
 				
 				<div class="form-group form-group-sm">
 					<?php echo form_label($this->lang->line('customers_discount_type'), 'discount_type', array('class'=>'control-label col-xs-3')); ?>
@@ -114,18 +138,6 @@
 									); ?>
 						</div>
 					</div>	
-				</div>
-
-				<div class="form-group form-group-sm">
-					<?php echo form_label($this->lang->line('customers_company_name'), 'company_name', array('class' => 'control-label col-xs-3')); ?>
-					<div class='col-xs-8'>
-						<?php echo form_input(array(
-								'name'=>'company_name',
-								'id'=>'company_name',
-								'class'=>'form-control input-sm',
-								'value'=>$person_info->company_name)
-								); ?>
-					</div>
 				</div>
 
 				<div class="form-group form-group-sm">

@@ -516,6 +516,7 @@ class Items extends Secure_Controller
 			'low_sell_item_id' => $this->input->post('low_sell_item_id') == NULL ? $item_id : $this->input->post('low_sell_item_id'),
 			'deleted' => $this->input->post('is_deleted') != NULL,
 			'hsn_code' => $this->input->post('hsn_code') == NULL ? '' : $this->input->post('hsn_code'),
+			'is_rehabilitationservice' => $this->input->post('is_rehabilitationservice') != NULL,
 			'is_membership' => $this->input->post('is_membership') != NULL,
 			'frequency' => $this->input->post('frequency')
 

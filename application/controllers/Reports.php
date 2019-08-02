@@ -144,6 +144,43 @@ class Reports extends Secure_Controller
 		$this->load->view('reports/tabular', $data);
 	}
 
+	//Summary Access by Item report
+	public function summary_rehabilitation_customers($start_date, $end_date, $item_id, $customer_id)
+	{
+
+		$inputs = array('start_date' => $start_date, 'end_date' => $end_date, 'item_id' => $item_id, 'customer_id' => $customer_id);
+
+		$this->load->model('reports/Summary_rehabilitation_customers');
+		$model = $this->Summary_rehabilitation_customers;
+
+		$report_data = $model->getData($inputs);
+		$summary = $this->xss_clean($model->getSummaryData($inputs));
+
+		$tabular_data = array();
+		foreach($report_data as $row)
+		{
+			$tabular_data[] = $this->xss_clean(array(
+				'item' => $row['item'],
+				'dni' => $row['dni'],
+				'name' => $row['name'],
+				'datein' => to_datetime(strtotime($row['datein'])),
+				'sale_id' => 'POS ' .$row['sale_id'],
+				'onhand' => $row['onhand'],
+				'used' => $row['used']
+			));
+		}
+
+		$data = array(
+			'title' => $this->lang->line('reports_rehabilitation_customers_summary_report'),
+			'subtitle' => $this->_get_subtitle_report(array('start_date' => $start_date, 'end_date' => $end_date)),
+			'headers' => $this->xss_clean($model->getDataColumns()),
+			'data' => $tabular_data,
+			'summary_data' => $summary
+		);
+
+		$this->load->view('reports/tabular', $data);
+	}
+
 	//Summary Expenses by Categories report
 	public function summary_expenses_categories($start_date, $end_date, $sale_type)
 	{
@@ -574,7 +611,34 @@ class Reports extends Secure_Controller
 		$data['item_memberships'] = array_reverse($item_memberships, TRUE);
 
 		$data['specific_input_name'] = $this->lang->line('reports_customer');
-		$customers = array();
+		$customers = array(1 => ' ');
+		foreach($this->Customer->get_all()->result() as $customer)
+		{
+			if(isset($customer->company_name))
+			{
+				$customers[$customer->person_id] = $this->xss_clean($customer->first_name . ' ' . $customer->last_name. ' ' . ' [ '.$customer->company_name.' ] ');
+			}
+			else
+			{
+				$customers[$customer->person_id] = $this->xss_clean($customer->first_name . ' ' . $customer->last_name);
+			}
+		}
+		$data['specific_input_data'] = $customers;
+		
+		$this->load->view('reports/specific_access_customer_input', $data);
+	}
+
+	//Input for reports that require only a date range. (see routes.php to see that all graphical summary reports route here)
+	public function date_input_rehab()
+	{
+		$data = array();
+
+		$item_memberships = $this->xss_clean($this->Item->get_item_rehabilitations());
+		$item_memberships['all'] =  $this->lang->line('reports_all');
+		$data['item_memberships'] = array_reverse($item_memberships, TRUE);
+
+		$data['specific_input_name'] = $this->lang->line('reports_customer');
+		$customers = array(1 => ' ');
 		foreach($this->Customer->get_all()->result() as $customer)
 		{
 			if(isset($customer->company_name))

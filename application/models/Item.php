@@ -311,6 +311,35 @@ class Item extends CI_Model
 	}
 
 	/*
+	Returns all the items
+	*/
+	public function get_item_rehabilitations($rows = 0, $limit_from = 0)
+	{
+		$this->db->from('items');
+		$this->db->join('suppliers', 'suppliers.person_id = items.supplier_id', 'left');
+		$this->db->where('items.deleted', 0);
+		$this->db->where('items.is_rehabilitationservice', 1);
+
+		// order by name of item
+		$this->db->order_by('items.name', 'asc');
+
+		if($rows > 0)
+		{
+			$this->db->limit($rows, $limit_from);
+		}
+
+
+		$items = $this->db->get()->result_array();
+
+		foreach($items as $item_data)
+		{
+			$item_memberships[$item_data['item_id']] = $item_data['name'];
+		}
+
+		return $item_memberships;
+	}
+
+	/*
 	Gets information about a particular item
 	*/
 	public function get_info($item_id)

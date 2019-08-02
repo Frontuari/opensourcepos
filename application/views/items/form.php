@@ -47,6 +47,18 @@
 		</div>
 
 		<div class="form-group form-group-sm">
+			<?php echo form_label($this->lang->line('items_is_rehabilitationservice'), 'is_rehabilitationservice', array('class'=>'control-label col-xs-3')); ?>
+			<div class='col-xs-1'>
+				<?php echo form_checkbox(array(
+						'name'=>'is_rehabilitationservice',
+						'id'=>'is_rehabilitationservice',
+						'value'=>1,
+						'checked'=>($item_info->is_rehabilitationservice) ? 1 : 0)
+						);?>
+			</div>
+		</div>
+
+		<div class="form-group form-group-sm">
 			<?php echo form_label($this->lang->line('items_is_membership'), 'is_membership', array('class'=>'control-label col-xs-3')); ?>
 			<div class='col-xs-1'>
 				<?php echo form_checkbox(array(

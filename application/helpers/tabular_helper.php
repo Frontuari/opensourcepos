@@ -250,6 +250,7 @@ function get_customer_manage_table_headers()
 		$headers[] = array('messages' => '', 'sortable' => FALSE);
 	}
 	$headers[] = array('discipline' => '');
+	$headers[] = array('rehabilitation' => '');
 
 	return transform_headers($headers);
 }
@@ -302,6 +303,8 @@ function get_customer_data_row($person, $stats)
 			array('class'=>'modal-dlg', 'data-btn-submit' => $CI->lang->line('common_submit'), 'title'=>$CI->lang->line('messages_sms_send'))),
 		'discipline' => anchor($controller_name."/discipline/$person->person_id", '<span class="glyphicon glyphicon-copy"></span>',
 			array('class'=>'modal-dlg', 'data-btn-submit' => $CI->lang->line('common_submit'), 'title'=>$CI->lang->line($controller_name.'_discipline'))),
+		'rehabilitation' => anchor($controller_name."/rehabilitation/$person->person_id", '<span class="glyphicon glyphicon-plus"></span>',
+			array('class'=>'modal-dlg', 'data-btn-submit' => $CI->lang->line('common_submit'), 'title'=>$CI->lang->line($controller_name.'_rehabilitation'))),
 		'edit' => anchor($controller_name."/view/$person->person_id", '<span class="glyphicon glyphicon-edit"></span>',
 			array('class'=>'modal-dlg', 'data-btn-submit' => $CI->lang->line('common_submit'), 'title'=>$CI->lang->line($controller_name.'_update'))
 	));

@@ -23,7 +23,7 @@ INSERT INTO `ospos_modules` (`name_lang_key`, `desc_lang_key`, `sort`, `module_i
 
 INSERT INTO `ospos_permissions` (`permission_id`, `module_id`, `location_id`) VALUES ('access_control', 'access_control', NULL);
 
-INSERT INTO `sealboxdb`.`ospos_permissions` (`permission_id`, `module_id`, `location_id`) VALUES ('reports_access_customers', 'reports', NULL);
+INSERT INTO `ospos_permissions` (`permission_id`, `module_id`, `location_id`) VALUES ('reports_access_customers', 'reports', NULL);
 
 -- Cambios 08-07-2019
 
@@ -60,3 +60,28 @@ INSERT INTO `ospos_permissions` (`permission_id`, `module_id`, `location_id`) VA
 INSERT INTO `ospos_grants` (`permission_id`, `person_id`, `menu_group`) VALUES ('reports_fiscalprinters', '1', '--');
 
 ALTER TABLE `ospos_sales_payments` ADD `bankreceptor` VARCHAR(255) NULL DEFAULT NULL AFTER `bankname`;
+
+-- Cambios 01-08-2019
+
+CREATE TABLE `ospos_customer_rehabilitation_control` (
+ `rehabilitation_id` int(10) NOT NULL AUTO_INCREMENT,
+ `item_id` INT(10) NOT NULL,
+ `sale_id` INT(10) NOT NULL,
+ `customer_id` int(10) NOT NULL,
+ `datein` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+ `dateout` timestamp NULL DEFAULT NULL,
+ `onhand` int(10) NOT NULL DEFAULT 0,
+ `used` int(10) NOT NULL DEFAULT 0,
+ PRIMARY KEY (`rehabilitation_id`),
+ KEY `customer_id` (`customer_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+INSERT INTO `ospos_modules` (`name_lang_key`, `desc_lang_key`, `sort`, `module_id`) VALUES ('module_rehabilitation_control', 'module_rehabilitation_control_desc', '25', 'rehabilitation_control');
+INSERT INTO `ospos_permissions` (`permission_id`, `module_id`, `location_id`) VALUES ('rehabilitation_control', 'rehabilitation_control', NULL);
+INSERT INTO `ospos_grants` (`permission_id`, `person_id`, `menu_group`) VALUES ('rehabilitation_control', '1', 'home');
+INSERT INTO `ospos_permissions` (`permission_id`, `module_id`, `location_id`) VALUES ('reports_rehabilitation_customers', 'reports', NULL);
+
+ALTER TABLE `ospos_items` ADD `is_rehabilitationservice` TINYINT(1) NULL DEFAULT NULL ;
+
+ALTER TABLE `ospos_customers` ADD `rif` VARCHAR(20) NULL DEFAULT NULL AFTER `company_name`;
+ALTER TABLE `ospos_customers` ADD `rehabilitation_id` INT(10) NULL DEFAULT NULL AFTER `discipline_id`, ADD `onhand` INT(10) NULL DEFAULT NULL AFTER `rehabilitation_id`, ADD `used` INT(10) NULL DEFAULT NULL AFTER `onhand`;

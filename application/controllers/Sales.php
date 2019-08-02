@@ -1562,7 +1562,7 @@ class Sales extends Secure_Controller
 				{
 					$customer = $this->Customer->get_info($sale_info->customer_id);
 					array_push($invoice,transform_cmd_fiscal_printer(array((!empty($customer->company_name) ? $customer->company_name."\n" : $customer->first_name." ".$customer->last_name."\n")),'RS'));
-					array_push($invoice,transform_cmd_fiscal_printer(array($customer->dni."\n"),'RIF'));
+					array_push($invoice,transform_cmd_fiscal_printer(array((!empty($customer->rif) ? $customer->rif : $customer->dni)."\n"),'RIF'));
 				}
 				if($action == "NC" || $action == "ND")
 				{

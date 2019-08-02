@@ -58,6 +58,7 @@ $lang["items_inventory_remarks"] = "Observaciones";
 $lang["items_is_deleted"] = "Eliminado";
 $lang["items_is_serialized"] = "El Artículo tiene Número de Serie";
 $lang["items_is_membership"] = "El Artículo tiene Membresía";
+$lang["items_is_rehabilitationservice"] = "Servicio de Rehabilitación";
 $lang["items_item"] = "Artículo";
 $lang["items_item_number"] = "UPC/EAN/ISBN";
 $lang["items_item_number_duplicate"] = "El número de artículo ya esta presente en la base de datos.";

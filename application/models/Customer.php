@@ -611,5 +611,111 @@ class Customer extends Person
 
 		return $success;
 	}
+
+	public function save_rehabilitation_control($data_access, $customer_id, $insert = FALSE)
+	{
+		$success = FALSE;
+
+		//Run these queries as a transaction, we want to make sure we do all or nothing
+		$this->db->trans_start();
+
+		$this->set_log("ID To Send: ".$customer_id);
+
+		$success = $this->db->insert('customer_rehabilitation_control', $data_access);
+		$this->set_log($this->db->last_query());
+
+		$this->db->trans_complete();
+
+		$success &= $this->db->trans_status();
+
+		return $success;
+	}
+
+	/*
+	Get search suggestions to find customers
+	*/
+	public function check_status($person_id)
+	{
+		$suggestions = array();
+
+		// create a temporary table to contain all the sum and average of items
+		$this->db->query('CREATE TEMPORARY TABLE IF NOT EXISTS ' . $this->db->dbprefix('sales_items_temp') .
+			' (INDEX(sale_id)) ENGINE=MEMORY
+			(
+				SELECT
+					sales.customer_id,
+					MAX(sales.sale_id) AS sale_id,
+					MAX(sales_items.item_id) AS item_id
+				FROM ' . $this->db->dbprefix('sales') . ' AS sales
+				INNER JOIN ' . $this->db->dbprefix('sales_items') . ' AS sales_items 
+					ON sales_items.sale_id = sales.sale_id
+				INNER JOIN ' . $this->db->dbprefix('items') . ' AS items 
+					ON sales_items.item_id = items.item_id 
+				WHERE sales.customer_id = ' . $this->db->escape($person_id) . ' 
+				AND items.is_rehabilitationservice = 1 
+				GROUP BY sales.customer_id 
+			)'
+		);
+
+		//echo $this->db->last_query();
+
+		$this->db->select('customers.person_id,
+			people.dni,
+			people.first_name,
+			people.last_name,
+			people.gender,
+			customers.company_name,
+			customers.pic_filename,
+			people.phone_number,
+			COALESCE(sales_items_temp.item_id,customers.rehabilitation_id) AS item_id,
+			items.name AS item_name,
+			CURRENT_TIMESTAMP() AS today,
+			COALESCE(sales_items_temp.sale_id,0) AS sale_id,
+			COALESCE((CASE WHEN sales_items_temp.sale_id IS NOT NULL THEN sales_items.quantity_purchased-COALESCE((SELECT used FROM ' . $this->db->dbprefix('customer_rehabilitation_control') . ' AS rehab 
+					WHERE sales_items_temp.item_id = rehab.item_id AND customers.person_id = rehab.customer_id AND rehab.sale_id = sales_items_temp.sale_id 
+					ORDER BY datein DESC LIMIT 1),0) ELSE NULL END),(SELECT onhand FROM ' . $this->db->dbprefix('customer_rehabilitation_control') . ' AS rehab 
+					WHERE customers.rehabilitation_id = rehab.item_id AND customers.person_id = rehab.customer_id AND rehab.sale_id = 0 
+					ORDER BY datein DESC LIMIT 1),customers.onhand) AS onhand,
+			COALESCE((CASE WHEN sales_items_temp.sale_id IS NOT NULL THEN COALESCE((SELECT used FROM ' . $this->db->dbprefix('customer_rehabilitation_control') . ' AS rehab 
+					WHERE sales_items_temp.item_id = rehab.item_id AND customers.person_id = rehab.customer_id AND rehab.sale_id = sales_items_temp.sale_id 
+					ORDER BY datein DESC LIMIT 1),0) ELSE NULL END),(SELECT used FROM ' . $this->db->dbprefix('customer_rehabilitation_control') . ' AS rehab 
+					WHERE customers.rehabilitation_id = rehab.item_id AND customers.person_id = rehab.customer_id AND rehab.sale_id = 0 
+					ORDER BY datein DESC LIMIT 1),customers.used) AS used');
+
+		$this->db->from('customers AS customers');
+		$this->db->join('people AS people', 'customers.person_id = people.person_id');
+		$this->db->join('sales_items_temp AS sales_items_temp', 'sales_items_temp.customer_id = customers.person_id','left');
+		$this->db->join('sales_items AS sales_items', 'sales_items_temp.sale_id = sales_items.sale_id','left');
+		$this->db->join('items AS items', 'items.item_id = COALESCE(sales_items_temp.item_id,customers.rehabilitation_id)','left');
+		$this->db->where('customers.person_id', $person_id);
+
+		$query = $this->db->get();
+		//echo "<br>".$this->db->last_query();
+		foreach($query->result() as $row)
+		{
+			$suggestions[] = array(
+				'id' => $row->person_id, 
+				'item_id' => $row->item_id, 
+				'dni' => $row->dni, 
+				'gender' => $row->gender, 
+				'item_name' => $row->item_name, 
+				'today' => to_datetime(strtotime($row->today)), 
+				'name' => $row->first_name . ' ' . $row->last_name . (!empty($row->company_name) ? ' [' . $row->company_name . ']' : ''). (!empty($row->phone_number) ? ' [' . $row->phone_number . ']' : ''),
+				'pic_filename' => $row->pic_filename, 
+				'sale_id' => $row->sale_id, 
+				'onhand' => round($row->onhand), 
+				'used' => round($row->used)
+			);
+
+		}
+
+
+		// drop the temporary table to contain memory consumption as it's no longer required
+		$this->db->query('DROP TEMPORARY TABLE IF EXISTS ' . $this->db->dbprefix('sales_items_temp'));
+
+		return $suggestions;
+	}
+
+
 }
 ?>

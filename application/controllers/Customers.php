@@ -281,6 +281,31 @@ class Customers extends Persons
 		$this->load->view("customers/form_discipline", $data);
 	}
 
+	public function rehabilitation($customer_id)
+	{
+		$info = $this->Customer->get_info($customer_id);
+		foreach(get_object_vars($info) as $property => $value)
+		{
+			$info->$property = $this->xss_clean($value);
+		}
+		$data['person_info'] = $info;
+
+		if(empty($info->person_id) || empty($info->date) || empty($info->employee_id))
+		{
+			$data['person_info']->date = date('Y-m-d H:i:s');
+			$data['person_info']->employee_id = $this->Employee->get_logged_in_employee_info()->person_id;
+		}
+
+		$employee_info = $this->Employee->get_info($info->employee_id);
+		$data['employee'] = $this->xss_clean($employee_info->first_name . ' ' . $employee_info->last_name);
+
+		$items = $this->Item->get_item_rehabilitations();
+		$data['items'] = $items;
+		$data['selected_item'] = $info->rehabilitation_id;
+
+		$this->load->view("customers/form_rehabilitation", $data);
+	}
+
 	/*
 	Inserts/updates a customer
 	*/
@@ -322,6 +347,7 @@ class Customers extends Persons
 			'consent' => $this->input->post('consent') != NULL,
 			'account_number' => $this->input->post('account_number') == '' ? NULL : $this->input->post('account_number'),
 			'tax_id' => $this->input->post('tax_id'),
+			'rif' => $this->input->post('rif') == '' ? NULL : $this->input->post('rif'),
 			'company_name' => $this->input->post('company_name') == '' ? NULL : $this->input->post('company_name'),
 			'discount' => $this->input->post('discount') == '' ? 0.00 : $this->input->post('discount'),
 			'discount_type' => $this->input->post('discount_type') == NULL ? PERCENT : $this->input->post('discount_type'),
@@ -389,6 +415,41 @@ class Customers extends Persons
 			'discipline_id' => $this->input->post('discipline_id'),
 			'is_exhonerated' => $this->input->post('is_exhonerated') != NULL,
 			'service_duedate' => $duedate_formatter->format('Y-m-d'),
+			'employee_id' => $this->input->post('employee_id')
+		);
+
+		if($this->Customer->save($customer_data, $customer_id))
+		{
+			echo json_encode(array('success' => TRUE,
+								'message' => $this->lang->line('customers_successful_updating') . ' ' . $first_name . ' ' . $last_name,
+								'id' => $customer_id));
+		}
+		else // Failure
+		{
+			$this->Customer->set_log("<< End Log >>");
+			//	Use get_log method for debugg
+			// --> $this->Customer->get_log().'<br>'.
+			echo json_encode(array('success' => FALSE,
+							'message' => $this->lang->line('customers_error_adding_updating') . ' ' . $first_name . ' ' . $last_name,
+							'id' => $customer_id));
+		}
+	}
+
+	public function save_rehabilitation($customer_id)
+	{
+		$this->Customer->set_log("<< Start Log >>");
+
+		$first_name = $this->xss_clean($this->input->post('first_name'));
+		$last_name = $this->xss_clean($this->input->post('last_name'));
+
+		// format first and last name properly
+		$first_name = $this->nameize($first_name);
+		$last_name = $this->nameize($last_name);
+
+		$customer_data = array(
+			'rehabilitation_id' => $this->input->post('rehabilitation_id'),
+			'onhand' => $this->input->post('onhand'),
+			'used' => $this->input->post('used'),
 			'employee_id' => $this->input->post('employee_id')
 		);
 
@@ -693,6 +754,16 @@ class Customers extends Persons
 	public function get_status($person_id)
 	{
 		$suggestions = $this->xss_clean($this->Customer->get_status($person_id));
+
+		echo json_encode($suggestions);
+	}
+
+	/*
+	Gives search suggestions based on what is being searched for
+	*/
+	public function check_status($person_id)
+	{
+		$suggestions = $this->xss_clean($this->Customer->check_status($person_id));
 
 		echo json_encode($suggestions);
 	}

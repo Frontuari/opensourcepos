@@ -59,6 +59,7 @@ $lang["items_inventory_remarks"] = "Remarks";
 $lang["items_is_deleted"] = "Deleted";
 $lang["items_is_serialized"] = "Item has Serial Number";
 $lang["items_is_membership"] = "Item has Membership";
+$lang["items_is_rehabilitationservice"] = "Item has Rehabilitation Service";
 $lang["items_item"] = "Item";
 $lang["items_item_number"] = "Barcode";
 $lang["items_item_number_duplicate"] = "Item Number is already present in the database.";
