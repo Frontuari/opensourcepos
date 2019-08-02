@@ -32,11 +32,11 @@ class Summary_access_customers extends Summary_report
 
 		if(empty($this->config->item('date_or_time_format')))
 		{
-			$this->db->where('DATE(cac.datein) >= ' . $this->db->escape($inputs['start_date']) . ' AND (DATE(cac.dateout) <=' . $this->db->escape($inputs['end_date']). ' OR cac.dateout IS NULL)');
+			$this->db->where('DATE(cac.datein) >= ' . $this->db->escape($inputs['start_date']) . ' AND (DATE(cac.datein) <=' . $this->db->escape($inputs['end_date']). ')');
 		}
 		else
 		{
-			$this->db->where('cac.datein >= ' . $this->db->escape(rawurldecode($inputs['start_date'])) . ' AND (cac.dateout <= ' . $this->db->escape(rawurldecode($inputs['end_date']). ' OR cac.dateout IS NULL)'));
+			$this->db->where('cac.datein >= ' . $this->db->escape(rawurldecode($inputs['start_date'])) . ' AND (cac.datein <= ' . $this->db->escape(rawurldecode($inputs['end_date']). ')'));
 		}
 
 		if($inputs['item_id'] != 'all')
@@ -63,11 +63,11 @@ class Summary_access_customers extends Summary_report
 
 		if(empty($this->config->item('date_or_time_format')))
 		{
-			$this->db->where('DATE(cac.datein) >= ' . $this->db->escape($inputs['start_date']) . ' AND (DATE(cac.dateout) <=' . $this->db->escape($inputs['end_date']). ' OR cac.dateout IS NULL)');
+			$this->db->where('DATE(cac.datein) >= ' . $this->db->escape($inputs['start_date']) . ' AND (DATE(cac.datein) <=' . $this->db->escape($inputs['end_date']). ')');
 		}
 		else
 		{
-			$this->db->where('cac.datein >= ' . $this->db->escape(rawurldecode($inputs['start_date'])) . ' AND (cac.dateout <= ' . $this->db->escape(rawurldecode($inputs['end_date']). ' OR cac.dateout IS NULL)'));
+			$this->db->where('cac.datein >= ' . $this->db->escape(rawurldecode($inputs['start_date'])) . ' AND (cac.datein <= ' . $this->db->escape(rawurldecode($inputs['end_date']). ')'));
 		}
 
 		if($inputs['item_id'] != 'all')
