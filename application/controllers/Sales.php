@@ -1581,7 +1581,7 @@ class Sales extends Secure_Controller
 				$type_cmd = ($action == "I" ? "PR" : ($action == "NC" ? "NCPR" : "NDPR"));
 
 				foreach ($item_sales_info->result() as $items) {
-					array_push($invoice,transform_cmd_fiscal_printer(array($items->tax,$items->price,$items->quantity,$items->code,$items->description."\n"),$type_cmd));
+					array_push($invoice,transform_cmd_fiscal_printer(array($items->tax,($this->config->item('tax_included') == 1 ? $items->price : $items->unit_price),$items->quantity,$items->code,$items->description."\n"),$type_cmd));
 				}
 
 				$fp = fopen($filename, "w+");
