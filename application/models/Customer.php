@@ -404,6 +404,36 @@ class Customer extends Person
 	}
 
  	/*
+	Get search suggestions to find customers
+	*/
+	public function get_search_accesscontrol_suggestions($search, $unique = TRUE, $limit = 25)
+	{
+		$suggestions = array();
+
+		$this->db->from('customers');
+		$this->db->join('people', 'customers.person_id = people.person_id');
+		$this->db->group_start();
+			$this->db->like('dni', $search);
+			$this->db->or_like('customer_number', $search);
+			$this->db->or_like('CONCAT(last_name, " ",first_name)', $search);
+		$this->db->group_end();
+		$this->db->where('deleted', 0);
+		$this->db->order_by('last_name', 'asc');
+		foreach($this->db->get()->result() as $row)
+		{
+			$suggestions[] = array('value' => $row->person_id, 'label' => $row->first_name . ' ' . $row->last_name . ' [' . $row->dni . ']');
+		}
+
+		//only return $limit suggestions
+		if(count($suggestions) > $limit)
+		{
+			$suggestions = array_slice($suggestions, 0, $limit);
+		}
+
+		return $suggestions;
+	}
+
+ 	/*
 	Gets rows
 	*/
 	public function get_found_rows($search)
