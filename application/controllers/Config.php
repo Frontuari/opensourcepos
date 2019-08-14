@@ -903,7 +903,8 @@ class Config extends Secure_Controller
 			
 			$prefs = array(
 				'format' => 'zip',
-				'filename' => 'ospos.sql'
+				'filename' => 'ospos.sql',
+				'foreign_key_checks' => FALSE
 			);
 			
 			$backup = $this->dbutil->backup($prefs);
