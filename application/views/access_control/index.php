@@ -113,9 +113,9 @@ $(document).ready(function()
 	};
 
 	$('#search_key').autocomplete({
-		source: "<?php echo site_url('customers/suggest'); ?>",
+		source: "<?php echo site_url('customers/suggest_accesscontrol'); ?>",
 		minChars: 0,
-		delay: 15,
+		delay: 0,
 		cacheLength: 1,
 		select: fill_value
 	});
