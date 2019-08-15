@@ -542,6 +542,7 @@ class Customer extends Person
 			items.name AS item_name,
 			CURRENT_TIMESTAMP() AS today,
 			DATEDIFF(service_duedate,CURDATE()) AS daysplace,
+			COALESCE((SELECT SUM(sp.payment_amount) FROM ' . $this->db->dbprefix('sales_payments') . ' sp INNER JOIN ' . $this->db->dbprefix('sales') . ' s ON sp.sale_id = s.sale_id WHERE s.customer_id = '.$person_id.' AND sp.payment_type = \'' . $this->lang->line('sales_due') . '\'),0) AS deudado,
 			CASE 
 				WHEN (sales.sale_status = ' . COMPLETED . ')
 					THEN 
@@ -582,6 +583,7 @@ class Customer extends Person
 				'item_name' => $row->item_name,
 				'is_exhonerated' => $row->is_exhonerated,
 				'daysplace' => $row->daysplace, 
+				'deudado' => $row->deudado, 
 				'today' => to_datetime(strtotime($row->today)), 
 				'service_duedate' => to_date(strtotime($row->service_duedate)), 
 				'name' => $row->first_name . ' ' . $row->last_name . (!empty($row->company_name) ? ' [' . $row->company_name . ']' : ''). (!empty($row->phone_number) ? ' [' . $row->phone_number . ']' : ''),

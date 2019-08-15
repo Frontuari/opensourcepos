@@ -16,9 +16,6 @@
 </div>
 <br>
 <div class="panel panel-info" id="v-card">
-	<div class="panel-heading">
-		<div id="lb_name"></div>
-	</div>
 	<div class="panel-body">
 		<div class="row">
             <div class="col-md-6">
@@ -26,15 +23,21 @@
 				<br>
 				<br>
 				<div id="lb_dni"></div>
-				<div id="lb_discipline"></div>
 				<div id="lb_duedate"></div>
 				<div id="lb_dateaccess"></div>
 				<div id="lb_exhonerated"></div>
             </div>
             <div class="col-md-6">
 				<br>
+				<div id="lb_name"></div>
+				<br>
 				<br>
             	<div id="lb_status"></div>
+				<br>
+				<br>
+				<div id="lb_discipline"></div>
+            	<br>
+				<div id="lb_deudado"></div>
             </div>
         </div>
 	</div>
@@ -72,8 +75,16 @@ $(document).ready(function()
 		            {
 		            	$('#lb_exhonerated').html("<b style='color: green;font-size: x-large;'><?php echo $this->lang->line('customers_exhonerated');?></b>");	
 		            }
-		            $('#lb_name').html("<b><?php echo $this->lang->line('common_first_name');?>:</b> "+resp[0].name);
-		            $('#lb_discipline').html("<b><?php echo $this->lang->line('customers_discipline_id');?>:</b> "+resp[0].item_name);
+		            if(resp[0].deudado > 0)
+		            {
+						$('#lb_deudado').html("<b><?php echo $this->lang->line('sales_due');?>:</b><span style='color: red;font-size: x-large;'>"+resp[0].deudado+"</span>");
+		            }
+		            else
+		            {
+		            	$('#lb_deudado').html("");
+		            }
+		            $('#lb_name').html("<b><?php echo $this->lang->line('common_first_name');?>:</b> <span style='color: black;font-size: x-large;'>"+resp[0].name+"</span>");
+		            $('#lb_discipline').html("<b><?php echo $this->lang->line('customers_discipline_id');?>:</b> <span style='color: black;font-size: large;'>"+resp[0].item_name+"</span>");
 		            $('#lb_dateaccess').html("<b><?php echo $this->lang->line('common_date');?>:</b> "+resp[0].today);
 		            $('#lb_duedate').html("<b><?php echo $this->lang->line('customers_service_duedate');?>:</b> "+resp[0].service_duedate);
 		            $('#lb_dni').html("<b><?php echo $this->lang->line('common_dni');?>:</b> "+resp[0].dni);
@@ -131,6 +142,7 @@ $(document).ready(function()
 	    //	Clear V-Card
 	    $('#lb_exhonerated').html("");
         $('#lb_name').html("");
+        $('#lb_deudado').html("");
         $('#lb_dateaccess').html("");
         $('#lb_dni').html("");
         $('#lb_status').html("");

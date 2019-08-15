@@ -137,6 +137,11 @@ class Detailed_sales extends Report
 			$this->db->where('sale_type', SALE_TYPE_RETURN);
 		}
 
+		if($inputs['fiscal_printer'] != "all")
+		{
+			$this->db->where('sale_fiscalprinter_status',$inputs['fiscal_printer']);
+		}
+
 		$this->db->group_by('sale_id');
 		$this->db->order_by('MAX(sale_date)');
 
@@ -216,6 +221,11 @@ class Detailed_sales extends Report
 		{
 			$this->db->where('sale_status', COMPLETED);
 			$this->db->where('sale_type', SALE_TYPE_RETURN);
+		}
+
+		if($inputs['fiscal_printer'] != "all")
+		{
+			$this->db->where('sale_fiscalprinter_status',$inputs['fiscal_printer']);
 		}
 
 		return $this->db->get()->row_array();

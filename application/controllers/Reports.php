@@ -682,6 +682,7 @@ class Reports extends Secure_Controller
 		$stock_locations['all'] =  $this->lang->line('reports_all');
 		$data['stock_locations'] = array_reverse($stock_locations, TRUE);
 		$data['mode'] = 'sale';
+		$data['fiscal_printer'] = array('all' => $this->lang->line('reports_all'),'I' => 'Factura','NC' => 'Nota de Crédito');
 		$data['sale_type_options'] = $this->get_sale_type_options();
 
 		$this->load->view('reports/date_input', $data);
@@ -1487,11 +1488,11 @@ class Reports extends Secure_Controller
 		return $sale_type_options;
 	}
 
-	public function detailed_sales($start_date, $end_date, $sale_type, $location_id = 'all')
+	public function detailed_sales($start_date, $end_date, $sale_type, $location_id = 'all',$discount_type_id, $fiscal_printer = "all")
 	{
 		$definition_names = $this->Attribute->get_definitions_by_flags(Attribute::SHOW_IN_SALES);
 
-		$inputs = array('start_date' => $start_date, 'end_date' => $end_date, 'sale_type' => $sale_type, 'location_id' => $location_id, 'definition_ids' => array_keys($definition_names));
+		$inputs = array('start_date' => $start_date, 'end_date' => $end_date, 'sale_type' => $sale_type, 'location_id' => $location_id, 'fiscal_printer' => $fiscal_printer, 'definition_ids' => array_keys($definition_names));
 
 		$this->load->model('reports/Detailed_sales');
 		$model = $this->Detailed_sales;

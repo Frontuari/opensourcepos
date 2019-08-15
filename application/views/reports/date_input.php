@@ -125,6 +125,20 @@ if(isset($error))
 	}
 	?>
 
+	<?php	
+	if (!empty($fiscal_printer) && count($fiscal_printer) > 1)
+	{
+	?>
+		<div class="form-group form-group-sm">
+			<?php echo form_label('Factura Fiscal', 'fiscal_printer', array('class'=>'required control-label col-xs-2')); ?>
+			<div class="col-xs-3">
+				<?php echo form_dropdown('fiscal_printer', $fiscal_printer, 'all', array('id'=>'fiscal_printer', 'class'=>'form-control')); ?>
+			</div>
+		</div>
+	<?php
+	}
+	?>
+
 	<?php
 	echo form_button(array(
 		'name'=>'generate_report',
@@ -144,7 +158,7 @@ $(document).ready(function()
 
 	$("#generate_report").click(function()
 	{		
-		window.location = [window.location, start_date, end_date, $("#input_type").val() || 0, $("#location_id").val(), $("#discount_type_id").val() || 0, $("#item_id").val(), $('#payment_type').val(), $('#cash_options').val() ].join("/");
+		window.location = [window.location, start_date, end_date, $("#input_type").val() || 0, $("#location_id").val(), $("#discount_type_id").val() || 0, $("#item_id").val(), $('#payment_type').val(), $('#cash_options').val(), $('#fiscal_printer').val() ].join("/");
 	});
 });
 </script>
