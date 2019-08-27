@@ -63,9 +63,15 @@ $(document).ready(function()
 
 <div id="toolbar">
 	<div class="pull-left btn-toolbar">
-		<button id="delete" class="btn btn-default btn-sm">
-			<span class="glyphicon glyphicon-trash">&nbsp</span><?php echo $this->lang->line("common_delete");?>
-		</button>
+		<?php if($controller_name == 'customers' && ($user_info->username == 'admin' || $user_info->username == 'yGutierrez')) : ?>
+			<button id="delete" class="btn btn-default btn-sm">
+				<span class="glyphicon glyphicon-trash">&nbsp</span><?php echo $this->lang->line("common_delete");?>
+			</button>
+		<?php elseif($controller_name != 'customers'):?>
+			<button id="delete" class="btn btn-default btn-sm">
+				<span class="glyphicon glyphicon-trash">&nbsp</span><?php echo $this->lang->line("common_delete");?>
+			</button>
+		<?php endif;?>
 		<button id="email" class="btn btn-default btn-sm">
 			<span class="glyphicon glyphicon-envelope">&nbsp</span><?php echo $this->lang->line("common_email");?>
 		</button>
