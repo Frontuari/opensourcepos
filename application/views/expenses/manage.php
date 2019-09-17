@@ -59,9 +59,11 @@ $(document).ready(function()
 
 <div id="toolbar">
 	<div class="pull-left form-inline" role="toolbar">
+		<?php if($user_info->username == 'admin' || $user_info->username == 'yGutierrez'): ?>
 		<button id="delete" class="btn btn-default btn-sm print_hide">
 			<span class="glyphicon glyphicon-trash">&nbsp</span><?php echo $this->lang->line("common_delete");?>
 		</button>
+		<?php endif;?>
 
 		<?php echo form_input(array('name'=>'daterangepicker', 'class'=>'form-control input-sm', 'id'=>'daterangepicker')); ?>
 		<?php echo form_multiselect('filters[]', $filters, '', array('id'=>'filters', 'data-none-selected-text'=>$this->lang->line('common_none_selected_text'), 'class'=>'selectpicker show-menu-arrow', 'data-selected-text-format'=>'count > 1', 'data-style'=>'btn-default btn-sm', 'data-width'=>'fit')); ?>

@@ -91,3 +91,17 @@ ALTER TABLE `ospos_customers` ADD `rehabilitation_id` INT(10) NULL DEFAULT NULL 
 ALTER TABLE `ospos_expenses` 
 	ADD `invoiceno` VARCHAR(255) NULL DEFAULT NULL AFTER `supplier_id`, 
 	ADD `referenceno` VARCHAR(255) NULL DEFAULT NULL AFTER `invoiceno`;
+
+-- Cambios 17-09-2019 
+
+CREATE TABLE `ospos_customer_changelog` (
+ `changelog_id` int(10) NOT NULL AUTO_INCREMENT,
+ `trans_customer` int(10) NOT NULL,
+ `trans_user` int(11) NOT NULL,
+ `trans_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+ `trans_comment` text NOT NULL,
+ PRIMARY KEY (`changelog_id`),
+ KEY `trans_customer` (`trans_customer`),
+ KEY `trans_user` (`trans_user`),
+ KEY `trans_date` (`trans_date`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;

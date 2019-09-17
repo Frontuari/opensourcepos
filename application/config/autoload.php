@@ -135,6 +135,7 @@ $autoload['language'] = array();
 $autoload['model'] = array(
 	'Appconfig',
 	'Person',
+	'Changelog',
 	'Customer',
 	'Employee',
 	'Module',

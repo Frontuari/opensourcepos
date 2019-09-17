@@ -72,6 +72,7 @@ abstract class Summary_report extends Report
 		$this->db->join('sales_items_taxes_temp AS sales_items_taxes',
 			'sales_items.sale_id = sales_items_taxes.sale_id AND sales_items.item_id = sales_items_taxes.item_id AND sales_items.line = sales_items_taxes.line',
 			'left outer');
+		$this->db->join('items AS items', 'sales_items.item_id = items.item_id', 'inner');
 	}
 
 	private function __common_where(array $inputs)
@@ -160,7 +161,9 @@ abstract class Summary_report extends Report
 
 		$this->_group_order();
 
-		return $this->db->get()->result_array();
+		$query = $this->db->get();
+
+		return $query->result_array();
 	}
 
 	public function getSummaryData(array $inputs)
@@ -171,7 +174,9 @@ abstract class Summary_report extends Report
 
 		$this->_where($inputs);
 
-		return $this->db->get()->row_array();
+		$query = $this->db->get();
+
+		return $query->row_array();
 	}
 }
 ?>

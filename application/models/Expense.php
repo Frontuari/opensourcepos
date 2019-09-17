@@ -97,6 +97,7 @@ class Expense extends CI_Model
 			$this->db->or_like('expenses.payment_type', $search);
 			$this->db->or_like('expenses.amount', $search);
 			$this->db->or_like('expenses.description', $search);
+			$this->db->or_like('suppliers.company_name', $search);
 			$this->db->or_like('expense_categories.category_name', $search);
 			$this->db->or_like('CONCAT(employees.first_name, " ", employees.last_name)', $search);
 		$this->db->group_end();

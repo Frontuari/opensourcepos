@@ -30,7 +30,17 @@ class Summary_items extends Summary_report
 	{
 		parent::_from();
 
-		$this->db->join('items AS items', 'sales_items.item_id = items.item_id', 'inner');
+		//$this->db->join('items AS items', 'sales_items.item_id = items.item_id', 'inner');
+	}
+
+	protected function _where(array $inputs)
+	{
+		parent::_where($inputs);
+
+		if($inputs['item_type'] != "all")
+		{
+			$this->db->where('items.stock_type',$inputs['item_type']);
+		}
 	}
 
 	protected function _group_order()

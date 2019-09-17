@@ -287,9 +287,9 @@ class Reports extends Secure_Controller
 	}
 
 	//Summary Items report
-	public function summary_items($start_date, $end_date, $sale_type, $location_id = 'all')
+	public function summary_items($start_date, $end_date, $sale_type, $location_id = 'all', $discount_type_id, $item_type = 'all')
 	{
-		$inputs = array('start_date' => $start_date, 'end_date' => $end_date, 'sale_type' => $sale_type, 'location_id' => $location_id);
+		$inputs = array('start_date' => $start_date, 'end_date' => $end_date, 'sale_type' => $sale_type, 'location_id' => $location_id, 'item_type' => $item_type);
 
 		$this->load->model('reports/Summary_items');
 		$model = $this->Summary_items;
@@ -589,6 +589,7 @@ class Reports extends Secure_Controller
 		$data['stock_locations'] = array_reverse($stock_locations, TRUE);
 		$data['mode'] = 'sale';
 		$data['sale_type_options'] = $this->get_sale_type_options();
+		$data['item_types'] = array('all' => $this->lang->line('reports_all'), '0' => $this->lang->line('reports_item_items'), '1' => $this->lang->line('reports_item_services'));
 
 		$this->load->view('reports/date_input', $data);
 	}
@@ -771,9 +772,9 @@ class Reports extends Secure_Controller
 	}
 
 	//Graphical summary items report
-	public function graphical_summary_items($start_date, $end_date, $sale_type, $location_id = 'all')
+	public function graphical_summary_items($start_date, $end_date, $sale_type, $location_id = 'all', $discount_type_id, $item_type = 'all')
 	{
-		$inputs = array('start_date' => $start_date, 'end_date' => $end_date, 'sale_type' => $sale_type, 'location_id' => $location_id);
+		$inputs = array('start_date' => $start_date, 'end_date' => $end_date, 'sale_type' => $sale_type, 'location_id' => $location_id, 'item_type' => $item_type);
 
 		$this->load->model('reports/Summary_items');
 		$model = $this->Summary_items;

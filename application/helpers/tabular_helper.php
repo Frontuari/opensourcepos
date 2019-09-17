@@ -251,6 +251,7 @@ function get_customer_manage_table_headers()
 	}
 	$headers[] = array('discipline' => '');
 	$headers[] = array('rehabilitation' => '');
+	$headers[] = array('changelog' => '');
 
 	return transform_headers($headers);
 }
@@ -305,6 +306,8 @@ function get_customer_data_row($person, $stats)
 			array('class'=>'modal-dlg', 'data-btn-submit' => $CI->lang->line('common_submit'), 'title'=>$CI->lang->line($controller_name.'_discipline'))),
 		'rehabilitation' => anchor($controller_name."/rehabilitation/$person->person_id", '<span class="glyphicon glyphicon-plus"></span>',
 			array('class'=>'modal-dlg', 'data-btn-submit' => $CI->lang->line('common_submit'), 'title'=>$CI->lang->line($controller_name.'_rehabilitation'))),
+		'changelog' => anchor($controller_name."/changelog/$person->person_id", '<span class="glyphicon glyphicon-list-alt"></span>',
+			array('class'=>'modal-dlg', 'data-btn-submit' => $CI->lang->line('common_submit'), 'title'=>$CI->lang->line($controller_name.'_changelog'))),
 		'edit' => anchor($controller_name."/view/$person->person_id", '<span class="glyphicon glyphicon-edit"></span>',
 			array('class'=>'modal-dlg', 'data-btn-submit' => $CI->lang->line('common_submit'), 'title'=>$CI->lang->line($controller_name.'_update'))
 	));

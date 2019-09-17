@@ -815,6 +815,15 @@ class Sale extends CI_Model
 				);
 				//	Save
 				$this->Customer->Save($discipline_data,$customer_id); 
+
+				// Customer Change Log
+				$changelog_data = array(
+					'trans_date'		=> date('Y-m-d H:i:s'),
+					'trans_customer'	=> $customer_id,
+					'trans_user'		=> $employee_id,
+					'trans_comment'		=> $this->lang->line('customers_pos_discipline')." POS ".$sale_id
+				);
+				$this->Changelog->insert($changelog_data);
 			}
 		}
 

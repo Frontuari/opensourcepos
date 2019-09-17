@@ -132,6 +132,18 @@ class Customers extends Persons
 		echo json_encode($suggestions);
 	}
 
+	public function changelog($customer_id = -1)
+	{
+		$customer_info = $this->Customer->get_info($customer_id);
+		foreach(get_object_vars($customer_info) as $property => $value)
+		{
+			$customer_info->$property = $this->xss_clean($value);
+		}
+		$data['customer_info'] = $customer_info;
+
+		$this->load->view('customers/form_changelog', $data);
+	}
+
 	/*
 	Loads the customer edit form
 	*/
@@ -380,18 +392,39 @@ class Customers extends Persons
 
 		if($this->Customer->save_customer($person_data, $customer_data, $customer_id))
 		{
+
 			// save customer to Mailchimp selected list
 			$this->mailchimp_lib->addOrUpdateMember($this->_list_id, $email, $first_name, $last_name, $this->input->post('mailchimp_status'), array('vip' => $this->input->post('mailchimp_vip') != NULL));
 
 			// New customer
 			if($customer_id == -1)
 			{
+
+				$changelog_data = array(
+					'trans_date' => date('Y-m-d H:i:s'),
+					'trans_customer' => $customer_data['person_id'],
+					'trans_user' => $this->Employee->get_logged_in_employee_info()->person_id,
+					'trans_comment' => $this->lang->line('customers_manually_adding')
+				);
+
+				$this->Changelog->insert($changelog_data);
+
 				echo json_encode(array('success' => TRUE,
 								'message' => $this->lang->line('customers_successful_adding') . ' ' . $first_name . ' ' . $last_name,
 								'id' => $this->xss_clean($customer_data['person_id'])));
 			}
 			else // Existing customer
 			{
+
+				$changelog_data = array(
+					'trans_date' => date('Y-m-d H:i:s'),
+					'trans_customer' => $customer_id,
+					'trans_user' => $this->Employee->get_logged_in_employee_info()->person_id,
+					'trans_comment' => $this->lang->line('customers_manually_editing')
+				);
+
+				$this->Changelog->insert($changelog_data);
+
 				echo json_encode(array('success' => TRUE,
 								'message' => $this->lang->line('customers_successful_updating') . ' ' . $first_name . ' ' . $last_name,
 								'id' => $customer_id));
@@ -430,6 +463,15 @@ class Customers extends Persons
 
 		if($this->Customer->save($customer_data, $customer_id))
 		{
+			$changelog_data = array(
+				'trans_date' => date('Y-m-d H:i:s'),
+				'trans_customer' => $customer_id,
+				'trans_user' => $this->Employee->get_logged_in_employee_info()->person_id,
+				'trans_comment' => $this->lang->line('customers_manually_adding_editing_discipline')
+			);
+
+			$this->Changelog->insert($changelog_data);
+
 			echo json_encode(array('success' => TRUE,
 								'message' => $this->lang->line('customers_successful_updating') . ' ' . $first_name . ' ' . $last_name,
 								'id' => $customer_id));
@@ -465,6 +507,15 @@ class Customers extends Persons
 
 		if($this->Customer->save($customer_data, $customer_id))
 		{
+			$changelog_data = array(
+				'trans_date' => date('Y-m-d H:i:s'),
+				'trans_customer' => $customer_id,
+				'trans_user' => $this->Employee->get_logged_in_employee_info()->person_id,
+				'trans_comment' => $this->lang->line('customers_manually_adding_editing_rehabilitation')
+			);
+
+			$this->Changelog->insert($changelog_data);
+
 			echo json_encode(array('success' => TRUE,
 								'message' => $this->lang->line('customers_successful_updating') . ' ' . $first_name . ' ' . $last_name,
 								'id' => $customer_id));
