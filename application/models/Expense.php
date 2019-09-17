@@ -51,15 +51,15 @@ class Expense extends CI_Model
 	/*
 	Gets rows
 	*/
-	public function get_found_rows($search, $filters)
+	public function get_found_rows($search, $filters, $expense_categories)
 	{
-		return $this->search($search, $filters, 0, 0, 'expense_id', 'asc', TRUE);
+		return $this->search($search, $filters, $expense_categories, 0, 0, 'expense_id', 'asc', TRUE);
 	}
 
 	/*
 	Searches expenses
 	*/
-	public function search($search, $filters, $rows = 0, $limit_from = 0, $sort = 'expense_id', $order = 'asc', $count_only = FALSE)
+	public function search($search, $filters, $expense_categories, $rows = 0, $limit_from = 0, $sort = 'expense_id', $order = 'asc', $count_only = FALSE)
 	{
 		// get_found_rows case
 		if($count_only == TRUE)
@@ -96,6 +96,7 @@ class Expense extends CI_Model
 			$this->db->or_like('employees.last_name', $search);
 			$this->db->or_like('expenses.payment_type', $search);
 			$this->db->or_like('expenses.amount', $search);
+			$this->db->or_like('expenses.description', $search);
 			$this->db->or_like('expense_categories.category_name', $search);
 			$this->db->or_like('CONCAT(employees.first_name, " ", employees.last_name)', $search);
 		$this->db->group_end();
@@ -139,10 +140,27 @@ class Expense extends CI_Model
 			$this->db->like('expenses.payment_type', $this->lang->line('expenses_check'));
 		}
 
+		if($filters['only_deposit'] != FALSE)
+		{
+			$this->db->like('expenses.payment_type', $this->lang->line('expenses_deposit'));
+		}
+
+		if($filters['only_mobile'] != FALSE)
+		{
+			$this->db->like('expenses.payment_type', $this->lang->line('expenses_mobile'));
+		}
+
+		if(!empty($expense_categories))
+		{
+			$this->db->where_in('expenses.expense_category_id',$expense_categories);
+		}
+
 		// get_found_rows case
 		if($count_only == TRUE)
 		{
-			return $this->db->get()->row()->count;
+			$query = $this->db->get();
+			//echo $this->db->last_query();
+			return $query->row()->count;
 		}
 
 		$this->db->group_by('expense_id');
@@ -154,7 +172,10 @@ class Expense extends CI_Model
 			$this->db->limit($rows, $limit_from);
 		}
 
-		return $this->db->get();
+		$query = $this->db->get();
+		//echo $this->db->last_query();
+
+		return $query;
 	}
 
 	/*
@@ -250,7 +271,7 @@ class Expense extends CI_Model
 	/*
 	Gets the payment summary for the expenses (expenses/manage) view
 	*/
-	public function get_payments_summary($search, $filters)
+	public function get_payments_summary($search, $filters, $expense_categories)
 	{
 		// get payment summary
 		$this->db->select('payment_type, COUNT(amount) AS count, SUM(amount) AS amount');
@@ -291,9 +312,26 @@ class Expense extends CI_Model
 			$this->db->like('payment_type', $this->lang->line('expenses_debit'));
 		}
 
+		if($filters['only_deposit'] != FALSE)
+		{
+			$this->db->like('expenses.payment_type', $this->lang->line('expenses_deposit'));
+		}
+
+		if($filters['only_mobile'] != FALSE)
+		{
+			$this->db->like('expenses.payment_type', $this->lang->line('expenses_mobile'));
+		}
+
+		if(!empty($expense_categories))
+		{
+			$this->db->where_in('expense_category_id',$expense_categories);
+		}
+
 		$this->db->group_by('payment_type');
 
-		$payments = $this->db->get()->result_array();
+		$query = $this->db->get();
+
+		$payments = $query->result_array();
 
 		return $payments;
 	}

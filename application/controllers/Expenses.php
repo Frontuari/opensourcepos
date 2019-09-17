@@ -19,7 +19,17 @@ class Expenses extends Secure_Controller
 			'only_check' => $this->lang->line('expenses_check_filter'),
 			'only_credit' => $this->lang->line('expenses_credit_filter'),
 			'only_debit' => $this->lang->line('expenses_debit_filter'),
+			'only_deposit' => $this->lang->line('expenses_deposit_filter'),
+			'only_mobile' => $this->lang->line('expenses_mobile_filter'),
 			'is_deleted' => $this->lang->line('expenses_is_deleted'));
+
+		$expense_categories = array();
+
+		foreach ($this->Expense_category->get_all()->result_array() as $key) {
+			$expense_categories[$key['expense_category_id']] = $this->xss_clean($key['category_name']);
+		}
+
+		$data['expense_categories'] = $expense_categories;
 
 		$this->load->view('expenses/manage', $data);
 	}
@@ -40,14 +50,20 @@ class Expenses extends Secure_Controller
 					 'only_check' => FALSE,
 					 'only_credit' => FALSE,
 					 'only_debit' => FALSE,
+					 'only_deposit' => FALSE,
+					 'only_mobile' => FALSE,
 					 'is_deleted' => FALSE);
 
 		// check if any filter is set in the multiselect dropdown
 		$filledup = array_fill_keys($this->input->get('filters'), TRUE);
 		$filters = array_merge($filters, $filledup);
-		$expenses = $this->Expense->search($search, $filters, $limit, $offset, $sort, $order);
-		$total_rows = $this->Expense->get_found_rows($search, $filters);
-		$payments = $this->Expense->get_payments_summary($search, $filters);
+
+		// check if any filter is set in the multiselect dropdown
+		$expense_categories = (!empty($this->input->get('expense_categories')[0]) ? $this->input->get('expense_categories') : '');
+
+		$expenses = $this->Expense->search($search, $filters, $expense_categories, $limit, $offset, $sort, $order);
+		$total_rows = $this->Expense->get_found_rows($search, $filters, $expense_categories);
+		$payments = $this->Expense->get_payments_summary($search, $filters, $expense_categories);
 		$payment_summary = get_expenses_manage_payments_summary($payments, $expenses);
 		$data_rows = array();
 		foreach($expenses->result() as $expense)
