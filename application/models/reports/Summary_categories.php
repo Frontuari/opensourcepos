@@ -30,7 +30,7 @@ class Summary_categories extends Summary_report
 	{
 		parent::_from();
 
-		$this->db->join('items AS items', 'sales_items.item_id = items.item_id', 'inner');
+		//$this->db->join('items AS items', 'sales_items.item_id = items.item_id', 'inner');
 	}
 
 	protected function _group_order()

@@ -816,12 +816,22 @@ class Sale extends CI_Model
 				//	Save
 				$this->Customer->Save($discipline_data,$customer_id); 
 
+				if($customer->discipline_id!=$cur_item_info->item_id)
+				{
+					$last_item = $this->Item->get_info($customer->discipline_id);
+					$new_item = $this->Item->get_info($cur_item_info->item_id);
+					$changes.="\nDisciplina valor anterior: ".$last_item->name." nuevo: ".$new_item->name;
+				}
+
+				$changes = $this->lang->line('customers_pos_discipline')." POS ".$sale_id;
+				$changes.="\nFecha Vencimiento valor anterior: ".$customer->service_duedate." nuevo: ".$service_duedate;
+
 				// Customer Change Log
 				$changelog_data = array(
 					'trans_date'		=> date('Y-m-d H:i:s'),
 					'trans_customer'	=> $customer_id,
 					'trans_user'		=> $employee_id,
-					'trans_comment'		=> $this->lang->line('customers_pos_discipline')." POS ".$sale_id
+					'trans_comment'		=> $changes
 				);
 				$this->Changelog->insert($changelog_data);
 			}

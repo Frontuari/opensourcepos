@@ -444,6 +444,7 @@ class Customers extends Persons
 	public function save_discipline($customer_id)
 	{
 		$this->Customer->set_log("<< Start Log >>");
+		$info = $this->Customer->get_info($customer_id);
 
 		$first_name = $this->xss_clean($this->input->post('first_name'));
 		$last_name = $this->xss_clean($this->input->post('last_name'));
@@ -463,11 +464,34 @@ class Customers extends Persons
 
 		if($this->Customer->save($customer_data, $customer_id))
 		{
+			$changes=$this->lang->line('customers_manually_adding_editing_discipline');
+
+			if($info->discipline_id!=$this->input->post('discipline_id'))
+			{
+				$last_item = $this->Item->get_info($discipline_id);
+				$new_item = $this->Item->get_info($this->input->post('discipline_id'));
+				$changes.="\nDisciplina valor anterior: ".$last_item->name." nuevo: ".$new_item->name;
+			}
+
+			if($info->is_exhonerated!=($this->input->post('is_exhonerated') != NULL))
+			{
+				$last_exhonerated = ($is_exhonerated ? $this->lang->line('common_yes') : $this->lang->line('common_no'));
+				$new_exhonerated = (($this->input->post('is_exhonerated') != NULL) ? $this->lang->line('common_yes') : $this->lang->line('common_no'));
+				$changes.="\nExonerado valor anterior: ".$last_exhonerated." nuevo: ".$new_exhonerated;
+			}
+
+			if($info->service_duedate!=$duedate_formatter->format('Y-m-d'))
+			{
+				$last_duedate = $info->service_duedate;
+				$new_duedate = $duedate_formatter->format('Y-m-d');
+				$changes.="\nFecha Vencimiento valor anterior: ".$last_duedate." nuevo: ".$new_duedate;
+			}
+
 			$changelog_data = array(
 				'trans_date' => date('Y-m-d H:i:s'),
 				'trans_customer' => $customer_id,
 				'trans_user' => $this->Employee->get_logged_in_employee_info()->person_id,
-				'trans_comment' => $this->lang->line('customers_manually_adding_editing_discipline')
+				'trans_comment' => $changes
 			);
 
 			$this->Changelog->insert($changelog_data);
@@ -490,6 +514,7 @@ class Customers extends Persons
 	public function save_rehabilitation($customer_id)
 	{
 		$this->Customer->set_log("<< Start Log >>");
+		$info = $this->Customer->get_info($customer_id);
 
 		$first_name = $this->xss_clean($this->input->post('first_name'));
 		$last_name = $this->xss_clean($this->input->post('last_name'));
@@ -507,11 +532,35 @@ class Customers extends Persons
 
 		if($this->Customer->save($customer_data, $customer_id))
 		{
+
+			$changes=$this->lang->line('customers_manually_adding_editing_rehabilitation');
+
+			if($info->rehabilitation_id!=$this->input->post('rehabilitation_id'))
+			{
+				$last_item = $this->Item->get_info($rehabilitation_id);
+				$new_item = $this->Item->get_info($this->input->post('rehabilitation_id'));
+				$changes.="\nRehabilitación valor anterior: ".$last_item->name." nuevo: ".$new_item->name;
+			}
+
+			if($info->onhand!=$this->input->post('onhand'))
+			{
+				$last_onhand = $info->onhand;
+				$new_onhand = $this->input->post('onhand');
+				$changes.="\nDisponible valor anterior: ".$last_onhand." nuevo: ".$new_onhand;
+			}
+
+			if($info->used!=$this->input->post('used'))
+			{
+				$last_used = $info->used;
+				$new_used = $this->input->post('used');
+				$changes.="\nUsados valor anterior: ".$last_used." nuevo: ".$new_used;
+			}
+
 			$changelog_data = array(
 				'trans_date' => date('Y-m-d H:i:s'),
 				'trans_customer' => $customer_id,
 				'trans_user' => $this->Employee->get_logged_in_employee_info()->person_id,
-				'trans_comment' => $this->lang->line('customers_manually_adding_editing_rehabilitation')
+				'trans_comment' => $changes
 			);
 
 			$this->Changelog->insert($changelog_data);

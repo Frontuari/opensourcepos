@@ -163,6 +163,8 @@ abstract class Summary_report extends Report
 
 		$query = $this->db->get();
 
+		//echo $this->db->last_query();
+
 		return $query->result_array();
 	}
 
