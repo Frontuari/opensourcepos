@@ -43,6 +43,13 @@ if(isset($error))
 		</div>
 	</div>
 
+	<div class="form-group form-group-sm">
+		<?php echo form_label($this->lang->line('reports_status'), 'status', array('class'=>'required control-label col-xs-2')); ?>
+		<div id='report_status' class="col-xs-3">
+			<?php echo form_dropdown('status', $status, 'all', array('id'=>'status', 'class'=>'form-control')); ?>
+		</div>
+	</div>
+
 	<?php
 	echo form_button(array(
 		'name'=>'generate_report',
@@ -62,7 +69,7 @@ $(document).ready(function()
 
 	$("#generate_report").click(function()
 	{		
-		window.location = [window.location, start_date, end_date, $("#item_id").val(), $('#specific_input_data').val()].join("/");
+		window.location = [window.location, start_date, end_date, $("#item_id").val(), $('#specific_input_data').val(), $('#status').val()].join("/");
 	});
 });
 </script>

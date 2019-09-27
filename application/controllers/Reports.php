@@ -108,10 +108,10 @@ class Reports extends Secure_Controller
 	}
 
 	//Summary Access by Item report
-	public function summary_access_customers($start_date, $end_date, $item_id, $customer_id)
+	public function summary_access_customers($start_date, $end_date, $item_id, $customer_id, $status)
 	{
 
-		$inputs = array('start_date' => $start_date, 'end_date' => $end_date, 'item_id' => $item_id, 'customer_id' => $customer_id);
+		$inputs = array('start_date' => $start_date, 'end_date' => $end_date, 'item_id' => $item_id, 'customer_id' => $customer_id, 'status' => $status);
 
 		$this->load->model('reports/Summary_access_customers');
 		$model = $this->Summary_access_customers;
@@ -625,6 +625,13 @@ class Reports extends Secure_Controller
 			}
 		}
 		$data['specific_input_data'] = $customers;
+
+		$data['status'] = array(
+				'all' => $this->lang->line('reports_all'), 
+				'0' => $this->lang->line('customers_status_0'), 
+				'1' => $this->lang->line('customers_status_1'), 
+				'2' => $this->lang->line('customers_status_2')
+			);
 		
 		$this->load->view('reports/specific_access_customer_input', $data);
 	}

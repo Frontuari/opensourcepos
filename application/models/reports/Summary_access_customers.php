@@ -49,6 +49,11 @@ class Summary_access_customers extends Summary_report
 			$this->db->where('cac.customer_id',$inputs['customer_id']);
 		}
 
+		if($inputs['status'] != 'all')
+		{
+			$this->db->where('cac.status',$inputs['status']);
+		}
+
 		$query = $this->db->get();
 
 		//echo $this->db->last_query();
@@ -78,6 +83,11 @@ class Summary_access_customers extends Summary_report
 		if(!empty($inputs['customer_id']) && $inputs['customer_id'] != 1)
 		{
 			$this->db->where('cac.customer_id',$inputs['customer_id']);
+		}
+
+		if($inputs['status'] != 'all')
+		{
+			$this->db->where('cac.status',$inputs['status']);
 		}
 
 		return $this->db->get()->row_array();
