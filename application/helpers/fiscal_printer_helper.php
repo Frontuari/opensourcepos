@@ -61,7 +61,7 @@ function transform_cmd_fiscal_printer($data,$type,$line = '00')
 			{
 				$tax = "#";
 			}
-
+			
 			$price = sprintf("%010d", str_replace('.', '', number_format($data[1], 2, '.', '')));
 			$cantidad = sprintf("%08d", str_replace('.', '', number_format($data[2], 3, '.', '')));
 			$codigo = (!empty($data[3]) ? "|".$data[3]."|" : "");
