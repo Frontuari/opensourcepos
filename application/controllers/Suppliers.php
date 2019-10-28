@@ -17,6 +17,19 @@ class Suppliers extends Persons
 	}
 
 	/*
+	Gives search suggestions based on what is being searched for
+	*/
+	public function get_row_by_dni($dni)
+	{
+		$data_row = $this->Person->get_info_by_dni($dni);
+		foreach(get_object_vars($data_row) as $property => $value)
+		{
+			$data_row->$property = $this->xss_clean($value);
+		}
+		echo json_encode($data_row);
+	}
+
+	/*
 	Gets one row for a supplier manage table. This is called using AJAX to update one row.
 	*/
 	public function get_row($row_id)
@@ -25,7 +38,7 @@ class Suppliers extends Persons
 
 		echo json_encode($data_row);
 	}
-	
+
 	/*
 	Returns Supplier table data rows. This will be called with AJAX.
 	*/
@@ -50,7 +63,7 @@ class Suppliers extends Persons
 
 		echo json_encode(array('total' => $total_rows, 'rows' => $data_rows));
 	}
-	
+
 	/*
 	Gives search suggestions based on what is being searched for
 	*/
@@ -67,7 +80,7 @@ class Suppliers extends Persons
 
 		echo json_encode($suggestions);
 	}
-	
+
 	/*
 	Loads the supplier edit form
 	*/
@@ -83,7 +96,7 @@ class Suppliers extends Persons
 
 		$this->load->view("suppliers/form", $data);
 	}
-	
+
 	/*
 	Inserts/updates a supplier
 	*/
@@ -100,6 +113,7 @@ class Suppliers extends Persons
 		$person_data = array(
 			'first_name' => $first_name,
 			'last_name' => $last_name,
+			'dni' => $this->input->post('dni'),
 			'gender' => $this->input->post('gender'),
 			'email' => $email,
 			'phone_number' => $this->input->post('phone_number'),
@@ -113,6 +127,7 @@ class Suppliers extends Persons
 		);
 
 		$supplier_data = array(
+			'ruc' => $this->input->post('ruc'),
 			'company_name' => $this->input->post('company_name'),
 			'agency_name' => $this->input->post('agency_name'),
 			'category' => $this->input->post('category'),
@@ -147,7 +162,7 @@ class Suppliers extends Persons
 							'id' => -1));
 		}
 	}
-	
+
 	/*
 	This deletes suppliers from the suppliers table
 	*/
@@ -165,6 +180,6 @@ class Suppliers extends Persons
 			echo json_encode(array('success' => FALSE,'message' => $this->lang->line('suppliers_cannot_be_deleted')));
 		}
 	}
-	
+
 }
 ?>

@@ -35,6 +35,19 @@ class Employees extends Persons
 	/*
 	Gives search suggestions based on what is being searched for
 	*/
+	public function get_row_by_dni($dni)
+	{
+		$data_row = $this->Person->get_info_by_dni($dni);
+		foreach(get_object_vars($data_row) as $property => $value)
+		{
+			$data_row->$property = $this->xss_clean($value);
+		}
+		echo json_encode($data_row);
+	}
+
+	/*
+	Gives search suggestions based on what is being searched for
+	*/
 	public function suggest_search()
 	{
 		$suggestions = $this->xss_clean($this->Employee->get_search_suggestions($this->input->post('term')));
@@ -53,6 +66,14 @@ class Employees extends Persons
 			$person_info->$property = $this->xss_clean($value);
 		}
 		$data['person_info'] = $person_info;
+
+		$stock_location = array('-1' => $this->lang->line('common_none_selected_text'));
+		foreach($this->Stock_location->get_all()->result_array() as $row)
+		{
+			$stock_location[$this->xss_clean($row['location_id'])] = $this->xss_clean($row['location_name']);
+		}
+		$data['stock_location'] = $stock_location;
+		$data['selected_stock_location'] = $data['person_info']->stock_location_id;
 
 		$modules = array();
 		foreach($this->Module->get_all_modules()->result() as $module)
@@ -95,6 +116,7 @@ class Employees extends Persons
 		$person_data = array(
 			'first_name' => $first_name,
 			'last_name' => $last_name,
+			'dni' => $this->input->post('dni'),
 			'gender' => $this->input->post('gender'),
 			'email' => $email,
 			'phone_number' => $this->input->post('phone_number'),
@@ -128,6 +150,7 @@ class Employees extends Persons
 				'username' 	=> $this->input->post('username'),
 				'password' 	=> password_hash($this->input->post('password'), PASSWORD_DEFAULT),
 				'hash_version' 	=> 2,
+				'stock_location_id' => $this->input->post('stock_location_id'),
 				'language_code' => $exploded[0],
 				'language' 	=> $exploded[1]
 			);
@@ -137,6 +160,7 @@ class Employees extends Persons
 			$exploded = explode(":", $this->input->post('language'));
 			$employee_data = array(
 				'username' 	=> $this->input->post('username'),
+				'stock_location_id' => $this->input->post('stock_location_id'),
 				'language_code'	=> $exploded[0],
 				'language' 	=> $exploded[1]
 			);

@@ -7,7 +7,7 @@
             <div id="stock_locations">
 				<?php $this->load->view('partial/stock_locations', array('stock_locations' => $stock_locations)); ?>
 			</div>
-            
+
             <?php echo form_submit(array(
                 'name' => 'submit_stock',
                 'id' => 'submit_stock',
@@ -27,21 +27,26 @@ $(document).ready(function()
 		if ($("input[name*='stock_location']:enabled").length > 1)
 		{
 			$(".remove_stock_location").show();
-		} 
+		}
 		else
 		{
 			$(".remove_stock_location").hide();
 		}
 	};
 
-	var add_stock_location = function() {
+  var add_stock_location = function() {
 		var id = $(this).parent().find('input').attr('id');
 		id = id.replace(/.*?_(\d+)$/g, "$1");
+		var previous_id = 'stock_location_' + id;
+		var previous_id_code = 'stock_code_' + id;
 		var block = $(this).parent().clone(true);
 		var new_block = block.insertAfter($(this).parent());
 		var new_block_id = 'stock_location_' + ++id;
-		$(new_block).find('label').html("<?php echo $this->lang->line('config_stock_location'); ?> " + ++location_count).attr('for', new_block_id).attr('class', 'control-label col-xs-2');
-		$(new_block).find('input').attr('id', new_block_id).removeAttr('disabled').attr('name', new_block_id).attr('class', 'form-control input-sm').val('');
+		var new_block_id_code = 'stock_code_' + id;
+		$(new_block).find("label[for='"+previous_id_code+"']").html("<?php echo $this->lang->line('config_stock_location_code'); ?> " + ++location_count).attr('for', new_block_id_code).attr('class', 'control-label col-xs-2');
+		$(new_block).find("input[id='"+previous_id_code+"']").attr('id', new_block_id_code).removeAttr('disabled').attr('name', new_block_id_code).attr('class', 'form-control input-sm').val('');
+		$(new_block).find("label[for='"+previous_id+"']").html("<?php echo $this->lang->line('config_stock_location'); ?> " + location_count).attr('for', new_block_id).attr('class', 'control-label col-xs-2');
+		$(new_block).find("input[id='"+previous_id+"']").attr('id', new_block_id).removeAttr('disabled').attr('name', new_block_id).attr('class', 'form-control input-sm').val('');
 		hide_show_remove();
 	};
 
@@ -62,7 +67,7 @@ $(document).ready(function()
 	$.validator.addMethod('stock_location' , function(value, element) {
 		var value_count = 0;
 		$("input[name*='stock_location']").each(function() {
-			value_count = $(this).val() == value ? value_count + 1 : value_count; 
+			value_count = $(this).val() == value ? value_count + 1 : value_count;
 		});
 		return value_count < 2;
     }, "<?php echo $this->lang->line('config_stock_location_duplicate'); ?>");
@@ -70,7 +75,7 @@ $(document).ready(function()
     $.validator.addMethod('valid_chars', function(value, element) {
 		return value.indexOf('_') === -1;
     }, "<?php echo $this->lang->line('config_stock_location_invalid_chars'); ?>");
-	
+
 	$('#location_config_form').validate($.extend(form_support.handler, {
 		submitHandler: function(form) {
 			$(form).ajaxSubmit({
@@ -103,7 +108,7 @@ $(document).ready(function()
 			?>
    		},
 
-		messages: 
+		messages:
 		{
 			<?php
 			$i = 0;

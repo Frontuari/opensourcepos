@@ -100,5 +100,21 @@ class Appconfig extends CI_Model
 		$this->save('last_used_work_order_number', $last_used);
 		return $last_used;
 	}
+
+	public function acquire_save_next_doctype_sequence($sequence_id)
+	{
+
+		$doctype_sequence = $this->Doctypesequence->get_info($sequence_id);
+
+		$last_used = $doctype_sequence->next_sequence;
+		$increment = $doctype_sequence->number_incremental;
+		$next = ($last_used+$increment);
+		$doctypesequence_data = array(
+			'next_sequence' => $next
+		);
+		$this->Doctypesequence->save($doctypesequence_data,$sequence_id);
+		return $doctype_sequence->prefix.$last_used.$doctype_sequence->suffix;
+	}
+
 }
 ?>

@@ -60,7 +60,7 @@ class Item extends CI_Model
 	public function item_number_exists($item_number, $item_id = '')
 	{
 		if($this->config->item('allow_duplicate_barcodes') != FALSE)
-		{			
+		{
 			return FALSE;
 		}
 
@@ -286,7 +286,7 @@ class Item extends CI_Model
 		$this->db->select('GROUP_CONCAT(attribute_value SEPARATOR \'|\') AS attribute_values');
 		$this->db->select('GROUP_CONCAT(attribute_decimal SEPARATOR \'|\') AS attribute_dvalues');
 		$this->db->select('GROUP_CONCAT(attribute_date SEPARATOR \'|\') AS attribute_dtvalues');
-		$this->db->select('suppliers.company_name');
+		$this->db->select('GROUP_CONCAT(company_name SEPARATOR \'|\') AS company_name');
 		$this->db->from('items');
 		$this->db->join('suppliers', 'suppliers.person_id = items.supplier_id', 'left');
 		$this->db->join('attribute_links', 'attribute_links.item_id = items.item_id', 'left');
@@ -499,7 +499,7 @@ class Item extends CI_Model
 		{
 			$seed .= ',' . $this->config->item('suggestions_second_column');
 		}
-			
+
 		if($this->config->item('suggestions_third_column') !== '')
 		{
 			$seed .= ',' . $this->config->item('suggestions_third_column');
@@ -507,7 +507,7 @@ class Item extends CI_Model
 
 		return $seed;
 	}
-	
+
 	function get_search_suggestion_label($result_row)
 	{
 		$label = '';
@@ -568,7 +568,7 @@ class Item extends CI_Model
 			}
 		}
 	}
-	
+
 	public function get_search_suggestions($search, $filters = array('is_deleted' => FALSE, 'search_custom' => FALSE), $unique = FALSE, $limit = 25)
 	{
 		$suggestions = array();

@@ -1,12 +1,24 @@
 <div id="required_fields_message"><?php echo $this->lang->line('common_fields_required_message'); ?></div>
 
-<ul id="error_message_box" class="error_message_box"></ul>
+<ul id="error_message_box" class="error_message_box"><?php echo ($cash_book_notfound==TRUE ? $this->lang->line('cashup_cashbook_notfound') : "");?></ul>
 
 <?php echo form_open('cashups/save/'.$cash_ups_info->cashup_id, array('id'=>'cashups_edit_form', 'class'=>'form-horizontal')); ?>
 	<fieldset id="item_basic_info">
 		<div class="form-group form-group-sm">
-			<?php echo form_label($this->lang->line('cashups_info'), 'cash_ups_info', array('class'=>'control-label col-xs-3')); ?>
-			<?php echo form_label(!empty($cash_ups_info->cashup_id) ? $this->lang->line('cashups_id') . ' ' . $cash_ups_info->cashup_id : '', 'cashup_id', array('class'=>'control-label col-xs-8', 'style'=>'text-align:left')); ?>
+			<?php echo form_label($this->lang->line('cashups_info'), 'cash_ups_info', array('class'=>'control-label col-xs-4')); ?>
+			<?php echo form_label('('.$cash_book_info->code . ') '. $user_info->first_name .' '.$user_info->last_name, 'cashup_id', array('class'=>'control-label col-xs-8', 'style'=>'text-align:left')); ?>
+			<?php echo form_input(array(
+				'name'=>'cash_book_id',
+				'id'=>'cash_book_id',
+				'type' => 'hidden',
+				'value'=>$cash_book_info->cash_book_id)
+				);?>
+			<?php echo form_input(array(
+				'name'=>'open_employee_id',
+				'id'=>'open_employee_id',
+				'type' => 'hidden',
+				'value'=>$user_info->person_id)
+				);?>
 		</div>
 
 		<div class="form-group form-group-sm">
@@ -24,15 +36,22 @@
 			</div>
 		</div>
 
-		<div class="form-group form-group-sm">
-			<?php echo form_label($this->lang->line('cashups_open_employee'), 'open_employee', array('class'=>'control-label col-xs-3')); ?>
+		<!--<div class="form-group form-group-sm">
+			<?php echo form_label($this->lang->line('cashups_cash_book_id'), 'cash_book_id', array('class'=>'required control-label col-xs-3')); ?>
 			<div class='col-xs-6'>
-				<?php echo form_dropdown('open_employee_id', $employees, $cash_ups_info->open_employee_id, 'id="open_employee_id" class="form-control"');?>
+				<?php echo form_dropdown('cash_book_id', $cash_books, $cash_ups_info->cash_book_id, 'id="cash_book_id" class="form-control"');?>
 			</div>
 		</div>
 
 		<div class="form-group form-group-sm">
-			<?php echo form_label($this->lang->line('cashups_open_amount_cash'), 'open_amount_cash', array('class'=>'control-label col-xs-3')); ?>
+			<?php echo form_label($this->lang->line('cashups_open_employee'), 'open_employee', array('class'=>'control-label col-xs-3')); ?>
+			<div class='col-xs-6'>
+				<?php echo form_dropdown('open_employee_id', $employees, $cash_ups_info->open_employee_id, 'id="open_employee_id" class="form-control" readonly');?>
+			</div>
+		</div>-->
+
+		<div class="form-group form-group-sm">
+			<?php echo form_label($this->lang->line('cashups_open_amount_cash'), 'open_amount_cash', array('class'=>'required control-label col-xs-3')); ?>
 			<div class='col-xs-4'>
 				<div class="input-group input-group-sm">
 					<?php if (!currency_side()): ?>
@@ -51,7 +70,7 @@
 			</div>
 		</div>
 
-		<div class="form-group form-group-sm">
+		<!--<div class="form-group form-group-sm">
 			<?php echo form_label($this->lang->line('cashups_transfer_amount_cash'), 'transfer_amount_cash', array('class'=>'control-label col-xs-3')); ?>
 			<div class='col-xs-4'>
 				<div class="input-group input-group-sm">
@@ -89,7 +108,7 @@
 		<div class="form-group form-group-sm">
 			<?php echo form_label($this->lang->line('cashups_close_employee'), 'close_employee', array('class'=>'control-label col-xs-3')); ?>
 			<div class='col-xs-6'>
-				<?php echo form_dropdown('close_employee_id', $employees, $cash_ups_info->close_employee_id, 'id="close_employee_id" class="form-control"');?>
+				<?php echo form_dropdown('close_employee_id', $employees, $cash_ups_info->close_employee_id, 'id="close_employee_id" class="form-control" readonly');?>
 			</div>
 		</div>
 
@@ -204,7 +223,7 @@
 					<?php endif; ?>
 				</div>
 			</div>
-		</div>
+		</div>-->
 
 		<div class="form-group form-group-sm">
 			<?php echo form_label($this->lang->line('cashups_description'), 'description', array('class'=>'control-label col-xs-3')); ?>
@@ -243,6 +262,11 @@
 //validation and submit handling
 $(document).ready(function()
 {
+
+	<?php if($cash_book_notfound): ?>
+		$("#cashups_edit_form :input").prop("disabled", true);
+	<?php endif;?>
+
 	<?php $this->load->view('partial/datepicker_locale'); ?>
 
 	$('#open_date').datetimepicker({
@@ -269,50 +293,7 @@ $(document).ready(function()
 		todayBtn: true,
 		todayHighlight: true,
 		bootcssVer: 3,
-		language: '<?php echo current_language_code(); ?>'
-	});
-
-	$('#close_date').datetimepicker({
-		format: "<?php echo dateformat_bootstrap($this->config->item('dateformat')) . ' ' . dateformat_bootstrap($this->config->item('timeformat'));?>",
-		startDate: "<?php echo date($this->config->item('dateformat') . ' ' . $this->config->item('timeformat'), mktime(0, 0, 0, 1, 1, 2010));?>",
-		<?php
-		$t = $this->config->item('timeformat');
-		$m = $t[strlen($t)-1];
-		if( strpos($this->config->item('timeformat'), 'a') !== false || strpos($this->config->item('timeformat'), 'A') !== false )
-		{
-		?>
-			showMeridian: true,
-		<?php
-		}
-		else
-		{
-		?>
-			showMeridian: false,
-		<?php
-		}
-		?>
-		minuteStep: 1,
-		autoclose: true,
-		todayBtn: true,
-		todayHighlight: true,
-		bootcssVer: 3,
-		language: '<?php echo current_language_code(); ?>'
-	});
-
-	$('#open_amount_cash, #transfer_amount_cash, #closed_amount_cash, #closed_amount_due, #closed_amount_card, #closed_amount_check').keyup(function() {
-		$.post("<?php echo site_url($controller_name . '/ajax_cashup_total')?>", {
-				'open_amount_cash': $('#open_amount_cash').val(),
-				'transfer_amount_cash': $('#transfer_amount_cash').val(),
-				'closed_amount_due': $('#closed_amount_due').val(),
-				'closed_amount_cash': $('#closed_amount_cash').val(),
-				'closed_amount_card': $('#closed_amount_card').val(),
-				'closed_amount_check': $('#closed_amount_check').val()
-			},
-			function(response) {
-				$('#closed_amount_total').val(response.total);
-			},
-			'json'
-		);
+		language: '<?php echo current_language(); ?>'
 	});
 
 	var submit_form = function()
@@ -323,10 +304,22 @@ $(document).ready(function()
 			{
 				dialog_support.hide();
 				table_support.handle_submit('<?php echo site_url('cashups'); ?>', response);
+				setTimeout(function(){
+					self.parent.location.reload();
+				},2000)
 			},
 			dataType: 'json'
 		});
 	};
+
+	// add the rule here
+	jQuery.validator.addMethod(
+		"notEqualTo",
+		function(elementValue,element,param) {
+			return elementValue != param;
+		},
+		"<?php echo $this->lang->line('cashup_open_amount_required'); ?>"
+	);
 
 	$('#cashups_edit_form').validate($.extend(
 	{
@@ -336,7 +329,7 @@ $(document).ready(function()
 		},
 		rules:
 		{
-
+			open_date: 'required'
 		},
 		messages:
 		{
@@ -344,16 +337,6 @@ $(document).ready(function()
 			{
 				required: '<?php echo $this->lang->line('cashups_date_required'); ?>'
 
-			},
-			close_date:
-			{
-				required: '<?php echo $this->lang->line('cashups_date_required'); ?>'
-
-			},
-			amount:
-			{
-				required: '<?php echo $this->lang->line('cashups_amount_required'); ?>',
-				number: '<?php echo $this->lang->line('cashups_amount_number'); ?>'
 			}
 		}
 	}, form_support.error));

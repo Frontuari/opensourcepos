@@ -657,7 +657,7 @@ function get_expense_category_data_row($expense_category)
 /*
 Get the header for the expenses tabular view
 */
-function get_expenses_manage_table_headers()
+/*function get_expenses_manage_table_headers()
 {
 	$CI =& get_instance();
 
@@ -676,11 +676,11 @@ function get_expenses_manage_table_headers()
 
 	return transform_headers($headers);
 }
-
+*/
 /*
 Gets the html data row for the expenses
 */
-function get_expenses_data_row($expense)
+/*function get_expenses_data_row($expense)
 {
 	$CI =& get_instance();
 
@@ -700,6 +700,561 @@ function get_expenses_data_row($expense)
 		'edit' => anchor($controller_name."/view/$expense->expense_id", '<span class="glyphicon glyphicon-edit"></span>',
 			array('class'=>'modal-dlg', 'data-btn-submit' => $CI->lang->line('common_submit'), 'title'=>$CI->lang->line($controller_name.'_update'))
 		)
+	);
+}*/
+
+/*
+Get the header for the growing areas tabular view
+*/
+function get_cash_concept_manage_table_headers()
+{
+	$CI =& get_instance();
+
+	$headers = array(
+		array('cash_concept_id' => $CI->lang->line('cash_concepts_cash_concept_id')),
+		array('code' => $CI->lang->line('cash_concepts_code')),
+		array('name' => $CI->lang->line('cash_concepts_name')),
+		array('concept_type' => $CI->lang->line('cash_concepts_concept_type')),
+		array('description' => $CI->lang->line('cash_concepts_description')),
+		array('is_cash_general_used' => $CI->lang->line('cash_concepts_is_cash_general_used'))
+	);
+
+	$headers[] = array('see' => '');
+
+	return transform_headers($headers);
+}
+
+/*
+Gets the html data row for the growing areas
+*/
+function get_cash_concept_data_row($cash_concept)
+{
+	$CI =& get_instance();
+	$controller_name = strtolower(get_class($CI));
+
+	return array (
+		'cash_concept_id' => $cash_concept->cash_concept_id,
+		'code' => $cash_concept->code,
+		'name' => $cash_concept->name,
+		'concept_type' => ($cash_concept->concept_type=="1" ? $CI->lang->line($controller_name.'_income') : ($cash_concept->concept_type=="2" ? $CI->lang->line($controller_name.'_cost') : ($cash_concept->concept_type=="3" ? $CI->lang->line($controller_name.'_expense') : $CI->lang->line($controller_name.'_notdefined')))),
+		'description' => $cash_concept->description,
+		'is_cash_general_used' => ($cash_concept->is_cash_general_used == 1 ? $CI->lang->line('common_yes') : $CI->lang->line('common_no')),
+		'edit' => ($cash_concept->concept_type=="1" ? anchor($controller_name."/view/$cash_concept->cash_concept_id", '<span class="glyphicon glyphicon-edit"></span>',
+				array('class'=>'modal-dlg', 'data-btn-submit' => $CI->lang->line('common_submit'), 'title'=>$CI->lang->line($controller_name.'_update'))
+			) : ($cash_concept->concept_type=="2" ? anchor($controller_name."/view_cost/$cash_concept->cash_concept_id", '<span class="glyphicon glyphicon-edit"></span>',
+				array('class'=>'modal-dlg', 'data-btn-submit' => $CI->lang->line('common_submit'), 'title'=>$CI->lang->line($controller_name.'_update_cost'))
+			) : anchor($controller_name."/view_expense/$cash_concept->cash_concept_id", '<span class="glyphicon glyphicon-edit"></span>',
+				array('class'=>'modal-dlg', 'data-btn-submit' => $CI->lang->line('common_submit'), 'title'=>$CI->lang->line($controller_name.'_update_expense'))
+			))),
+		'see' => ($cash_concept->concept_type=="1" ? anchor($controller_name."/subconcept/$cash_concept->cash_concept_id", '<span class="glyphicon glyphicon-list-alt"></span>',
+				array('title'=>$CI->lang->line($controller_name.'_update'))
+			) : ($cash_concept->concept_type=="2" ? anchor($controller_name."/subconcept/$cash_concept->cash_concept_id", '<span class="glyphicon glyphicon-list-alt"></span>',
+				array('title'=>$CI->lang->line($controller_name.'_update_cost'))
+			) : anchor($controller_name."/subconcept/$cash_concept->cash_concept_id", '<span class="glyphicon glyphicon-list-alt"></span>',
+				array('title'=>$CI->lang->line($controller_name.'_update_expense'))
+			)))
+		);
+}
+
+/*
+Get the header for the growing areas tabular view
+*/
+function get_cash_concept_parent_manage_table_headers()
+{
+	$CI =& get_instance();
+
+	$headers = array(
+		array('cash_concept_id' => $CI->lang->line('cash_concepts_cash_concept_id')),
+		array('code' => $CI->lang->line('cash_concepts_code')),
+		array('name' => $CI->lang->line('cash_concepts_name')),
+		array('description' => $CI->lang->line('cash_concepts_description')),
+		array('document_sequence' => $CI->lang->line('cash_concepts_document_sequence')),
+		array('cash_concept_parent_name' => $CI->lang->line('cash_concepts_cash_concept_parent_id')),
+		array('is_summary' => $CI->lang->line('cash_concepts_summary'))
+	);
+
+	return transform_headers($headers);
+}
+
+/*
+Gets the html data row for the growing areas
+*/
+function get_cash_concept_parent_data_row($cash_concept)
+{
+	$CI =& get_instance();
+	$controller_name = strtolower(get_class($CI));
+
+	return array (
+		'cash_concept_id' => $cash_concept->cash_concept_id,
+		'code' => $cash_concept->code,
+		'name' => $cash_concept->name,
+		'description' => $cash_concept->description,
+		'document_sequence' => $cash_concept->document_sequence,
+		'cash_concept_parent_name' => $cash_concept->cash_concept_parent_name,
+		'is_summary' => ($cash_concept->is_summary==1 ? $CI->lang->line('common_yes') : $CI->lang->line('common_no')),
+		'edit' => ($cash_concept->concept_type=="1" ? anchor($controller_name."/view_subconcept/$cash_concept->parent_id/$cash_concept->cash_concept_id", '<span class="glyphicon glyphicon-edit"></span>',
+				array('class'=>'modal-dlg', 'data-btn-submit' => $CI->lang->line('common_submit'), 'title'=>$CI->lang->line($controller_name.'_update'))
+			) : ($cash_concept->concept_type=="2" ? anchor($controller_name."/view_subconcept/$cash_concept->parent_id/$cash_concept->cash_concept_id", '<span class="glyphicon glyphicon-edit"></span>',
+				array('class'=>'modal-dlg', 'data-btn-submit' => $CI->lang->line('common_submit'), 'title'=>$CI->lang->line($controller_name.'_update_cost'))
+			) : anchor($controller_name."/view_subconcept/$cash_concept->parent_id/$cash_concept->cash_concept_id", '<span class="glyphicon glyphicon-edit"></span>',
+				array('class'=>'modal-dlg', 'data-btn-submit' => $CI->lang->line('common_submit'), 'title'=>$CI->lang->line($controller_name.'_update_expense'))
+			)))
+		);
+}
+
+/*
+Get the header for the growing areas tabular view
+*/
+function get_cash_book_manage_table_headers()
+{
+	$CI =& get_instance();
+
+	$headers = array(
+		array('cash_book_id' => $CI->lang->line('cash_books_cash_book_id')),
+		array('code' => $CI->lang->line('cash_books_code')),
+		array('location_name' => $CI->lang->line('cash_books_stock_location_id')),
+		array('username' => $CI->lang->line('cash_books_user_id')),
+		array('address' => $CI->lang->line('cash_books_address')),
+		array('is_cash_general' => $CI->lang->line('cash_books_is_cash_general'))
+	);
+
+	return transform_headers($headers);
+}
+
+/*
+Gets the html data row for the growing areas
+*/
+function get_cash_book_data_row($cash_book)
+{
+	$CI =& get_instance();
+	$controller_name = strtolower(get_class($CI));
+
+	return array (
+		'cash_book_id' => $cash_book->cash_book_id,
+		'code' => $cash_book->code,
+		'location_name' => $cash_book->location_name,
+		'username' => $cash_book->username,
+		'address' => $cash_book->address,
+		'is_cash_general' => ($cash_book->is_cash_general == 1 ? $CI->lang->line('common_yes') : $CI->lang->line('common_no')),
+		'edit' => anchor($controller_name."/view/$cash_book->cash_book_id", '<span class="glyphicon glyphicon-edit"></span>',
+				array('class'=>'modal-dlg', 'data-btn-submit' => $CI->lang->line('common_submit'), 'title'=>$CI->lang->line($controller_name.'_update'))
+			)
+		);
+}
+
+/*
+Get the header for the growing areas tabular view
+*/
+function get_overall_cash_manage_table_headers()
+{
+	$CI =& get_instance();
+
+	$headers = array(
+		array('overall_cash_id' => $CI->lang->line('overall_cashs_overall_cash_id')),
+		array('opendate' => $CI->lang->line('overall_cashs_opendate')),
+		array('income_currency' => $CI->lang->line('overall_cashs_income_currency')),
+		array('cost_currency' => $CI->lang->line('overall_cashs_cost_currency')),
+		array('balance_currency' => $CI->lang->line('overall_cashs_balance_currency')),
+		array('income_usd' => $CI->lang->line('overall_cashs_income_usd')),
+		array('cost_usd' => $CI->lang->line('overall_cashs_cost_usd')),
+		array('balance_usd' => $CI->lang->line('overall_cashs_balance_usd')),
+		array('state' => $CI->lang->line('common_state'))
+	);
+
+	$headers[] = array('close' => '');
+	$headers[] = array('detail' => '');
+	$headers[] = array('print' => '');
+
+	return transform_headers($headers);
+}
+
+/*
+Gets the html data row for the growing areas
+*/
+function get_overall_cash_data_row($overall_cash)
+{
+	$CI =& get_instance();
+	$controller_name = strtolower(get_class($CI));
+
+	return array (
+		'overall_cash_id' => $overall_cash->overall_cash_id,
+		'opendate' => to_date(strtotime($overall_cash->opendate)),
+		'income_currency' => to_currency($overall_cash->income),
+		'cost_currency' => to_currency($overall_cash->cost),
+		'balance_currency' => to_currency(($overall_cash->income-$overall_cash->cost)),
+		'income_usd' => to_usd($overall_cash->usdincome),
+		'cost_usd' => to_usd($overall_cash->usdcost),
+		'balance_usd' => to_usd(($overall_cash->usdincome-$overall_cash->usdcost)),
+		'state' => ($overall_cash->state==0 ? $CI->lang->line('common_opened') : $CI->lang->line('common_closed')),
+		'close' => ($overall_cash->state==0 ? anchor($controller_name."/close/$overall_cash->overall_cash_id", '<span class="glyphicon glyphicon-folder-close"></span>',
+			array('class'=>'modal-dlg', 'data-btn-submit' => $CI->lang->line('common_submit'), 'title'=>$CI->lang->line($controller_name.'_close'))
+		) : ''),
+		'detail' => anchor($controller_name."/detail/$overall_cash->overall_cash_id", '<span class="glyphicon glyphicon-list-alt"></span>',
+			array('title'=>$CI->lang->line($controller_name.'_showdetail'))
+		),
+		'print' => anchor($controller_name."/print_report/$overall_cash->overall_cash_id", '<span class="glyphicon glyphicon-print"></span>',
+			array('title'=>$CI->lang->line($controller_name.'_print'))
+		),
+		'edit' => ''
+		);
+}
+
+/*
+Get the header for the growing areas tabular view
+*/
+function get_cash_flow_manage_table_headers()
+{
+	$CI =& get_instance();
+
+	$headers = array(
+		array('overall_cash_id' => $CI->lang->line('overall_cashs_overall_cash_id')),
+		array('movementdate' => $CI->lang->line('overall_cashs_movementdate')),
+		array('currency' => $CI->lang->line('overall_cashs_currency')),
+		array('cash_concept_id' => $CI->lang->line('overall_cashs_cash_concept_id')),
+		array('cash_book_id' => $CI->lang->line('overall_cashs_cash_book_id')),
+		array('operation_type' => $CI->lang->line('overall_cashs_operation_type')),
+		array('description' => $CI->lang->line('overall_cashs_description')),
+		array('amount' => $CI->lang->line('overall_cashs_amount')),
+		array('reference_id' => $CI->lang->line('overall_cashs_reference_id'))
+	);
+
+	return transform_headers($headers);
+}
+
+/*
+Gets the html data row for the growing areas
+*/
+function get_cash_flow_data_row($cash_flow)
+{
+	$CI =& get_instance();
+	$controller_name = strtolower(get_class($CI));
+
+	return array (
+		'overall_cash_id' => $cash_flow->cash_flow_id,
+		'movementdate' => to_datetime(strtotime($cash_flow->movementdate)),
+		'currency' => ($cash_flow->currency == CURRENCY ? CURRENCY_LABEL : USDCURRENCY_LABEL),
+		'cash_concept_id' => $cash_flow->cash_concept_name,
+		'cash_book_id' => $cash_flow->cash_book_name,
+		'operation_type' => $cash_flow->movementtype,
+		'description' => $cash_flow->description,
+		'amount' => ($cash_flow->currency == CURRENCY ? to_currency($cash_flow->amount) : to_usd($cash_flow->amount)),
+		'reference_id' => $cash_flow->referenceno
+		);
+}
+
+/*
+Get the header for the growing areas tabular view
+*/
+function get_cash_daily_manage_table_headers()
+{
+	$CI =& get_instance();
+
+	$headers = array(
+		array('cashup_id' => $CI->lang->line('overall_cashs_overall_cash_id')),
+		array('movementdate' => $CI->lang->line('overall_cashs_movementdate')),
+		array('currency' => $CI->lang->line('overall_cashs_currency')),
+		array('cash_concept_id' => $CI->lang->line('overall_cashs_cash_concept_id')),
+		array('cash_book_id' => $CI->lang->line('overall_cashs_cash_book_id')),
+		array('operation_type' => $CI->lang->line('overall_cashs_operation_type')),
+		array('description' => $CI->lang->line('overall_cashs_description')),
+		array('amount' => $CI->lang->line('overall_cashs_amount')),
+		array('reference_id' => $CI->lang->line('overall_cashs_reference_id'))
+	);
+
+	return transform_headers($headers);
+}
+
+/*
+Gets the html data row for the growing areas
+*/
+function get_cash_daily_data_row($cash_daily)
+{
+	$CI =& get_instance();
+	$controller_name = strtolower(get_class($CI));
+
+	return array (
+		'overall_cash_id' => $cash_daily->cash_daily_id,
+		'movementdate' => to_datetime(strtotime($cash_daily->movementdate)),
+		'currency' => ($cash_daily->currency == CURRENCY ? CURRENCY_LABEL : USDCURRENCY_LABEL),
+		'cash_concept_id' => $cash_daily->cash_concept_name,
+		'cash_book_id' => $cash_daily->cash_book_name,
+		'operation_type' => $cash_daily->movementtype,
+		'description' => $cash_daily->description,
+		'amount' => ($cash_daily->currency == CURRENCY ? to_currency($cash_daily->amount) : to_usd($cash_daily->amount)),
+		'reference_id' => $cash_daily->referenceno
+		);
+}
+
+/*
+Get the header for the growing areas tabular view
+*/
+function get_bank_manage_table_headers()
+{
+	$CI =& get_instance();
+
+	$headers = array(
+		array('bank_id' => $CI->lang->line('banks_bank_id')),
+		array('ruc' => $CI->lang->line('banks_ruc')),
+		array('name' => $CI->lang->line('banks_name')),
+		array('account_type' => $CI->lang->line('banks_account_type')),
+		array('account_number' => $CI->lang->line('banks_account_number'))
+	);
+
+	return transform_headers($headers);
+}
+
+/*
+Gets the html data row for the growing areas
+*/
+function get_bank_data_row($bank)
+{
+	$CI =& get_instance();
+	$controller_name = strtolower(get_class($CI));
+
+	return array (
+		'bank_id' => $bank->bank_id,
+		'ruc' => $bank->ruc,
+		'name' => $bank->name,
+		'account_type' => $bank->currency,
+		'account_number' => $bank->account_number,
+		'edit' => anchor($controller_name."/view_bank/$bank->bank_id", '<span class="glyphicon glyphicon-edit"></span>',
+			array('class'=>'modal-dlg', 'data-btn-submit' => $CI->lang->line('common_submit'), 'title'=>$CI->lang->line($controller_name.'_update'))
+		)
+		);
+}
+
+/*
+Get the header for the growing areas tabular view
+*/
+function get_income_manage_table_headers($cashmovements = 0)
+{
+	$CI =& get_instance();
+
+	if($cashmovements == 0)
+	{
+		$headers = array(
+			array('income_id' => $CI->lang->line('incomes_income_id')),
+			array('documentdate' => $CI->lang->line('incomes_documentdate')),
+			array('documentno' => $CI->lang->line('incomes_documentno')),
+			array('name' => $CI->lang->line('common_person_name')),
+			array('bank' => $CI->lang->line('overall_cashs_financialentity')),
+			array('detail' => $CI->lang->line('incomes_detail')),
+			array('cash_currency' => $CI->lang->line('incomes_cash_currency')),
+			array('bank_currency' => $CI->lang->line('incomes_bank_currency')),
+			array('cash_usd' => $CI->lang->line('incomes_cash_usd')),
+			array('bank_usd' => $CI->lang->line('incomes_bank_usd'))
+		);
+	}
+	else
+	{
+		$headers = array(
+			array('income_id' => $CI->lang->line('incomes_income_id')),
+			array('documentdate' => $CI->lang->line('incomes_documentdate')),
+			array('documentno' => $CI->lang->line('incomes_documentno')),
+			array('name' => $CI->lang->line('common_person_name')),
+			array('cash_concept' => $CI->lang->line('incomes_cash_concept_id')),
+			array('cash_subconcept' => $CI->lang->line('incomes_cash_subconcept_id')),
+			array('detail' => $CI->lang->line('incomes_detail')),
+			array('cash' => $CI->lang->line('common_cash')),
+			array('bank' => $CI->lang->line('common_bank'))
+		);
+	}
+
+	$headers[] = array('delete' => '');
+
+	return transform_headers($headers);
+}
+
+/*
+Gets the html data row for the growing areas
+*/
+function get_income_data_row($income,$cashmovements = 0)
+{
+	$CI =& get_instance();
+	$controller_name = strtolower(get_class($CI));
+
+	if($cashmovements == 0)
+	{
+		return array (
+			'income_id' => $income->income_id,
+			'documentdate' => to_datetime(strtotime($income->documentdate)),
+			'documentno' => $income->documentno,
+			'name' => $income->name,
+			'bank' => $income->bank,
+			'detail' => $income->detail,
+			'cash_currency' => to_currency($income->cash_amount),
+			'bank_currency' => to_currency($income->check_amount),
+			'cash_usd' => to_usd($income->cash_usdamount),
+			'bank_usd' => to_usd($income->check_usdamount),
+			'delete' => ($income->readonly == 0 ? anchor($controller_name."/delete_income/$income->income_id", '<span class="glyphicon glyphicon-trash"></span>',
+				array('class'=>'modal-dlg', 'data-btn-submit' => $CI->lang->line('common_submit'), 'title'=>$CI->lang->line('incomes_delete'))
+			) : ''),
+			'edit' => ($income->readonly == 0 ? anchor($controller_name."/view_income/$income->income_id", '<span class="glyphicon glyphicon-edit"></span>',
+				array('class'=>'modal-dlg', 'data-btn-submit' => $CI->lang->line('common_submit'), 'title'=>$CI->lang->line('incomes_update'))
+			) : '')
+			);
+	}
+	else
+	{
+		return array (
+			'income_id' => $income->income_id,
+			'documentdate' => to_datetime(strtotime($income->documentdate)),
+			'documentno' => $income->documentno,
+			'name' => $income->name,
+			'cash_concept' => $income->cash_concept,
+			'cash_subconcept' => $income->cash_subconcept,
+			'detail' => $income->detail,
+			'cash' => to_currency($income->cash_amount),
+			'bank' => to_currency($income->check_amount),
+			'delete' => ($income->readonly == 0 ? anchor($controller_name."/delete_income/$income->income_id", '<span class="glyphicon glyphicon-trash"></span>',
+				array('class'=>'modal-dlg', 'data-btn-submit' => $CI->lang->line('common_submit'), 'title'=>$CI->lang->line('incomes_delete'))
+			) : ''),
+			'edit' => ($income->readonly == 0 ? anchor($controller_name."/view_income/$income->income_id", '<span class="glyphicon glyphicon-edit"></span>',
+				array('class'=>'modal-dlg', 'data-btn-submit' => $CI->lang->line('common_submit'), 'title'=>$CI->lang->line('incomes_update'))
+			) : '')
+			);
+	}
+}
+
+/*
+Get the header for the growing areas tabular view
+*/
+function get_cost_manage_table_headers($cashmovement = 0)
+{
+	$CI =& get_instance();
+
+	if($cashmovement == 0)
+	{
+		$headers = array(
+			array('cost_id' => $CI->lang->line('costs_cost_id')),
+			array('documentdate' => $CI->lang->line('costs_documentdate')),
+			array('documentno' => $CI->lang->line('costs_documentno')),
+			array('name' => $CI->lang->line('common_person_name')),
+			array('concept' => $CI->lang->line('costs_cash_concept_id')),
+			array('detail' => $CI->lang->line('costs_detail')),
+			array('cash_currency' => $CI->lang->line('costs_cash_currency')),
+			array('bank_currency' => $CI->lang->line('costs_bank_currency'))
+		);
+	}
+	else
+	{
+		$headers = array(
+			array('cost_id' => $CI->lang->line('costs_cost_id')),
+			array('documentdate' => $CI->lang->line('costs_documentdate')),
+			array('documentno' => $CI->lang->line('costs_documentno')),
+			array('name' => $CI->lang->line('common_person_name')),
+			array('concept' => $CI->lang->line('costs_cash_concept_id')),
+			array('subconcept' => $CI->lang->line('costs_cash_subconcept_id')),
+			array('detail' => $CI->lang->line('costs_detail')),
+			array('cash_currency' => $CI->lang->line('costs_cash_currency')),
+			array('bank_currency' => $CI->lang->line('costs_bank_currency'))
+		);
+	}
+
+	$headers[] = array('delete' => '');
+
+	return transform_headers($headers);
+}
+
+/*
+Gets the html data row for the growing areas
+*/
+function get_cost_data_row($cost,$cashmovement = 0)
+{
+	$CI =& get_instance();
+	$controller_name = strtolower(get_class($CI));
+
+	if($cashmovement == 0)
+	{
+		return array (
+			'cost_id' => $cost->cost_id,
+			'documentdate' => to_datetime(strtotime($cost->documentdate)),
+			'documentno' => $cost->documentno,
+			'name' => $cost->name,
+			'concept' => $cost->cash_subconcept_name,
+			'detail' => $cost->detail,
+			'cash_currency' => to_currency($cost->cash_amount),
+			'bank_currency' => to_currency($cost->check_amount),
+			'delete' => ($cost->readonly == 0 ? anchor($controller_name."/delete_cost/$cost->cost_id", '<span class="glyphicon glyphicon-trash"></span>',
+				array('class'=>'modal-dlg', 'data-btn-submit' => $CI->lang->line('common_submit'), 'title'=>$CI->lang->line('costs_delete'))
+			) : ''),
+			'edit' => ($cost->readonly == 0 ? anchor($controller_name."/view_cost/$cost->cost_id", '<span class="glyphicon glyphicon-edit"></span>',
+				array('class'=>'modal-dlg', 'data-btn-submit' => $CI->lang->line('common_submit'), 'title'=>$CI->lang->line('costs_update'))
+			) : '')
+			);
+	}
+	else
+	{
+		return array (
+		'cost_id' => $cost->cost_id,
+		'documentdate' => to_datetime(strtotime($cost->documentdate)),
+		'documentno' => $cost->documentno,
+		'name' => $cost->name,
+		'concept' => $cost->cash_concept_name,
+		'subconcept' => $cost->cash_subconcept_name,
+		'detail' => $cost->detail,
+		'cash_currency' => to_currency($cost->cash_amount),
+		'bank_currency' => to_currency($cost->check_amount),
+		'delete' => ($cost->readonly == 0 ? anchor($controller_name."/delete_cost/$cost->cost_id", '<span class="glyphicon glyphicon-trash"></span>',
+			array('class'=>'modal-dlg', 'data-btn-submit' => $CI->lang->line('common_submit'), 'title'=>$CI->lang->line('costs_delete'))
+		) : ''),
+		'edit' => ($cost->readonly == 0 ? anchor($controller_name."/view_cost/$cost->cost_id", '<span class="glyphicon glyphicon-edit"></span>',
+			array('class'=>'modal-dlg', 'data-btn-submit' => $CI->lang->line('common_submit'), 'title'=>$CI->lang->line('costs_update'))
+		) : '')
+		);
+	}
+}
+
+/*
+Get the header for the growing areas tabular view
+*/
+function get_expense_manage_table_headers($cashmovement = 0)
+{
+	$CI =& get_instance();
+
+	$headers = array(
+		array('expense_id' => $CI->lang->line('expenses_expense_id')),
+		array('documentdate' => $CI->lang->line('expenses_documentdate')),
+		array('documentno' => $CI->lang->line('expenses_documentno')),
+		array('name' => $CI->lang->line('common_person_name')),
+		array('concept' => $CI->lang->line('expenses_cash_concept_id')),
+		array('detail' => $CI->lang->line('expenses_detail')),
+		array('doctype' => $CI->lang->line('expenses_doctype')),
+		array('docnumber' => $CI->lang->line('expenses_docnumber')),
+		array('cash_currency' => $CI->lang->line('expenses_cash_currency')),
+		array('bank_currency' => $CI->lang->line('expenses_bank_currency'))
+	);
+
+	$headers[] = array('delete' => '');
+
+	return transform_headers($headers);
+}
+
+/*
+Gets the html data row for the growing areas
+*/
+function get_expense_data_row($expense,$cashmovement = 0)
+{
+	$CI =& get_instance();
+	$controller_name = strtolower(get_class($CI));
+
+	return array (
+		'expense_id' => $expense->expense_id,
+		'documentdate' => to_datetime(strtotime($expense->documentdate)),
+		'documentno' => $expense->documentno,
+		'name' => $expense->name,
+		'concept' => $expense->cash_concept_name,
+		'detail' => $expense->detail,
+		'doctype' => $expense->doctype,
+		'docnumber' => $expense->docnumber,
+		'cash_currency' => to_currency($expense->cash_amount),
+		'bank_currency' => to_currency($expense->check_amount),
+		'delete' => ($expense->readonly == 0 ? anchor($controller_name."/delete_expense/$expense->expense_id", '<span class="glyphicon glyphicon-trash"></span>',
+			array('class'=>'modal-dlg', 'data-btn-submit' => $CI->lang->line('common_submit'), 'title'=>$CI->lang->line('expenses_delete'))
+		) : ''),
+		'edit' => ($expense->readonly == 0 ? anchor($controller_name."/view_expense/$expense->expense_id", '<span class="glyphicon glyphicon-edit"></span>',
+			array('class'=>'modal-dlg', 'data-btn-submit' => $CI->lang->line('common_submit'), 'title'=>$CI->lang->line('expenses_update'))
+		) : '')
 	);
 }
 
@@ -748,11 +1303,72 @@ function get_expenses_manage_payments_summary($payments, $expenses)
 	return $table;
 }
 
-
 /*
 Get the header for the cashup tabular view
 */
 function get_cashups_manage_table_headers()
+{
+	$CI =& get_instance();
+
+	$headers = array(
+		array('cashup_id' => $CI->lang->line('cashups_id')),
+		array('cash_book_id' => $CI->lang->line('cashups_cash_book_id')),
+		array('open_employee_id' => $CI->lang->line('cashups_open_employee')),
+		array('open_date' => $CI->lang->line('cashups_opened_date')),
+		array('income' => $CI->lang->line('cashups_income')),
+		array('cost_cash' => $CI->lang->line('cashups_cost_cash')),
+		array('cost_bank' => $CI->lang->line('cashups_cost_bank')),
+		array('expense' => $CI->lang->line('cashups_expense')),
+		array('balance' => $CI->lang->line('cashups_balance')),
+		array('state' => $CI->lang->line('common_state')),
+		array('close_date' => $CI->lang->line('cashups_closed_date'))
+	);
+
+	$headers[] = array('close' => '');
+	$headers[] = array('detail' => '');
+	$headers[] = array('print' => '');
+
+	return transform_headers($headers);
+}
+
+/*
+Gets the html data row for the cashups
+*/
+function get_cash_up_data_row($cash_up)
+{
+	$CI =& get_instance();
+
+	$controller_name = strtolower(get_class($CI));
+
+	return array (
+		'cashup_id' => $cash_up->cashup_id,
+		'cash_book_id' => $cash_up->cash_book,
+		'open_employee_id' => $cash_up->open_first_name . ' ' . $cash_up->open_last_name,
+		'open_date' => to_datetime(strtotime($cash_up->open_date)),
+		'income' => to_currency($cash_up->income),
+		'cost_cash' => to_currency($cash_up->cost_cash),
+		'cost_bank' => to_currency($cash_up->cost_bank),
+		'expense' => to_currency($cash_up->expense),
+		'balance' => to_currency($cash_up->closed_amount_total),
+		'state' => ($cash_up->state==0 ? $CI->lang->line('common_opened') : $CI->lang->line('common_closed')),
+		'close_date' => (!empty($cash_up->close_date) ? to_datetime(strtotime($cash_up->close_date)) : ''),
+		'close' => ($cash_up->state==0 ? anchor($controller_name."/close/$cash_up->cashup_id", '<span class="glyphicon glyphicon-folder-close"></span>',
+			array('class'=>'modal-dlg', 'data-btn-submit' => $CI->lang->line('common_submit'), 'title'=>$CI->lang->line($controller_name.'_close'))
+		) : ''),
+		'detail' => anchor($controller_name."/detail/$cash_up->cashup_id", '<span class="glyphicon glyphicon-list-alt"></span>',
+			array('title'=>$CI->lang->line($controller_name.'_showdetail'))
+		),
+		'print' => anchor($controller_name."/print_report/$cash_up->cashup_id", '<span class="glyphicon glyphicon-print"></span>',
+			array('title'=>$CI->lang->line($controller_name.'_print'))
+		),
+		'edit' => ''
+	);
+}
+
+/*
+Get the header for the cashup tabular view
+*/
+/*function get_cashups_manage_table_headers()
 {
 	$CI =& get_instance();
 
@@ -773,12 +1389,12 @@ function get_cashups_manage_table_headers()
 	);
 
 	return transform_headers($headers);
-}
+}*/
 
 /*
 Gets the html data row for the cashups
 */
-function get_cash_up_data_row($cash_up)
+/*function get_cash_up_data_row($cash_up)
 {
 	$CI =& get_instance();
 
@@ -802,5 +1418,49 @@ function get_cash_up_data_row($cash_up)
 			array('class'=>'modal-dlg', 'data-btn-submit' => $CI->lang->line('common_submit'), 'title'=>$CI->lang->line($controller_name.'_update'))
 		)
 	);
+}*/
+
+/*
+Get the header for the doctypesequence tabular view
+*/
+function get_doctypesequence_manage_table_headers()
+{
+	$CI =& get_instance();
+
+	$headers = array(
+		array('sequence_id' => $CI->lang->line('doctypesequences_sequence_id')),
+		array('name' => $CI->lang->line('doctypesequences_name')),
+		array('doctype' => $CI->lang->line('doctypesequences_doctype')),
+		array('prefix' => $CI->lang->line('doctypesequences_prefix')),
+		array('suffix' => $CI->lang->line('doctypesequences_suffix')),
+		array('next_sequence' => $CI->lang->line('doctypesequences_next_sequence')),
+		array('number_incremental' => $CI->lang->line('doctypesequences_number_incremental')),
+		array('is_cashup' => $CI->lang->line('doctypesequences_is_cashup'))
+	);
+
+	return transform_headers($headers);
 }
+
+/*
+Gets the html data row for the doctypesequence
+*/
+function get_doctypesequence_data_row($doctypesequence)
+{
+	$CI =& get_instance();
+	$controller_name = strtolower(get_class($CI));
+
+	return array (
+		'sequence_id' => $doctypesequence->sequence_id,
+		'name' => $doctypesequence->name,
+		'doctype' => $CI->lang->line('doctypesequences_doctype_'.substr($doctypesequence->doctype,0,-1)),
+		'prefix' => $doctypesequence->prefix,
+		'suffix' => $doctypesequence->suffix,
+		'next_sequence' => $doctypesequence->next_sequence,
+		'number_incremental' => $doctypesequence->number_incremental,
+		'is_cashup' => ($doctypesequence->is_cashup == 0 ? $CI->lang->line('common_no') : $CI->lang->line('common_yes')),
+		'edit' => anchor($controller_name."/view/$doctypesequence->sequence_id", '<span class="glyphicon glyphicon-edit"></span>',
+			array('class'=>'modal-dlg', 'data-btn-submit' => $CI->lang->line('common_submit'), 'title'=>$CI->lang->line($controller_name.'_update'))
+		));
+}
+
 ?>

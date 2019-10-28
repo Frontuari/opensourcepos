@@ -25,6 +25,19 @@ class Customers extends Persons
 	}
 
 	/*
+	Gives search suggestions based on what is being searched for
+	*/
+	public function get_row_by_dni($dni)
+	{
+		$data_row = $this->Person->get_info_by_dni($dni);
+		foreach(get_object_vars($data_row) as $property => $value)
+		{
+			$data_row->$property = $this->xss_clean($value);
+		}
+		echo json_encode($data_row);
+	}
+
+	/*
 	Gets one row for a customer manage table. This is called using AJAX to update one row.
 	*/
 	public function get_row($row_id)
@@ -239,6 +252,7 @@ class Customers extends Persons
 		$person_data = array(
 			'first_name' => $first_name,
 			'last_name' => $last_name,
+			'dni' => $this->input->post('dni'),
 			'gender' => $this->input->post('gender'),
 			'email' => $email,
 			'phone_number' => $this->input->post('phone_number'),
@@ -254,6 +268,7 @@ class Customers extends Persons
 		$date_formatter = date_create_from_format($this->config->item('dateformat') . ' ' . $this->config->item('timeformat'), $this->input->post('date'));
 
 		$customer_data = array(
+			'ruc' => $this->input->post('ruc'),
 			'consent' => $this->input->post('consent') != NULL,
 			'account_number' => $this->input->post('account_number') == '' ? NULL : $this->input->post('account_number'),
 			'tax_id' => $this->input->post('tax_id'),

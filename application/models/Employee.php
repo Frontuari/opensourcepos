@@ -101,7 +101,7 @@ class Employee extends Person
 		{
 			if(!$employee_id || !$this->exists($employee_id))
 			{
-				$employee_data['person_id'] = $employee_id = $person_data['person_id'];
+				$employee_data['person_id'] = $employee_id = (!empty($person_data['person_id']) ? $person_data['person_id'] : $employee_id);
 				$success = $this->db->insert('employees', $employee_data);
 			}
 			else
@@ -332,7 +332,7 @@ class Employee extends Person
 	}
 
 	/*
-	Logs out a user by destorying all session data and redirect to login
+	Logs out a employee by destorying all session data and redirect to login
 	*/
 	public function logout()
 	{
@@ -485,5 +485,47 @@ class Employee extends Person
 
 		return $success;
 	}
+
+	/*
+	Gets employees information about a particular location
+	*/
+	public function get_employee_by_location($location_id)
+	{
+		$this->db->select('employees.person_id,
+			employees.username,
+			people.first_name,
+			people.last_name,
+			stock_locations.location_code,
+			stock_locations.location_name');
+		$this->db->from('employees');
+		$this->db->join('people', 'people.person_id = employees.person_id');
+		$this->db->join('stock_locations', 'stock_locations.location_id = employees.stock_location_id');
+		$this->db->where('employees.stock_location_id', $location_id);
+		$query = $this->db->get();
+
+		if($query->num_rows() >= 1)
+		{
+			return $query->result();
+		}
+		else
+		{
+			//Get empty base parent object, as $employee_id is NOT an employee
+			$person_obj = parent::get_info(-1);
+
+			//Get all the fields from employee table
+			//append those fields to base parent object, we we have a complete empty object
+			foreach($this->db->list_fields('employees') as $field)
+			{
+				$person_obj->$field = '';
+			}
+			foreach($this->db->list_fields('stock_locations') as $field)
+			{
+				$person_obj->$field = '';
+			}
+
+			return $person_obj;
+		}
+	}
+
 }
 ?>

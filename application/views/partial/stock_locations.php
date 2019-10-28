@@ -4,10 +4,23 @@ $i = 0;
 foreach($stock_locations as $location => $location_data)
 {
 	$location_id = $location_data['location_id'];
+	$location_code = $location_data['location_code'];
 	$location_name = $location_data['location_name'];
 	++$i;
 ?>
 	<div class="form-group form-group-sm" style="<?php echo $location_data['deleted'] ? 'display:none;' : 'display:block;' ?>">
+		<?php echo form_label($this->lang->line('config_stock_location_code') . ' ' . $i, 'stock_code_' . $i, array('class'=>'control-label col-xs-2')); ?>
+		<div class='col-xs-2'>
+			<?php $form_data = array(
+					'name'=>'stock_code_' . $location_id,
+					'id'=>'stock_code_' . $location_id,
+					'class'=>'stock_location valid_chars form-control input-sm required',
+					'value'=>$location_code
+				);
+				$location_data['deleted'] && $form_data['disabled'] = 'disabled';
+				echo form_input($form_data);
+			?>
+		</div>
 		<?php echo form_label($this->lang->line('config_stock_location') . ' ' . $i, 'stock_location_' . $i, array('class'=>'required control-label col-xs-2')); ?>
 		<div class='col-xs-2'>
 			<?php $form_data = array(

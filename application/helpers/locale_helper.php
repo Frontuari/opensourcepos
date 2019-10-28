@@ -337,6 +337,69 @@ function to_datetime($datetime = DEFAULT_DATETIME)
 	return date($config->item('dateformat') . ' ' . $config->item('timeformat'), $datetime);
 }
 
+function convert_currency_to_usd($amount)
+{
+	$convert_amount = 0;
+	$config = get_instance()->config;
+	if(!empty($config->item('currency_usd_conversion')))
+	{
+		$convert_amount = $amount / $config->item('currency_usd_conversion');
+	}
+	else
+	{
+		$convert_amount = $amount * 1;
+	}
+
+	$convert_amount = round($convert_amount,$config->item('currency_decimals'));
+
+	return $convert_amount;
+}
+
+function convert_usd_to_currency($amount)
+{
+	$convert_amount = 0;
+	$config = get_instance()->config;
+	if(!empty($config->item('currency_usd_conversion')))
+	{
+		$convert_amount = $amount * $config->item('currency_usd_conversion');
+	}
+	else
+	{
+		$convert_amount = $amount * 1;
+	}
+
+	$convert_amount = round($convert_amount,$config->item('currency_decimals'));
+
+	return $convert_amount;
+}
+
+function to_usd($number)
+{
+	return usd_to_decimals($number, 'currency_decimals', \NumberFormatter::CURRENCY);
+}
+
+function usd_to_decimals($number, $decimals, $type=\NumberFormatter::DECIMAL)
+{
+	// ignore empty strings and return
+	// NOTE: do not change it to empty otherwise tables will show a 0 with no decimal nor currency symbol
+	if(!isset($number))
+	{
+		return $number;
+	}
+
+	$config = get_instance()->config;
+	$fmt = new \NumberFormatter('en_US', $type);
+	$fmt->setAttribute(\NumberFormatter::MIN_FRACTION_DIGITS, $config->item($decimals));
+	$fmt->setAttribute(\NumberFormatter::MAX_FRACTION_DIGITS, $config->item($decimals));
+	if(empty($config->item('thousands_separator')))
+	{
+		$fmt->setAttribute(\NumberFormatter::GROUPING_SEPARATOR_SYMBOL, '');
+	}
+	$fmt->setSymbol(\NumberFormatter::CURRENCY_SYMBOL, '$');
+
+	return $fmt->format($number);
+}
+
 function to_currency($number)
 {
 	return to_decimals($number, 'currency_decimals', \NumberFormatter::CURRENCY);

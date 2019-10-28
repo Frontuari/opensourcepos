@@ -89,6 +89,19 @@ class Module extends CI_Model
 		return $this->db->get();
 	}
 
+	public function get_allowed_custom_modules($person_id,$module)
+	{
+		$menus = array($module, 'both');
+		$this->db->from('modules');
+		$this->db->join('permissions', 'permissions.permission_id = modules.module_id');
+		$this->db->join('grants', 'permissions.permission_id = grants.permission_id');
+		$this->db->where('person_id', $person_id);
+		$this->db->where_in('menu_group', $menus);
+		$this->db->where('sort !=', 0);
+		$this->db->order_by('sort', 'asc');
+		return $this->db->get();
+	}
+
 	/**
 	 * This method is used to set the show the office navigation icon on the home page
 	 * which happens when the sort value is greater than zero

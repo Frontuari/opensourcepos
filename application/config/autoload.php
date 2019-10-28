@@ -133,6 +133,7 @@ $autoload['language'] = array();
 |	$autoload['model'] = array('first_model' => 'first');
 */
 $autoload['model'] = array(
+	'Doctypesequence',
 	'Appconfig',
 	'Person',
 	'Customer',
@@ -143,6 +144,11 @@ $autoload['model'] = array(
 	'Sale',
 	'Supplier',
 	'Inventory',
+	'Cash_concept',
+	'Cash_book',
+	'Cash_flow',
+	'Cash_daily',
+	'Overall_cash',
 	'Receiving',
 	'Giftcard',
 	'Item_kit',
@@ -153,6 +159,9 @@ $autoload['model'] = array(
 	'Customer_rewards',
 	'Rewards',
 	'Expense_category',
+	'Bank',
+	'Income',
+	'Cost',
 	'Expense',
 	'Cashup',
 	'Attribute',

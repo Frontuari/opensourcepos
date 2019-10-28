@@ -54,6 +54,10 @@ $route['default_controller'] = 'login';
 $route['no_access/([^/]+)'] = 'no_access/index/$1';
 $route['no_access/([^/]+)/([^/]+)'] = 'no_access/index/$1/$2';
 
+//	Submenu
+$route['cash'] = 'submenu/index/cash';
+$route['pay_cash'] = 'submenu/index/pay_cash';
+
 $route['sales/index/([^/]+)'] = 'sales/manage/$1';
 $route['sales/index/([^/]+)/([^/]+)'] = 'sales/manage/$1/$2';
 $route['sales/index/([^/]+)/([^/]+)/([^/]+)'] = 'sales/manage/$1/$2/$3';

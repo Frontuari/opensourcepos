@@ -36,13 +36,19 @@ $(document).ready(function()
 <?php $this->load->view('partial/print_receipt', array('print_after_sale'=>false, 'selected_printer'=>'takings_printer')); ?>
 
 <div id="title_bar" class="print_hide btn-toolbar">
-	<button onclick="javascript:printdoc()" class='btn btn-info btn-sm pull-right'>
+	<!--<button onclick="javascript:printdoc()" class='btn btn-info btn-sm pull-right'>
 		<span class="glyphicon glyphicon-print">&nbsp;</span><?php echo $this->lang->line('common_print'); ?>
-	</button>
+	</button>-->
+	<?php if(empty($cashup_openend->cashup_id) || (!empty($cashup_openend->cashup_id) && !empty($cashup_openend->close_date))):?>
 	<button class='btn btn-info btn-sm pull-right modal-dlg' data-btn-submit='<?php echo $this->lang->line('common_submit') ?>' data-href='<?php echo site_url($controller_name."/view"); ?>'
 			title='<?php echo $this->lang->line($controller_name.'_new'); ?>'>
-		<span class="glyphicon glyphicon-tags">&nbsp</span><?php echo $this->lang->line($controller_name . '_new'); ?>
+		<span class="glyphicon glyphicon-folder-open">&nbsp</span><?php echo $this->lang->line($controller_name . '_new'); ?>
 	</button>
+	<?php else:?>	
+	<?php echo anchor($controller_name.'/expense','<span class="glyphicon glyphicon-asterisk">&nbsp</span>'.$this->lang->line('common_manage').$this->lang->line($controller_name . '_expense'),array('class' => 'btn btn-success btn-sm pull-right')); ?>
+	<?php echo anchor($controller_name.'/cost','<span class="glyphicon glyphicon-minus">&nbsp</span>'.$this->lang->line('common_manage').$this->lang->line($controller_name . '_cost'),array('class' => 'btn btn-success btn-sm pull-right')); ?>
+	<?php echo anchor($controller_name.'/income','<span class="glyphicon glyphicon-plus">&nbsp</span>'.$this->lang->line('common_manage').$this->lang->line($controller_name . '_income'),array('class' => 'btn btn-success btn-sm pull-right')); ?>
+	<?php endif;?>
 </div>
 
 <div id="toolbar">

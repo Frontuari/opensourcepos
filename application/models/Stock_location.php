@@ -101,9 +101,10 @@ class Stock_location extends CI_Model
 
 	public function save(&$location_data, $location_id)
 	{
+		$location_code = $location_data['location_code'];
 		$location_name = $location_data['location_name'];
 
-		$location_data_to_save = array('location_name' => $location_name, 'deleted' => 0);
+		$location_data_to_save = array('location_code' => $location_code, 'location_name' => $location_name, 'deleted' => 0);
 
 		if(!$this->exists($location_id))
 		{
