@@ -123,9 +123,9 @@
 							<li>
 								<?php echo 'Recibo de '.$this->lang->line('costs_one_or_multiple') . ': ' .to_currency((!empty($receipt_cost) ? $receipt_cost : 0)); ?>
 							</li>
-							<li>
+							<!--<li>
 								<?php echo 'Compras: ' .to_currency((!empty($purchases) ? $purchases : 0)); ?>
-							</li>
+							</li>-->
 							<!--<li>
 								<?php echo 'Comprobante de Operación Serie I: ' .to_currency((!empty($vo_serie01) ? $vo_serie01 : 0)); ?>
 							</li>

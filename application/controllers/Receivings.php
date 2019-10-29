@@ -243,14 +243,14 @@ class Receivings extends Secure_Controller
 		$data['receiving_id'] = 'RECV ' . $this->Receiving->save($data['cart'], $supplier_id, $employee_id, $data['comment'], $data['reference'], $data['payment_type'], $data['stock_location']);
 
 		//	register cash journal movement
-		$cashup_info = $this->Cashup->get_cashup_employee_daily($employee_info->person_id,date('Y-m-d'));
-		$cash_concept = $this->Cash_concept->get_info_by_code('00-02-00');
-		$cash_book = $this->Cash_book->get_info_by_user($employee_info->person_id);
-		$cash_daily_data[] = array(
-			'cashup_id' => $cashup_info->cashup_id,
+		$overall_cash_info = $this->Overall_cash->get_overall_cash_open_info(date('Y-m-d'));
+		$cash_concept = $this->Cash_concept->get_info_by_code('02-00');
+		$cash_book = $this->Cash_book->get_info_overall_cash();
+		$cash_flow_data[] = array(
+			'overall_cash_id' => $overall_cash_info->overall_cash_id,
 			'cash_concept_id' => $cash_concept->cash_concept_id,
 			'cash_book_id' => $cash_book->cash_book_id,
-			'operation_type' => ($cash_concept->concept_type==1 ? 1 : ($cash_concept->concept_type==2 ? 2 : 3)),
+			'operation_type' => ($cash_concept->concept_type==1 ? 1 : 0),
 			'movementdate' => date('Y-m-d H:i:s'),
 			'description' => $data['receiving_id'],
 			'currency' => CURRENCY,
@@ -259,7 +259,7 @@ class Receivings extends Secure_Controller
 			'reference_id' => substr($data['receiving_id'],5,strlen($data['receiving_id']))
 		);
 
-		$this->Cash_daily->save($cash_daily_data[0],-1);
+		$this->Cash_flow->save($cash_flow_data[0],-1);
 		//	End save cash journal movement
 
 		$data = $this->xss_clean($data);

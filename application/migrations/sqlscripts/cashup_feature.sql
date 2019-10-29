@@ -35,7 +35,7 @@ INSERT INTO `ospos_cash_concepts` (`cash_concept_id`, `code`, `name`, `concept_t
   (NULL, '01-00', 'SALDO APERTURA CAJA GENERAL', '1', NULL, NULL, '0', '1', NULL, '1', '0'),
   (NULL, '00-01-00', 'SALDO APERTURA CAJA PAGADORA', '1', NULL, NULL, '0', '0', NULL, '1', '0'),
   (NULL, '00-01-01', 'VENTAS', '1', NULL, NULL, '0', '0', NULL, '1', '0'),
-  (NULL, '00-02-00', 'COMPRAS', '2', NULL, NULL, '0', '0', NULL, '1', '0');
+  (NULL, '02-00', 'COMPRAS', '0', NULL, NULL, '0', '1', NULL, '1', '0');
 
 
 INSERT INTO `ospos_modules` (`name_lang_key`, `desc_lang_key`, `sort`, `module_id`) VALUES
