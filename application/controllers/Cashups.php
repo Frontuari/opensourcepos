@@ -152,11 +152,13 @@ class Cashups extends Secure_Controller
 		//	Incomes
 		$data['receipt_income'] = $this->Cash_daily->get_balance_by_code($data['cashup_summary']->cashup_id,'01-01')->balance;
 		$data['open_cash'] = ($this->Cash_daily->get_balance_by_code($data['cashup_summary']->cashup_id,'00-01-00')->balance + $this->Cash_daily->get_balance_by_code($data['cashup_summary']->cashup_id,'01-02')->balance);
+		$data['sales'] = $this->Cash_daily->get_balance_by_code($data['cashup_summary']->cashup_id,'00-01-01')->balance;
 		//$data['ticket_sales'] = $this->Cash_daily->get_balance_by_code($data['cashup_summary']->cashup_id,'00-01-05')->balance;
 		//$data['invoices'] = $this->Cash_daily->get_balance_by_code($data['cashup_summary']->cashup_id,'00-01-06')->balance;
 		//$data['vouchers'] = $this->Cash_daily->get_vouchers($data['cashup_summary']->cash_book_id,$data['cashup_summary']->open_date)->balance;
 		//	Costs
 		$data['receipt_cost'] = $this->Cash_daily->get_balance_by_code($data['cashup_summary']->cashup_id,'02-01')->balance;
+		$data['purchases'] = $this->Cash_daily->get_balance_by_code($data['cashup_summary']->cashup_id,'00-02-00')->balance;
 		//$data['vo_serie01'] = $this->Cash_daily->get_balance_by_code($data['cashup_summary']->cashup_id,'00-02-03')->balance;
 		//$data['vo_serie02'] = $this->Cash_daily->get_balance_by_code($data['cashup_summary']->cashup_id,'00-02-04')->balance;
 		//$data['adjustnotes'] = $this->Cash_daily->get_balance_by_code($data['cashup_summary']->cashup_id,'02-02')->balance;
@@ -284,12 +286,14 @@ class Cashups extends Secure_Controller
 		$data['initial_balance'] = $this->Cash_daily->get_initial_balance($data['cashup_summary']->cash_book_id,$data['cashup_summary']->open_date)->balance;
 		//	Incomes
 		$data['receipt_income'] = $this->Cash_daily->get_balance_by_code($data['cashup_summary']->cashup_id,'01-01')->balance;
+		$data['sales'] = $this->Cash_daily->get_balance_by_code($data['cashup_summary']->cashup_id,'00-01-01')->balance;
 		$data['open_cash'] = ($this->Cash_daily->get_balance_by_code($data['cashup_summary']->cashup_id,'00-01-00')->balance + $this->Cash_daily->get_balance_by_code($data['cashup_summary']->cashup_id,'01-02')->balance);
 		//$data['ticket_sales'] = $this->Cash_daily->get_balance_by_code($data['cashup_summary']->cashup_id,'00-01-05')->balance;
 		//$data['invoices'] = $this->Cash_daily->get_balance_by_code($data['cashup_summary']->cashup_id,'00-01-06')->balance;
 		//$data['vouchers'] = $this->Cash_daily->get_vouchers($data['cashup_summary']->cash_book_id,$data['cashup_summary']->open_date)->balance;
 		//	Costs
 		$data['receipt_cost'] = $this->Cash_daily->get_balance_by_code($data['cashup_summary']->cashup_id,'02-01')->balance;
+		$data['purchases'] = $this->Cash_daily->get_balance_by_code($data['cashup_summary']->cashup_id,'00-02-00')->balance;
 		//$data['vo_serie01'] = $this->Cash_daily->get_balance_by_code($data['cashup_summary']->cashup_id,'00-02-03')->balance;
 		//$data['vo_serie02'] = $this->Cash_daily->get_balance_by_code($data['cashup_summary']->cashup_id,'00-02-04')->balance;
 		//$data['adjustnotes'] = $this->Cash_daily->get_balance_by_code($data['cashup_summary']->cashup_id,'02-02')->balance;

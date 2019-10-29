@@ -97,6 +97,9 @@
 								<?php echo 'Recibo de '.$this->lang->line('incomes_one_or_multiple') . ': ' .to_currency((!empty($receipt_income) ? $receipt_income : 0)); ?>
 							</li>
 							<li>
+								<?php echo 'Ventas: ' .to_currency((!empty($sales) ? $sales : 0)); ?>
+							</li>
+							<li>
 								<?php echo 'Caja General Ingreso de Efectivo: ' .to_currency((!empty($open_cash) ? $open_cash : 0)); ?>
 							</li>
 							<!--<li>
@@ -119,6 +122,9 @@
 						<ul><b style="font-size: large;">Egresos: </b><?php echo to_currency($cashup_summary->cost);?>
 							<li>
 								<?php echo 'Recibo de '.$this->lang->line('costs_one_or_multiple') . ': ' .to_currency((!empty($receipt_cost) ? $receipt_cost : 0)); ?>
+							</li>
+							<li>
+								<?php echo 'Compras: ' .to_currency((!empty($purchases) ? $purchases : 0)); ?>
 							</li>
 							<!--<li>
 								<?php echo 'Comprobante de Operación Serie I: ' .to_currency((!empty($vo_serie01) ? $vo_serie01 : 0)); ?>

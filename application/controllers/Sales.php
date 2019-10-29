@@ -792,6 +792,26 @@ class Sales extends Secure_Controller
 
 			$data['sale_id'] = 'POS ' . $data['sale_id_num'];
 
+			//	register cash journal movement
+			$cashup_info = $this->Cashup->get_cashup_employee_daily($employee_info->person_id,date('Y-m-d'));
+			$cash_concept = $this->Cash_concept->get_info_by_code('00-01-01');
+			$cash_book = $this->Cash_book->get_info_by_user($employee_info->person_id);
+			$cash_daily_data[] = array(
+				'cashup_id' => $cashup_info->cashup_id,
+				'cash_concept_id' => $cash_concept->cash_concept_id,
+				'cash_book_id' => $cash_book->cash_book_id,
+				'operation_type' => ($cash_concept->concept_type==1 ? 1 : ($cash_concept->concept_type==2 ? 2 : 3)),
+				'movementdate' => date('Y-m-d H:i:s'),
+				'description' => $data['sale_id'],
+				'currency' => CURRENCY,
+				'amount' => parse_decimals($data['total']),
+				'table_reference' => 'sales',
+				'reference_id' => $data['sale_id_num']
+			);
+
+			$this->Cash_daily->save($cash_daily_data[0],-1);
+			//	End save cash journal movement
+
 			$data['cart'] = $this->sale_lib->sort_and_filter_cart($data['cart']);
 			$data = $this->xss_clean($data);
 

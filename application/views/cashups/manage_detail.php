@@ -36,6 +36,10 @@ $(document).ready(function()
 						<?php echo anchor($controller_name.'/detail_income/'.$cashup_summary->cashup_id.'/'.CURRENCY,'<span class="glyphicon glyphicon-list-alt">&nbsp</span>',array('title' => 'Ver detalle de ingresos')); ?>
 					</li>
 					<li>
+						<?php echo 'Ventas: ' .to_currency((!empty($sales) ? $sales : 0)); ?>
+						<?php echo anchor($controller_name.'/detail_income/'.$cashup_summary->cashup_id.'/'.CURRENCY,'<span class="glyphicon glyphicon-list-alt">&nbsp</span>',array('title' => 'Ver detalle de Ventas')); ?>
+					</li>
+					<li>
 						<?php echo 'Caja General Ingreso de Efectivo: ' .to_currency((!empty($open_cash) ? $open_cash : 0)); ?>
 						<?php echo anchor($controller_name.'/detail_income/'.$cashup_summary->cashup_id.'/'.CURRENCY,'<span class="glyphicon glyphicon-list-alt">&nbsp</span>',array('title' => 'Ver detalle de ingresos')); ?>
 					</li>
@@ -64,6 +68,10 @@ $(document).ready(function()
 					<li>
 						<?php echo 'Recibo de '.$this->lang->line('costs_one_or_multiple') . ': ' .to_currency((!empty($receipt_cost) ? $receipt_cost : 0)); ?>
 						<?php echo anchor($controller_name.'/detail_cost/'.$cashup_summary->cashup_id.'/'.CURRENCY,'<span class="glyphicon glyphicon-list-alt">&nbsp</span>',array('title' => 'Ver detalle de egresos')); ?>
+					</li>
+					<li>
+						<?php echo 'Compras: ' .to_currency((!empty($purchases) ? $purchases : 0)); ?>
+						<?php echo anchor($controller_name.'/detail_cost/'.$cashup_summary->cashup_id.'/'.CURRENCY,'<span class="glyphicon glyphicon-list-alt">&nbsp</span>',array('title' => 'Ver detalle de compras')); ?>
 					</li>
 					<!--<li>
 						<?php echo 'Comprobante de Operación Serie I: ' .to_currency((!empty($vo_serie01) ? $vo_serie01 : 0)); ?>

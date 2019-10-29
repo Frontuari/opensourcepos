@@ -1,14 +1,22 @@
-<?php 
+<?php
 
 $lang["module_attributes"] = "Attributes";
 $lang["module_attributes_desc"] = "Add, Update, Delete, and Search attributes.";
 $lang["module_both"] = "Both";
+$lang["module_cash"] = "Cash";
+$lang["module_cash_books"] = "Cash Books";
+$lang["module_cash_books_desc"] = "Add, Update, Delete, and Search Cash Books.";
+$lang["module_cash_concepts"] = "Cash Concepts";
+$lang["module_cash_concepts_desc"] = "Add, Update, Delete, and Search Cash Concepts.";
+$lang["module_cash_desc"] = "List cash menu modules.";
 $lang["module_cashups"] = "Cashups";
 $lang["module_cashups_desc"] = "Add, Update, Delete, and Search Cashups.";
 $lang["module_config"] = "Configuration";
 $lang["module_config_desc"] = "Change OSPOS's Configuration.";
 $lang["module_customers"] = "Customers";
 $lang["module_customers_desc"] = "Add, Update, Delete, and Search Customers.";
+$lang["module_doctypesequences"] = "Document Type Sequences";
+$lang["module_doctypesequences_desc"] = "Add, Update, Delete, and Search Document Type Sequences.";
 $lang["module_employees"] = "Employees";
 $lang["module_employees_desc"] = "Add, Update, Delete, and Search Employees.";
 $lang["module_expenses"] = "Expenses";
@@ -29,6 +37,10 @@ $lang["module_migrate"] = "Migrate";
 $lang["module_migrate_desc"] = "Update the OSPOS Database.";
 $lang["module_office"] = "Office";
 $lang["module_office_desc"] = "List office menu modules.";
+$lang["module_overall_cashs"] = "Overall Cash";
+$lang["module_overall_cashs_desc"] = "Add, Update, Delete, and Search Overall Cash.";
+$lang["module_pay_cash"] = "Pay Cash";
+$lang["module_pay_cash_desc"] = "List pay cash menu modules.";
 $lang["module_receivings"] = "Receivings";
 $lang["module_receivings_desc"] = "Process Purchase Orders.";
 $lang["module_reports"] = "Reports";
