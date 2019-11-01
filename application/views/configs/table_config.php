@@ -4,7 +4,7 @@
             <div id="required_fields_message"><?php echo $this->lang->line('common_fields_required_message'); ?></div>
             <ul id="table_error_message_box" class="error_message_box"></ul>
 
-			<div class="form-group form-group-sm">	
+			<div class="form-group form-group-sm">
 				<?php echo form_label($this->lang->line('config_dinner_table_enable'), 'dinner_table_enable', array('class' => 'control-label col-xs-2')); ?>
 				<div class='col-xs-1'>
 					<?php echo form_checkbox(array(
@@ -18,7 +18,7 @@
             <div id="dinner_tables">
 				<?php $this->load->view('partial/dinner_tables', array('dinner_tables' => $dinner_tables)); ?>
 			</div>
-            
+
             <?php echo form_submit(array(
                 'name' => 'submit_table',
                 'id' => 'submit_table',
@@ -42,7 +42,7 @@ $(document).ready(function()
 		}
 		else
 		{
-			$(".add_dinner_table, .remove_dinner_table").hide();	
+			$(".add_dinner_table, .remove_dinner_table").hide();
 		}
 		return arguments.callee;
 	})();
@@ -55,7 +55,7 @@ $(document).ready(function()
 		if ($("input[name*='dinner_tables']:enabled").length > 1)
 		{
 			$(".remove_dinner_tables").show();
-		} 
+		}
 		else
 		{
 			$(".remove_dinner_tables").hide();
@@ -92,7 +92,7 @@ $(document).ready(function()
 	$.validator.addMethod('dinner_table' , function(value, element) {
 		var value_count = 0;
 		$("input[name*='dinner_table']:not(input[name=dinner_table_enable])").each(function() {
-			value_count = $(this).val() == value ? value_count + 1 : value_count; 
+			value_count = $(this).val() == value ? value_count + 1 : value_count;
 		});
 		return value_count < 2;
     }, "<?php echo $this->lang->line('config_dinner_table_duplicate'); ?>");
@@ -100,12 +100,12 @@ $(document).ready(function()
     $.validator.addMethod('valid_chars', function(value, element) {
 		return value.indexOf('_') === -1;
     }, "<?php echo $this->lang->line('config_dinner_table_invalid_chars'); ?>");
-	
+
 	$('#table_config_form').validate($.extend(form_support.handler, {
 		submitHandler: function(form) {
 			$(form).ajaxSubmit({
 				beforeSerialize: function(arr, $form, options) {
-					$("input[name*='dinner_table']:not(input[name=dinner_table_enable])").prop("disabled", false); 
+					$("input[name*='dinner_table']:not(input[name=dinner_table_enable])").prop("disabled", false);
 					return true;
 				},
 				success: function(response)	{
@@ -137,7 +137,7 @@ $(document).ready(function()
 			?>
    		},
 
-		messages: 
+		messages:
 		{
 			<?php
 			$i = 0;

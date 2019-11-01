@@ -14,6 +14,14 @@
 			<th><?php echo $this->lang->line('sales_customer'); ?></th>
 			<th><?php echo $this->lang->line('sales_comments'); ?></th>
 			<th><?php echo $this->lang->line('sales_unsuspend_and_delete'); ?></th>
+			<?php
+			if($this->config->item('dinner_table_enable') == TRUE)
+			{
+			?>
+				<th><?php echo $this->lang->line('common_print'); ?></th>
+			<?php
+			}
+			?>
 		</tr>
 	</thead>
 	<tbody>
@@ -55,6 +63,20 @@
 						<input type="submit" name="submit" value="<?php echo $this->lang->line('sales_unsuspend'); ?>" id="submit" class="btn btn-primary btn-xs pull-right">
 					<?php echo form_close(); ?>
 				</td>
+				<?php
+				if($this->config->item('dinner_table_enable') == TRUE)
+				{
+				?>
+					<td>
+						<?php echo form_open('sales/print_order');
+							echo form_hidden('suspended_sale_id', $suspended_sale['sale_id']);
+						?>
+							<input type="submit" name="submit" value="<?php echo $this->lang->line('common_print'); ?>" id="submit" class="btn btn-success btn-xs pull-right">
+						<?php echo form_close(); ?>
+					</td>
+				<?php
+				}
+				?>
 			</tr>
 		<?php
 		}

@@ -49,6 +49,14 @@
 		?>
 
 		<div id="employee"><?php echo $this->lang->line('employees_employee').": ".$employee; ?></div>
+		<?php
+		if($this->config->item('dinner_table_enable') == TRUE)
+		{
+		?>
+			<div id="dinner_table"><?php echo $this->lang->line('sales_table').": ".$this->Dinner_table->get_name($dinner_table); ?></div>
+		<?php
+		}
+		?>
 	</div>
 
 	<table id="receipt_items">
@@ -120,7 +128,7 @@
 						?>
 							<td colspan="3" class="discount"><?php echo number_format($item['discount'], 0) . " " . $this->lang->line("sales_discount_included") ?></td>
 						<?php
-						}	
+						}
 						?>
 						<td class="total-value"><?php echo to_currency($item['discounted_total']); ?></td>
 					</tr>

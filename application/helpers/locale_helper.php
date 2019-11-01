@@ -292,7 +292,7 @@ function currency_side()
 	$fmt = new \NumberFormatter($config->item('number_locale'), \NumberFormatter::CURRENCY);
 	$fmt->setSymbol(\NumberFormatter::CURRENCY_SYMBOL, $config->item('currency_symbol'));
 
-	return !preg_match('/^¤/', $fmt->getPattern());
+	return !preg_match('/^造/', $fmt->getPattern());
 }
 
 function quantity_decimals()
@@ -341,9 +341,10 @@ function convert_currency_to_usd($amount)
 {
 	$convert_amount = 0;
 	$config = get_instance()->config;
-	if(!empty($config->item('currency_usd_conversion')))
+	$currency_usd_conversion = $config->item('currency_usd_conversion');
+	if(!empty($currency_usd_conversion))
 	{
-		$convert_amount = $amount / $config->item('currency_usd_conversion');
+        $convert_amount = $amount / $currency_usd_conversion;
 	}
 	else
 	{
@@ -359,9 +360,10 @@ function convert_usd_to_currency($amount)
 {
 	$convert_amount = 0;
 	$config = get_instance()->config;
-	if(!empty($config->item('currency_usd_conversion')))
+	$currency_usd_conversion = $config->item('currency_usd_conversion');
+	if(!empty($currency_usd_conversion))
 	{
-		$convert_amount = $amount * $config->item('currency_usd_conversion');
+		$convert_amount = $amount * $currency_usd_conversion;
 	}
 	else
 	{
@@ -391,7 +393,8 @@ function usd_to_decimals($number, $decimals, $type=\NumberFormatter::DECIMAL)
 	$fmt = new \NumberFormatter('en_US', $type);
 	$fmt->setAttribute(\NumberFormatter::MIN_FRACTION_DIGITS, $config->item($decimals));
 	$fmt->setAttribute(\NumberFormatter::MAX_FRACTION_DIGITS, $config->item($decimals));
-	if(empty($config->item('thousands_separator')))
+	$thousands_separator = $config->item('thousands_separator');
+	if(empty($thousands_separator))
 	{
 		$fmt->setAttribute(\NumberFormatter::GROUPING_SEPARATOR_SYMBOL, '');
 	}
@@ -454,7 +457,8 @@ function to_decimals($number, $decimals, $type=\NumberFormatter::DECIMAL)
 	$fmt = new \NumberFormatter($config->item('number_locale'), $type);
 	$fmt->setAttribute(\NumberFormatter::MIN_FRACTION_DIGITS, $config->item($decimals));
 	$fmt->setAttribute(\NumberFormatter::MAX_FRACTION_DIGITS, $config->item($decimals));
-	if(empty($config->item('thousands_separator')))
+	$thousands_separator = $config->item('thousands_separator');
+	if(empty($thousands_separator))
 	{
 		$fmt->setAttribute(\NumberFormatter::GROUPING_SEPARATOR_SYMBOL, '');
 	}
@@ -475,8 +479,8 @@ function parse_decimals($number)
 	$fmt = new \NumberFormatter($config->item('number_locale'), \NumberFormatter::DECIMAL);
 
 	$fmt->setAttribute(\NumberFormatter::FRACTION_DIGITS, $config->item('currency_decimals'));
-
-	if(empty($config->item('thousands_separator')))
+    $thousands_separator = $config->item('thousands_separator');
+	if(empty($thousands_separator))
 	{
 		$fmt->setAttribute(\NumberFormatter::GROUPING_SEPARATOR_SYMBOL, '');
 	}

@@ -129,8 +129,8 @@ class Sale extends CI_Model
 	{
 		// Pick up only non-suspended records
 		$where = 'sales.sale_status = 0 AND ';
-
-		if(empty($this->config->item('date_or_time_format')))
+		$date_or_time_format = $this->config->item('date_or_time_format');
+		if(empty($date_or_time_format))
 		{
 			$where .= 'DATE(sales.sale_time) BETWEEN ' . $this->db->escape($filters['start_date']) . ' AND ' . $this->db->escape($filters['end_date']);
 		}
@@ -312,7 +312,8 @@ class Sale extends CI_Model
 		$this->db->join('people AS customer_p', 'sales.customer_id = customer_p.person_id', 'LEFT');
 		$this->db->join('customers AS customer', 'sales.customer_id = customer.person_id', 'LEFT');
 
-		if(empty($this->config->item('date_or_time_format')))
+		$date_or_time_format = $this->config->item('date_or_time_format');
+		if(empty($date_or_time_format))
 		{
 			$this->db->where('DATE(sales.sale_time) BETWEEN ' . $this->db->escape($filters['start_date']) . ' AND ' . $this->db->escape($filters['end_date']));
 		}
@@ -1088,7 +1089,8 @@ class Sale extends CI_Model
 	{
 		if(empty($inputs['sale_id']))
 		{
-			if(empty($this->config->item('date_or_time_format')))
+			$date_or_time_format = $this->config->item('date_or_time_format');
+			if(empty($date_or_time_format))
 			{
 				$where = 'DATE(sales.sale_time) BETWEEN ' . $this->db->escape($inputs['start_date']) . ' AND ' . $this->db->escape($inputs['end_date']);
 			}

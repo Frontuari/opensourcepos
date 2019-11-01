@@ -112,7 +112,8 @@ class Cashup extends CI_Model
 
 		$this->db->where('cash_up.deleted', $filters['is_deleted']);
 
-		if(empty($this->config->item('date_or_time_format')))
+		$date_or_time_format = $this->config->item('date_or_time_format');
+		if(empty($date_or_time_format))
 		{
 			$this->db->where('DATE_FORMAT(cash_up.open_date, "%Y-%m-%d") BETWEEN ' . $this->db->escape($filters['start_date']) . ' AND ' . $this->db->escape($filters['end_date']));
 		}
@@ -210,7 +211,8 @@ class Cashup extends CI_Model
 		$initial_balance = "(SELECT SUM(amount * (CASE WHEN cd.operation_type = 1 THEN 1 ELSE -1 END)) FROM ". $this->db->dbprefix('cash_daily')." AS cd
 				WHERE cd.cash_book_id = (SELECT MAX(cash_book_id) FROM ".$this->db->dbprefix('cash_books')." WHERE employee_id = $employee_id AND deleted = 0) AND cd.deleted = 0 ";
 
-		if(empty($this->config->item('date_or_time_format')))
+		$date_or_time_format = $this->config->item('date_or_time_format');
+		if(empty($date_or_time_format))
 		{
 			$initial_balance .=' AND DATE_FORMAT(cd.movementdate, "%Y-%m-%d") < ' . $this->db->escape($today) . ')';
 		}
@@ -257,7 +259,8 @@ class Cashup extends CI_Model
 		$this->db->join('people AS close_employees', 'close_employees.person_id = cash_up.close_employee_id', 'LEFT');
 		$this->db->where('cash_up.deleted', 0);
 		$this->db->where('cash_up.open_employee_id', $employee_id);
-		if(empty($this->config->item('date_or_time_format')))
+		$date_or_time_format = $this->config->item('date_or_time_format');
+		if(empty($date_or_time_format))
 		{
 			$this->db->where('DATE_FORMAT(cash_up.open_date, "%Y-%m-%d") BETWEEN ' . $this->db->escape($today) . ' AND ' . $this->db->escape($today));
 		}

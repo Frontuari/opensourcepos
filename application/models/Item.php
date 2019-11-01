@@ -164,7 +164,8 @@ class Item extends CI_Model
 			$this->db->where('location_id', $filters['stock_location_id']);
 		}
 
-		if(empty($this->config->item('date_or_time_format')))
+		$date_or_time_format = $this->config->item('date_or_time_format');
+		if(empty($date_or_time_format))
 		{
 			$this->db->where('DATE_FORMAT(trans_date, "%Y-%m-%d") BETWEEN ' . $this->db->escape($filters['start_date']) . ' AND ' . $this->db->escape($filters['end_date']));
 		}

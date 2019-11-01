@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 $lang["common_address_1"] = "Address 1";
 $lang["common_address_2"] = "Address 2";
@@ -65,6 +65,6 @@ $lang["common_unknown"] = "Unknown";
 $lang["common_view_recent_sales"] = "View Recent Sales";
 $lang["common_website"] = "website";
 $lang["common_welcome"] = "Welcome";
-$lang["common_welcome_message"] = "Welcome to OSPOS, click a module below to get started.";
-$lang["common_you_are_using_ospos"] = "You are using Open Source Point Of Sale version";
+$lang["common_welcome_message"] = "Welcome to ComercialPOS, click a module below to get started.";
+$lang["common_you_are_using_ospos"] = "You are using ComercialPOS version";
 $lang["common_zip"] = "Postal Code";

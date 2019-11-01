@@ -198,7 +198,7 @@ class Receiving extends CI_Model
 
 		// execute transaction
 		$this->db->trans_complete();
-	
+
 		return $this->db->trans_status();
 	}
 
@@ -209,7 +209,7 @@ class Receiving extends CI_Model
 
 		return $this->db->get();
 	}
-	
+
 	public function get_supplier($receiving_id)
 	{
 		$this->db->from('receivings');
@@ -236,7 +236,8 @@ class Receiving extends CI_Model
 	{
 		if(empty($inputs['receiving_id']))
 		{
-			if(empty($this->config->item('date_or_time_format')))
+			$date_or_time_format = $this->config->item('date_or_time_format');
+			if(empty($date_or_time_format))
 			{
 				$where = 'WHERE DATE(receiving_time) BETWEEN ' . $this->db->escape($inputs['start_date']) . ' AND ' . $this->db->escape($inputs['end_date']);
 			}
@@ -253,7 +254,7 @@ class Receiving extends CI_Model
 		$this->db->query('CREATE TEMPORARY TABLE IF NOT EXISTS ' . $this->db->dbprefix('receivings_items_temp') .
 			' (INDEX(receiving_date), INDEX(receiving_time), INDEX(receiving_id))
 			(
-				SELECT 
+				SELECT
 					MAX(DATE(receiving_time)) AS receiving_date,
 					MAX(receiving_time) AS receiving_time,
 					receivings_items.receiving_id,
@@ -261,7 +262,7 @@ class Receiving extends CI_Model
 					MAX(item_location) AS item_location,
 					MAX(reference) AS reference,
 					MAX(payment_type) AS payment_type,
-					MAX(employee_id) AS employee_id, 
+					MAX(employee_id) AS employee_id,
 					items.item_id,
 					MAX(receivings.supplier_id) AS supplier_id,
 					MAX(quantity_purchased) AS quantity_purchased,

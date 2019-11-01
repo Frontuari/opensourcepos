@@ -263,7 +263,7 @@ class Expense extends CI_Model
 				cash_concepts.name AS cash_concept_name,
 				cash_subconcepts.name AS cash_subconcept_name,
 				CASE WHEN expenses.movementtype = \'C\' AND expenses.currency = \'' . CURRENCY . '\' THEN expenses.amount ELSE 0 END AS cash_amount,
-				CASE WHEN expenses.movementtype = \'B\' AND expenses.currency = \'' . CURRENCY . '\' THEN expenses.amount ELSE 0 END AS check_amount');	
+				CASE WHEN expenses.movementtype = \'B\' AND expenses.currency = \'' . CURRENCY . '\' THEN expenses.amount ELSE 0 END AS check_amount');
 		}
 
 		$this->db->from('expenses AS expenses');
@@ -278,7 +278,8 @@ class Expense extends CI_Model
 		$this->db->where('expenses.is_cashupmovement', $cashmovement);
 		$this->db->where('expenses.deleted', 0);
 
-		if(empty($this->config->item('date_or_time_format')))
+		$date_or_time_format = $this->config->item('date_or_time_format');
+		if(empty($date_or_time_format))
 		{
 			$this->db->where('DATE_FORMAT(expenses.documentdate, "%Y-%m-%d") BETWEEN ' . $this->db->escape($filters['start_date']) . ' AND ' . $this->db->escape($filters['end_date']));
 		}
@@ -394,7 +395,7 @@ class Expense extends CI_Model
 		$success &= $this->db->trans_status();
 
 		return $success;
-		
+
 		return $success;
 	}
 

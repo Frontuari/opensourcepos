@@ -828,6 +828,136 @@ class Sales extends Secure_Controller
 		}
 	}
 
+	public function print_order()
+	{
+
+		$sale_id = $this->input->post('suspended_sale_id');
+		$this->sale_lib->clear_all();
+
+		if($sale_id > 0)
+		{
+			$this->sale_lib->copy_entire_sale($sale_id);
+		}
+		// Set current register mode to reflect that of unsuspended order type
+		$this->change_register_mode($this->sale_lib->get_sale_type());
+
+		$sale_id = $this->sale_lib->get_sale_id();
+		$sale_type = $this->sale_lib->get_sale_type();
+		$data = array();
+		$data['dinner_table'] = $this->sale_lib->get_dinner_table();
+
+		$data['cart'] = $this->sale_lib->get_cart();
+
+		$data['include_hsn'] = ($this->config->item('include_hsn') == '1');
+		$__time = time();
+		$data['transaction_time'] = to_datetime($__time);
+		$data['transaction_date'] = to_date($__time);
+		$data['show_stock_locations'] = $this->Stock_location->show_locations('sales');
+		$data['comments'] = $this->sale_lib->get_comment();
+		$employee_id = $this->Employee->get_logged_in_employee_info()->person_id;
+		$employee_info = $this->Employee->get_info($employee_id);
+		$data['employee'] = $employee_info->first_name . ' ' . mb_substr($employee_info->last_name, 0, 1);
+
+		$data['company_info'] = implode("\n", array(
+			$this->config->item('address'),
+			$this->config->item('phone')
+		));
+		if($this->config->item('account_number'))
+		{
+			$data['company_info'] .= "\n" . $this->lang->line('sales_account_number') . ": " . $this->config->item('account_number');
+		}
+		if($this->config->item('tax_id') != '')
+		{
+			$data['company_info'] .= "\n" . $this->lang->line('sales_tax_id') . ": " . $this->config->item('tax_id');
+		}
+
+		$data['invoice_number_enabled'] = $this->sale_lib->is_invoice_mode();
+		$data['cur_giftcard_value'] = $this->sale_lib->get_giftcard_remainder();
+		$data['cur_rewards_value'] = $this->sale_lib->get_rewards_remainder();
+		$data['print_after_sale'] = $this->sale_lib->is_print_after_sale();
+		$data['price_work_orders'] = $this->sale_lib->is_price_work_orders();
+		$data['email_receipt'] = $this->sale_lib->is_email_receipt();
+		$customer_id = $this->sale_lib->get_customer();
+		$invoice_number_enabled = $this->sale_lib->get_invoice_number_enabled();
+		$invoice_number = $this->sale_lib->get_invoice_number();
+		$data["invoice_number"] = $invoice_number;
+		$work_order_number = $this->sale_lib->get_work_order_number();
+		$data["work_order_number"] = $work_order_number;
+		$quote_number = $this->sale_lib->get_quote_number();
+		$data["quote_number"] = $quote_number;
+		$customer_info = $this->_load_customer_data($customer_id, $data);
+		if($customer_info != NULL)
+		{
+			$data["customer_comments"] = $customer_info->comments;
+			$data['tax_id'] = $customer_info->tax_id;
+		}
+		$tax_details = $this->tax_lib->get_taxes($data['cart']);
+		$data['taxes'] = $tax_details[0];
+		$data['discount'] = $this->sale_lib->get_discount();
+		$data['payments'] = $this->sale_lib->get_payments();
+
+		// Returns 'subtotal', 'total', 'cash_total', 'payment_total', 'amount_due', 'cash_amount_due', 'payments_cover_total'
+		$totals = $this->sale_lib->get_totals($tax_details[0]);
+		$data['subtotal'] = $totals['subtotal'];
+		$data['total'] = $totals['total'];
+		$data['payments_total'] = $totals['payment_total'];
+		$data['payments_cover_total'] = $totals['payments_cover_total'];
+		$data['cash_rounding'] = $this->session->userdata('cash_rounding');
+		$data['prediscount_subtotal'] = $totals['prediscount_subtotal'];
+		$data['cash_total'] = $totals['cash_total'];
+		$data['non_cash_total'] = $totals['total'];
+		$data['cash_amount_due'] = $totals['cash_amount_due'];
+		$data['non_cash_amount_due'] = $totals['amount_due'];
+
+		if($data['cash_rounding'])
+		{
+			$data['total'] = $totals['cash_total'];
+			$data['amount_due'] = $totals['cash_amount_due'];
+		}
+		else
+		{
+			$data['total'] = $totals['total'];
+			$data['amount_due'] = $totals['amount_due'];
+		}
+		$data['amount_change'] = $data['amount_due'] * -1;
+
+		if($data['amount_change'] > 0)
+		{
+			// Save cash refund to the cash payment transaction if found, if not then add as new Cash transaction
+
+			if(array_key_exists($this->lang->line('sales_cash'), $data['payments']))
+			{
+				$data['payments'][$this->lang->line('sales_cash')]['cash_refund'] = $data['amount_change'];
+			}
+			else
+			{
+				$payment = array($this->lang->line('sales_cash') => array('payment_type' => $this->lang->line('sales_cash'), 'payment_amount' => 0, 'cash_refund' => $data['amount_change']));
+				$data['payments'] += $payment;
+			}
+		}
+
+		$data['print_price_info'] = TRUE;
+
+		$override_invoice_number = NULL;
+
+		// Save the data to the sales table
+		$data['sale_status'] = SUSPENDED;
+		if($this->sale_lib->is_return_mode())
+		{
+			$sale_type = SALE_TYPE_RETURN;
+		}
+		else
+		{
+			$sale_type = SALE_TYPE_POS;
+		}
+
+		$data['sale_id'] = 'POS ' . $sale_id;
+
+		$data['barcode'] = $this->barcode_lib->generate_receipt_barcode($data['sale_id']);
+		$this->load->view('sales/receipt', $data);
+		$this->sale_lib->clear_all();
+	}
+
 	public function send_pdf($sale_id, $type = 'invoice')
 	{
 		$sale_data = $this->_load_sale_data($sale_id);
