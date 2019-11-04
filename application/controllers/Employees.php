@@ -46,6 +46,16 @@ class Employees extends Persons
 	}
 
 	/*
+	Gives search data from sunat
+	*/
+	public function get_data_from_sunat($type,$dni)
+	{
+			$this->load->library('sunat_lib');
+			$response = $this->sunat_lib->getData($type, $dni);
+			echo json_encode($response);
+	}
+
+	/*
 	Gives search suggestions based on what is being searched for
 	*/
 	public function suggest_search()

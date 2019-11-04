@@ -41,7 +41,7 @@
 			<?php echo form_radio(array(
 					'name'=>'gender',
 					'type'=>'radio',
-					'id'=>'gender',
+					'id'=>'genderM',
 					'value'=>1,
 					'checked'=>$person_info->gender === '1')
 					); ?> <?php echo $this->lang->line('common_gender_male'); ?>
@@ -50,7 +50,7 @@
 			<?php echo form_radio(array(
 					'name'=>'gender',
 					'type'=>'radio',
-					'id'=>'gender',
+					'id'=>'genderF',
 					'value'=>0,
 					'checked'=>$person_info->gender === '0')
 					); ?> <?php echo $this->lang->line('common_gender_female'); ?>
@@ -237,6 +237,29 @@ $(document).ready(function()
           console.log(jqXHR);
       }
 		});
+		if($("#first_name").val()=="")
+		{
+			if(<?php echo $this->config->item('sunat_enable');?>)
+			{
+				$.ajax({
+					type: 'GET',
+					url: "<?php echo site_url($controller_name.'/get_data_from_sunat/dni/"+$(this).val()+"'); ?>",
+					dataType: 'json',
+					success: function(result){
+						resp = JSON.parse(result);
+						$('#first_name').val(resp.nombres);
+						$('#last_name').val(resp.apellidoPaterno+" "+resp.apellidoMaterno);
+					},
+					error: function(result){
+						alert("Ocurrio un error al conectarse a la API del SUNAT");
+						console.log(result);
+					},
+					complete: function(result){
+						console.log("complete");
+					}
+				});
+			}
+		}
 	});
 
 });

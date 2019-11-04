@@ -494,6 +494,23 @@ class Config extends Secure_Controller
 		));
 	}
 
+	public function save_sunat()
+	{
+		$batch_save_data = array(
+			'sunat_token' => $this->input->post('sunat_token'),
+			'sunat_url' => $this->input->post('sunat_url'),
+			'sunat_enable' => $this->input->post('sunat_enable') != NULL
+		);
+
+		$result = $this->Appconfig->batch_save($batch_save_data);
+		$success = $result ? TRUE : FALSE;
+
+		echo json_encode(array(
+			'success' => $success,
+			'message' => $this->lang->line('config_saved_' . ($success ? '' : 'un') . 'successfully')
+		));
+	}
+
 	public function ajax_stock_locations()
 	{
 		$stock_locations = $this->Stock_location->get_all()->result_array();

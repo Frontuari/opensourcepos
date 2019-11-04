@@ -38,6 +38,16 @@ class Customers extends Persons
 	}
 
 	/*
+	Gives search data from sunat
+	*/
+	public function get_data_from_sunat($type,$dni)
+	{
+			$this->load->library('sunat_lib');
+			$response = $this->sunat_lib->getData($type, $dni);
+			echo json_encode($response);
+	}
+
+	/*
 	Gets one row for a customer manage table. This is called using AJAX to update one row.
 	*/
 	public function get_row($row_id)

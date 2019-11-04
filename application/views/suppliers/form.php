@@ -5,6 +5,18 @@
 <?php echo form_open($controller_name . '/save/' . $person_info->person_id, array('id'=>'supplier_form', 'class'=>'form-horizontal')); ?>
 	<fieldset id="supplier_basic_info">
 		<div class="form-group form-group-sm">
+			<?php echo form_label($this->lang->line('common_ruc'), 'ruc', array('class'=>'required control-label col-xs-3')); ?>
+			<div class='col-xs-8'>
+				<?php echo form_input(array(
+						'name'=>'ruc',
+						'id'=>'ruc',
+						'class'=>'form-control input-sm',
+						'value'=>$person_info->ruc)
+						);?>
+			</div>
+		</div>
+
+		<div class="form-group form-group-sm">
 			<?php echo form_label($this->lang->line('suppliers_company_name'), 'company_name', array('class'=>'required control-label col-xs-3')); ?>
 			<div class='col-xs-8'>
 				<?php echo form_input(array(
@@ -23,7 +35,7 @@
 			</div>
 		</div>
 
-		<div class="form-group form-group-sm">	
+		<div class="form-group form-group-sm">
 			<?php echo form_label($this->lang->line('suppliers_agency_name'), 'agency_name', array('class'=>'control-label col-xs-3')); ?>
 			<div class='col-xs-8'>
 				<?php echo form_input(array(
@@ -37,7 +49,7 @@
 
 		<?php $this->load->view("people/form_basic_info"); ?>
 
-		<div class="form-group form-group-sm">	
+		<div class="form-group form-group-sm">
 			<?php echo form_label($this->lang->line('suppliers_account_number'), 'account_number', array('class'=>'control-label col-xs-3')); ?>
 			<div class='col-xs-8'>
 				<?php echo form_input(array(
@@ -67,6 +79,35 @@
 //validation and submit handling
 $(document).ready(function()
 {
+
+	$('#ruc').change(function(){
+		if(<?php echo $this->config->item('sunat_enable');?>)
+		{
+			$.ajax({
+				type: 'GET',
+				url: "<?php echo site_url($controller_name.'/get_data_from_sunat/ruc/"+$(this).val()+"'); ?>",
+				dataType: 'json',
+				success: function(result){
+					resp = JSON.parse(result);
+					console.log(resp);
+					$('#company_name_input').val(((resp.nombreComercial === "" || resp.nombreComercial != "-") ? resp.nombreComercial : resp.razonSocial));
+					$('#address_1').val(resp.direccion);
+					$('#address_2').val(resp.departamento);
+					$('#state').val(resp.provincia);
+					$('#city').val(resp.distrito);
+					$('#country').val("PERÚ");
+				},
+				error: function(result){
+					alert("Ocurrio un error al conectarse a la API del SUNAT");
+					console.log(result);
+				},
+				complete: function(result){
+					console.log("complete");
+				}
+			});
+		}
+	});
+
 	$('#supplier_form').validate($.extend({
 		submitHandler: function(form) {
 			$(form).ajaxSubmit({
@@ -80,7 +121,7 @@ $(document).ready(function()
 		},
 
 		errorLabelContainer: '#error_message_box',
- 
+
 		rules:
 		{
 			company_name: 'required',
@@ -89,7 +130,7 @@ $(document).ready(function()
 			email: 'email'
    		},
 
-		messages: 
+		messages:
 		{
 			company_name: "<?php echo $this->lang->line('suppliers_company_name_required'); ?>",
 			first_name: "<?php echo $this->lang->line('common_first_name_required'); ?>",

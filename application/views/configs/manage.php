@@ -48,6 +48,9 @@
 		<a data-toggle="tab" href="#integrations_tab" title="<?php echo $this->lang->line('config_integrations_configuration'); ?>"><?php echo $this->lang->line('config_integrations'); ?></a>
 	</li>
 	<li role="presentation">
+		<a data-toggle="tab" href="#sunat_tab" title="<?php echo $this->lang->line('config_sunat_configuration'); ?>"><?php echo $this->lang->line('config_sunat'); ?></a>
+	</li>
+	<li role="presentation">
 		<a data-toggle="tab" href="#license_tab" title="<?php echo $this->lang->line('config_license_configuration'); ?>"><?php echo $this->lang->line('config_license'); ?></a>
 	</li>
 	<li role="presentation">
@@ -97,6 +100,9 @@
 	</div>
 	<div class="tab-pane" id="integrations_tab">
 		<?php $this->load->view("configs/integrations_config"); ?>
+	</div>
+	<div class="tab-pane" id="sunat_tab">
+		<?php $this->load->view("configs/sunat_config"); ?>
 	</div>
 	<div class="tab-pane" id="license_tab">
 		<?php $this->load->view("configs/license_config"); ?>

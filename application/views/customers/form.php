@@ -39,8 +39,32 @@
 					</div>
 				</div>
 
+				<div class="form-group form-group-sm">
+					<?php echo form_label($this->lang->line('common_ruc'), 'ruc', array('class'=>'required control-label col-xs-3')); ?>
+					<div class='col-xs-8'>
+						<?php echo form_input(array(
+								'name'=>'ruc',
+								'id'=>'ruc',
+								'class'=>'form-control input-sm',
+								'value'=>$person_info->ruc)
+								);?>
+					</div>
+				</div>
+
+				<div class="form-group form-group-sm">
+					<?php echo form_label($this->lang->line('customers_company_name'), 'company_name', array('class' => 'control-label col-xs-3')); ?>
+					<div class='col-xs-8'>
+						<?php echo form_input(array(
+								'name'=>'company_name',
+								'id'=>'company_name',
+								'class'=>'form-control input-sm',
+								'value'=>$person_info->company_name)
+								); ?>
+					</div>
+				</div>
+
 				<?php $this->load->view("people/form_basic_info"); ?>
-				
+
 				<div class="form-group form-group-sm">
 					<?php echo form_label($this->lang->line('customers_discount_type'), 'discount_type', array('class'=>'control-label col-xs-3')); ?>
 					<div class="col-xs-8">
@@ -76,18 +100,6 @@
 									'value'=>$person_info->discount)
 									); ?>
 						</div>
-					</div>	
-				</div>
-
-				<div class="form-group form-group-sm">
-					<?php echo form_label($this->lang->line('customers_company_name'), 'company_name', array('class' => 'control-label col-xs-3')); ?>
-					<div class='col-xs-8'>
-						<?php echo form_input(array(
-								'name'=>'company_name',
-								'id'=>'company_name',
-								'class'=>'form-control input-sm',
-								'value'=>$person_info->company_name)
-								); ?>
 					</div>
 				</div>
 
@@ -226,7 +238,7 @@
 							</div>
 						</div>
 					</div>
-					
+
 					<div class="form-group form-group-sm">
 						<?php echo form_label($this->lang->line('customers_max'), 'max', array('class' => 'control-label col-xs-3')); ?>
 						<div class="col-xs-4">
@@ -247,7 +259,7 @@
 							</div>
 						</div>
 					</div>
-					
+
 					<div class="form-group form-group-sm">
 						<?php echo form_label($this->lang->line('customers_min'), 'min', array('class' => 'control-label col-xs-3')); ?>
 						<div class="col-xs-4">
@@ -268,7 +280,7 @@
 							</div>
 						</div>
 					</div>
-					
+
 					<div class="form-group form-group-sm">
 						<?php echo form_label($this->lang->line('customers_average'), 'average', array('class' => 'control-label col-xs-3')); ?>
 						<div class="col-xs-4">
@@ -289,7 +301,7 @@
 							</div>
 						</div>
 					</div>
-					
+
 					<div class="form-group form-group-sm">
 						<?php echo form_label($this->lang->line('customers_quantity'), 'quantity', array('class' => 'control-label col-xs-3')); ?>
 						<div class="col-xs-4">
@@ -335,7 +347,7 @@
 					<div class="form-group form-group-sm">
 						<?php echo form_label($this->lang->line('customers_mailchimp_status'), 'mailchimp_status', array('class' => 'control-label col-xs-3')); ?>
 						<div class='col-xs-4'>
-							<?php echo form_dropdown('mailchimp_status', 
+							<?php echo form_dropdown('mailchimp_status',
 								array(
 									'subscribed' => 'subscribed',
 									'unsubscribed' => 'unsubscribed',
@@ -469,6 +481,34 @@ $(document).ready(function()
 		appendTo: '.modal-content',
 		select: fill_value,
 		focus: fill_value
+	});
+
+	$('#ruc').change(function(){
+		if(<?php echo $this->config->item('sunat_enable');?>)
+		{
+			$.ajax({
+				type: 'GET',
+				url: "<?php echo site_url($controller_name.'/get_data_from_sunat/ruc/"+$(this).val()+"'); ?>",
+				dataType: 'json',
+				success: function(result){
+					resp = JSON.parse(result);
+					console.log(resp);
+					$('#company_name').val(((resp.nombreComercial === "" || resp.nombreComercial != "-") ? resp.nombreComercial : resp.razonSocial));
+					$('#address_1').val(resp.direccion);
+					$('#address_2').val(resp.departamento);
+					$('#state').val(resp.provincia);
+					$('#city').val(resp.distrito);
+					$('#country').val("PERÚ");
+				},
+				error: function(result){
+					alert("Ocurrio un error al conectarse a la API del SUNAT");
+					console.log(result);
+				},
+				complete: function(result){
+					console.log("complete");
+				}
+			});
+		}
 	});
 
 	$('#customer_form').validate($.extend({
