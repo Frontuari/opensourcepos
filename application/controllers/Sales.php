@@ -21,15 +21,7 @@ class Sales extends Secure_Controller
 	public function index()
 	{
 		$this->session->set_userdata('allow_temp_items', 1);
-		$cashup_info = $this->Cashup->get_cashup_employee_daily($this->session->userdata('person_id'),date('Y-m-d'));
-		if(empty($cashup_info->cashup_id) || (!empty($cashup_info->cashup_id) && !empty($cashup_info->close_date)))
-		{
-			redirect('cashups/index');
-		}
-		else {
-			$this->_reload();
-		}
-
+		$this->_reload();
 	}
 
 	public function manage()
@@ -1313,6 +1305,8 @@ class Sales extends Secure_Controller
 		}
 
 		$data = $this->xss_clean($data);
+		//	Get Cash for Employee
+		$data['cashup_info'] = $this->Cashup->get_cashup_employee_daily($this->Employee->get_logged_in_employee_info()->person_id,date('Y-m-d'));
 
 		$this->load->view("sales/register", $data);
 	}

@@ -514,8 +514,9 @@ if(isset($success))
 							</tr>
 						</table>
 					<?php echo form_close(); ?>
-
-					<div class='btn btn-sm btn-success pull-right' id='add_payment_button' tabindex="<?php echo ++$tabindex; ?>"><span class="glyphicon glyphicon-credit-card">&nbsp</span><?php echo $this->lang->line('sales_add_payment'); ?></div>
+					<?php if((!empty($cashup_info->cashup_id) && empty($cashup_info->close_date))):?>
+						<div class='btn btn-sm btn-success pull-right' id='add_payment_button' tabindex="<?php echo ++$tabindex; ?>"><span class="glyphicon glyphicon-credit-card">&nbsp</span><?php echo $this->lang->line('sales_add_payment'); ?></div>
+					<?php endif; ?>
 				<?php
 				}
 				?>
