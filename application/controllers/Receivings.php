@@ -14,7 +14,14 @@ class Receivings extends Secure_Controller
 
 	public function index()
 	{
-		$this->_reload();
+		$overall_cash_info = $this->Overall_cash->get_overall_cash_open_info(date('Y-m-d'));
+		if(empty($overall_cash_info->overall_cash_id) || (!empty($overall_cash_info->overall_cash_id) && !empty($overall_cash_info->closedate)))
+		{
+			redirect('overall_cashs/index');
+		}
+		else {
+			$this->_reload();
+		}
 	}
 
 	public function item_search()
@@ -250,7 +257,7 @@ class Receivings extends Secure_Controller
 			'overall_cash_id' => $overall_cash_info->overall_cash_id,
 			'cash_concept_id' => $cash_concept->cash_concept_id,
 			'cash_book_id' => $cash_book->cash_book_id,
-			'operation_type' => ($cash_concept->concept_type==1 ? 1 : 0),
+			'operation_type' => ($cash_concept->concept_type==1 ? 1 : ($cash_concept->concept_type==2 ? 2 : 0)),
 			'movementdate' => date('Y-m-d H:i:s'),
 			'description' => $data['receiving_id'],
 			'currency' => CURRENCY,

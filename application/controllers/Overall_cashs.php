@@ -116,7 +116,7 @@ class Overall_cashs extends Secure_Controller
 
 		$data['overall_cash_summary'] = $this->Overall_cash->get_endingbalance($overall_cash_id);
 
-		$data['operation_types'] = array('all' => $this->lang->line('common_none_selected_text'), '1' => "INGRESO", '0' => "EGRESO");
+		$data['operation_types'] = array('all' => $this->lang->line('common_none_selected_text'), '1' => "INGRESO", '0' => "EGRESO", '2' => "COMPRAS");
 
 		$data['operation_type'] = 1;
 
@@ -133,9 +133,26 @@ class Overall_cashs extends Secure_Controller
 
 		$data['overall_cash_summary'] = $this->Overall_cash->get_endingbalance($overall_cash_id);
 
-		$data['operation_types'] = array('all' => $this->lang->line('common_none_selected_text'), '1' => "INGRESO", '0' => "EGRESO");
+		$data['operation_types'] = array('all' => $this->lang->line('common_none_selected_text'), '1' => "INGRESO", '0' => "EGRESO", '2' => "COMPRAS");
 
 		$data['operation_type'] = 0;
+
+		$data['currencies'] = array('all' => $this->lang->line('common_none_selected_text'), CURRENCY => CURRENCY_LABEL, USDCURRENCY => USDCURRENCY_LABEL);
+
+		$data['currency'] = $currency;
+
+		$this->load->view('overall_cashs/manage_detailed', $data);
+	}
+
+	public function detail_purchase($overall_cash_id,$currency = 'all')
+	{
+		$data['table_headers'] = $this->xss_clean(get_cash_flow_manage_table_headers());
+
+		$data['overall_cash_summary'] = $this->Overall_cash->get_endingbalance($overall_cash_id);
+
+		$data['operation_types'] = array('all' => $this->lang->line('common_none_selected_text'), '1' => "INGRESO", '0' => "EGRESO", '2' => "COMPRAS");
+
+		$data['operation_type'] = 2;
 
 		$data['currencies'] = array('all' => $this->lang->line('common_none_selected_text'), CURRENCY => CURRENCY_LABEL, USDCURRENCY => USDCURRENCY_LABEL);
 
@@ -181,7 +198,7 @@ class Overall_cashs extends Secure_Controller
 		//$this->load->view('overall_cashs/report_cash_register', $data);
 
 		$html = $this->load->view('overall_cashs/report_cash_register', $data, TRUE);
-		
+
 		// Cargamos la librería
 		$this->load->library('pdfgenerator_lib');
 		// definamos un nombre para el archivo. No es necesario agregar la extension .pdf
@@ -242,7 +259,7 @@ class Overall_cashs extends Secure_Controller
 				if($overall_cash_id == -1)
 				{
 					$this->Overall_cash->set_log("<< End Log >>");
-					//	Use log 
+					//	Use log
 					//	$this->Overall_cash->get_log()."<br>".
 					echo json_encode(array('success' => TRUE, 'message' => $this->lang->line('overall_cashs_successful_adding'), 'id' => $overall_cash_data['overall_cash_id']));
 				}
@@ -250,7 +267,7 @@ class Overall_cashs extends Secure_Controller
 				{
 					$this->Overall_cash->set_log($this->db->last_query());
 					$this->Overall_cash->set_log("<< End Log >>");
-					//	Use log 
+					//	Use log
 					//	$this->Overall_cash->get_log()."<br>".
 					echo json_encode(array('success' => TRUE, 'message' => $this->lang->line('overall_cashs_successful_updating'), 'id' => $overall_cash_id));
 				}
@@ -262,7 +279,7 @@ class Overall_cashs extends Secure_Controller
 					$this->Overall_cash->set_log($this->db->last_query());
 				}
 				$this->Overall_cash->set_log("<< End Log >>");
-				//	Use log 
+				//	Use log
 				//	$this->Overall_cash->get_log()."<br>".
 				echo json_encode(array('success' => FALSE, 'message' => $this->lang->line('overall_cashs_error_adding_updating') . ' ' . $overall_cash_data['opendate'], 'id' => -1));
 			}
@@ -311,17 +328,17 @@ class Overall_cashs extends Secure_Controller
 			if($this->Overall_cash->closed($overall_cash_data, $denominates_currency_data, $overall_cash_id))
 			{
 				$overall_cash_data = $this->xss_clean($overall_cash_data);
-				
+
 				$this->Overall_cash->set_log($this->db->last_query());
 				$this->Overall_cash->set_log("<< End Log >>");
-				//	Use log 
+				//	Use log
 				//	$this->Overall_cash->get_log()."<br>".
 				echo json_encode(array('success' => TRUE, 'message' => $this->lang->line('overall_cashs_successful_updating'), 'id' => $overall_cash_id));
 			}
 			else//failure
 			{
 				$this->Overall_cash->set_log("<< End Log >>");
-				//	Use log 
+				//	Use log
 				//	$this->Overall_cash->get_log()."<br>".
 				echo json_encode(array('success' => FALSE, 'message' => $this->lang->line('overall_cashs_error_adding_updating') . ' ' . $overall_cash_data['closedate'], 'id' => -1));
 			}
@@ -335,7 +352,7 @@ class Overall_cashs extends Secure_Controller
 	public function delete()
 	{
 		$overall_cash_to_delete = $this->input->post('ids');
-		
+
 		if($this->Overall_cash->delete_list($overall_cash_to_delete))
 		{
 			echo json_encode(array('success' => TRUE, 'message' => $this->lang->line('overall_cashs_successful_deleted') . ' ' . count($overall_cash_to_delete) . ' ' . $this->lang->line('overall_cashs_one_or_multiple')));
@@ -410,7 +427,7 @@ class Overall_cashs extends Secure_Controller
 			if($bank_id == -1)
 			{
 				$this->Bank->set_log("<< End Log >>");
-				//	Use log 
+				//	Use log
 				//	$this->Bank->get_log()."<br>".
 				echo json_encode(array('success' => TRUE, 'message' => $this->lang->line('banks_successful_adding'), 'id' => $bank_data['bank_id']));
 			}
@@ -418,7 +435,7 @@ class Overall_cashs extends Secure_Controller
 			{
 				$this->Bank->set_log($this->db->last_query());
 				$this->Bank->set_log("<< End Log >>");
-				//	Use log 
+				//	Use log
 				//	$this->Bank->get_log()."<br>".
 				echo json_encode(array('success' => TRUE, 'message' => $this->lang->line('banks_successful_updating'), 'id' => $bank_id));
 			}
@@ -430,7 +447,7 @@ class Overall_cashs extends Secure_Controller
 				$this->Bank->set_log($this->db->last_query());
 			}
 			$this->Bank->set_log("<< End Log >>");
-			//	Use log 
+			//	Use log
 			//	$this->Bank->get_log()."<br>".
 			echo json_encode(array('success' => FALSE, 'message' => $this->lang->line('banks_error_adding_updating') . ' ' . $bank_data['name'], 'id' => -1));
 		}
@@ -575,7 +592,7 @@ class Overall_cashs extends Secure_Controller
 			if($income_id == -1)
 			{
 				$this->Income->set_log("<< End Log >>");
-				//	Use log 
+				//	Use log
 				//	$this->Income->get_log()."<br>".
 				echo json_encode(array('success' => TRUE, 'message' => $this->lang->line('incomes_successful_adding'), 'id' => $income_data['income_id']));
 			}
@@ -583,7 +600,7 @@ class Overall_cashs extends Secure_Controller
 			{
 				$this->Income->set_log($this->db->last_query());
 				$this->Income->set_log("<< End Log >>");
-				//	Use log 
+				//	Use log
 				//	$this->Income->get_log()."<br>".
 				echo json_encode(array('success' => TRUE, 'message' => $this->lang->line('incomes_successful_updating'), 'id' => $income_id));
 			}
@@ -595,7 +612,7 @@ class Overall_cashs extends Secure_Controller
 				$this->Income->set_log($this->db->last_query());
 			}
 			$this->Income->set_log("<< End Log >>");
-			//	Use log 
+			//	Use log
 			//	$this->Income->get_log()."<br>".
 			echo json_encode(array('success' => FALSE, 'message' => $this->lang->line('incomes_error_adding_updating') . ' ' . $income_data['documentno'], 'id' => -1));
 		}
@@ -615,7 +632,7 @@ class Overall_cashs extends Secure_Controller
 		{
 			$this->Income->set_log('<< START LOG >>');
 			$income_to_delete = $this->input->post('ids');
-			
+
 			if($this->Income->delete($income_to_delete,$this->input->post('currency')))
 			{
 				echo json_encode(array('success' => TRUE, 'message' => $this->lang->line('incomes_successful_deleted') . ' ' . count($income_to_delete) . ' ' . $this->lang->line('incomes_one_or_multiple')));
@@ -771,7 +788,7 @@ class Overall_cashs extends Secure_Controller
 			if($cost_id == -1)
 			{
 				$this->Cost->set_log("<< End Log >>");
-				//	Use log 
+				//	Use log
 				//	$this->Cost->get_log()."<br>".
 				echo json_encode(array('success' => TRUE, 'message' => $this->lang->line('costs_successful_adding'), 'id' => $cost_data['cost_id']));
 			}
@@ -779,7 +796,7 @@ class Overall_cashs extends Secure_Controller
 			{
 				$this->Cost->set_log($this->db->last_query());
 				$this->Cost->set_log("<< End Log >>");
-				//	Use log 
+				//	Use log
 				//	$this->Cost->get_log()."<br>".
 				echo json_encode(array('success' => TRUE, 'message' => $this->lang->line('costs_successful_updating'), 'id' => $cost_id));
 			}
@@ -791,7 +808,7 @@ class Overall_cashs extends Secure_Controller
 				$this->Cost->set_log($this->db->last_query());
 			}
 			$this->Cost->set_log("<< End Log >>");
-			//	Use log 
+			//	Use log
 			//	$this->Cost->get_log()."<br>".
 			echo json_encode(array('success' => FALSE, 'message' => $this->Cost->get_log()."<br>".$this->lang->line('costs_error_adding_updating') . ' ' . $cost_data['documentno'], 'id' => -1));
 		}
@@ -811,7 +828,7 @@ class Overall_cashs extends Secure_Controller
 		{
 			$this->Cost->set_log('<< START LOG >>');
 			$cost_to_delete = $this->input->post('ids');
-			
+
 			if($this->Cost->delete($cost_to_delete,$this->input->post('currency')))
 			{
 				echo json_encode(array('success' => TRUE, 'message' => $this->lang->line('costs_successful_deleted') . ' ' . count($cost_to_delete) . ' ' . $this->lang->line('costs_one_or_multiple')));
@@ -826,7 +843,7 @@ class Overall_cashs extends Secure_Controller
 		{
 			echo json_encode(array('success' => TRUE, 'message' => $this->lang->line('costs_none_to_be_deleted')));
 		}
-	}	
+	}
 
 }
 ?>

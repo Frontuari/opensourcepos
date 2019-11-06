@@ -10,7 +10,7 @@ $(document).ready(function()
 		headers: <?php echo $table_headers; ?>,
 		pageSize: <?php echo $this->config->item('lines_per_page'); ?>,
 		uniqueId: 'overall_cash_id',
-		
+
 	});
 
 	// when any filter is clicked and the dropdown window is closed

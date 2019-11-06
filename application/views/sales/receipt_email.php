@@ -41,6 +41,14 @@
 
 		<div id="sale_id"><?php echo $this->lang->line('sales_id').": ".$sale_id; ?></div>
 		<div id="employee"><?php echo $this->lang->line('employees_employee').": ".$employee; ?></div>
+		<?php
+		if($this->config->item('dinner_table_enable') == TRUE)
+		{
+		?>
+			<div id="dinner_table"><?php echo $this->lang->line('sales_table').": ".$this->Dinner_table->get_name($dinner_table); ?></div>
+		<?php
+		}
+		?>
 	</div>
 
 	<br>
@@ -98,7 +106,7 @@
 						?>
 							<td colspan="3" class="discount"><?php echo number_format($item['discount'], 0) . " " . $this->lang->line("sales_discount_included") ?></td>
 						<?php
-						}	
+						}
 						?>
 						<td class="total-value"><?php echo to_currency($item['discounted_total']); ?></td>
 					</tr>
@@ -205,9 +213,11 @@
 	</div>
 
 	<br>
-
+	
+	<?php if(isset($barcode) && !empty($barcode)): ?>
 	<div id="barcode" style="text-align:center">
 		<img src='data:image/png;base64,<?php echo $barcode; ?>' /><br>
 		<?php echo $sale_id; ?>
 	</div>
+	<?php endif;?>
 </div>

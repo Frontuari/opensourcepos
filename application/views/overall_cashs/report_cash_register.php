@@ -91,7 +91,9 @@
 						<br>
 						<?php echo 'Recibo de '.$this->lang->line('incomes_one_or_multiple') . ': ' .to_currency((!empty($overall_cash_summary->income) ? $overall_cash_summary->income : 0)); ?>
 						<br>
-						<?php echo 'Recibo de '.$this->lang->line('expenses_one_or_multiple') . ': ' .to_currency((!empty($overall_cash_summary->expense) ? $overall_cash_summary->expense : 0)); ?>
+						<?php echo 'Recibo de '.$this->lang->line('costs_one_or_multiple') . ': ' .to_currency((!empty($overall_cash_summary->cost) ? $overall_cash_summary->cost : 0)); ?>
+						<br>
+						<?php echo 'Compras: ' .to_currency((!empty($overall_cash_summary->purchase) ? $overall_cash_summary->purchase : 0)); ?>
 						<br>
 						<?php echo $this->lang->line('overall_cashs_endingbalance') . ': ' .to_currency((!empty($overall_cash_summary->endingbalance) ? $overall_cash_summary->endingbalance : 0)); ?>
 						<br>
@@ -123,7 +125,9 @@
 						<br>
 						<?php echo 'Recibo de '.$this->lang->line('incomes_one_or_multiple') . ': ' .to_usd((!empty($overall_cash_summary->usdincome) ? $overall_cash_summary->usdincome : 0)); ?>
 						<br>
-						<?php echo 'Recibo de '.$this->lang->line('expenses_one_or_multiple') . ': ' .to_usd((!empty($overall_cash_summary->usdexpense) ? $overall_cash_summary->usdexpense : 0)); ?>
+						<?php echo 'Recibo de '.$this->lang->line('costs_one_or_multiple') . ': ' .to_usd((!empty($overall_cash_summary->usdcost) ? $overall_cash_summary->usdcost : 0)); ?>
+						<br>
+						<?php echo 'Compras: ' .to_usd((!empty($overall_cash_summary->usdpurchase) ? $overall_cash_summary->usdpurchase : 0)); ?>
 						<br>
 						<?php echo $this->lang->line('overall_cashs_endingbalance') . ': ' .to_usd((!empty($overall_cash_summary->usdendingbalance) ? $overall_cash_summary->usdendingbalance : 0)); ?>
 						<br>

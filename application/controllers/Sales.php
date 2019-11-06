@@ -21,7 +21,15 @@ class Sales extends Secure_Controller
 	public function index()
 	{
 		$this->session->set_userdata('allow_temp_items', 1);
-		$this->_reload();
+		$cashup_info = $this->Cashup->get_cashup_employee_daily($this->session->userdata('person_id'),date('Y-m-d'));
+		if(empty($cashup_info->cashup_id) || (!empty($cashup_info->cashup_id) && !empty($cashup_info->close_date)))
+		{
+			redirect('cashups/index');
+		}
+		else {
+			$this->_reload();
+		}
+
 	}
 
 	public function manage()
@@ -953,7 +961,7 @@ class Sales extends Secure_Controller
 
 		$data['sale_id'] = 'POS ' . $sale_id;
 
-		$data['barcode'] = $this->barcode_lib->generate_receipt_barcode($data['sale_id']);
+		//$data['barcode'] = $this->barcode_lib->generate_receipt_barcode($data['sale_id']);
 		$this->load->view('sales/receipt', $data);
 		$this->sale_lib->clear_all();
 	}

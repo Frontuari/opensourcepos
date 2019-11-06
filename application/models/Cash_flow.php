@@ -183,7 +183,7 @@ class Cash_flow extends CI_Model
 		$this->db->join('cash_concepts AS cash_concepts','cash_concepts.cash_concept_id = cash_flow.cash_concept_id');
 		$this->db->join('cash_books AS cash_books','cash_books.cash_book_id = cash_flow.cash_book_id');
 		$this->db->join('stock_locations AS stock_locations','cash_books.stock_location_id = stock_locations.location_id');
-		$this->db->join('people AS people','cash_books.user_id = people.person_id');
+		$this->db->join('people AS people','cash_books.employee_id = people.person_id');
 		$this->db->join('overall_cashs AS overall_cashs','cash_flow.reference_id = overall_cashs.overall_cash_id AND cash_flow.table_reference=\'overall_cashs\'','LEFT');
 		$this->db->join('incomes AS incomes','cash_flow.reference_id = incomes.income_id AND cash_flow.table_reference=\'incomes\'','LEFT');
 		$this->db->join('costs AS costs','cash_flow.reference_id = costs.cost_id AND cash_flow.table_reference=\'costs\'','LEFT');
@@ -266,7 +266,7 @@ class Cash_flow extends CI_Model
 		$this->db->where('cash_flow_id', $cash_flow_id);
 
 		$result &= $this->db->update('cash_flow', array('deleted' => 1));
-		
+
 		return $result;
 	}
 

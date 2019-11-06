@@ -53,7 +53,7 @@
 		if($this->config->item('dinner_table_enable') == TRUE)
 		{
 		?>
-			<div id="dinner_table"><?php echo $this->lang->line('sales_table').": ".$this->Dinner_table->get_name($dinner_table); ?></div>
+			<div id="dinner_table"><h5><b><?php echo $this->lang->line('sales_table').": ".$this->Dinner_table->get_name($dinner_table); ?></b></h5></div>
 		<?php
 		}
 		?>
@@ -232,8 +232,10 @@
 		<?php echo nl2br($this->config->item('return_policy')); ?>
 	</div>
 
+	<?php if(isset($barcode) && !empty($barcode)): ?>
 	<div id="barcode">
 		<img src='data:image/png;base64,<?php echo $barcode; ?>' /><br>
 		<?php echo $sale_id; ?>
 	</div>
+	<?php endif;?>
 </div>

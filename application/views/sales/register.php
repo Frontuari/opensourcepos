@@ -56,9 +56,9 @@ if(isset($success))
 				?>
 
 				<li class="pull-right">
-					<button class='btn btn-default btn-sm modal-dlg' id='show_suspended_sales_button' data-href="<?php echo site_url($controller_name."/suspended"); ?>"
-							title="<?php echo $this->lang->line('sales_suspended_sales'); ?>">
-						<span class="glyphicon glyphicon-align-justify">&nbsp</span><?php echo $this->lang->line('sales_suspended_sales'); ?>
+					<button class='btn btn-default btn-sm modal-dlg modal-dlg-wide' id='show_suspended_sales_button' data-href="<?php echo site_url($controller_name."/suspended"); ?>"
+							title="<?php echo ($this->config->item('dinner_table_enable') ? $this->lang->line('sales_pause_ordered_sales') : $this->lang->line('sales_suspended_sales')); ?>">
+						<span class="glyphicon glyphicon-align-justify">&nbsp</span><?php echo ($this->config->item('dinner_table_enable') ? $this->lang->line('sales_ordered_sales') : $this->lang->line('sales_suspended_sales')); ?>
 					</button>
 				</li>
 
@@ -201,7 +201,7 @@ if(isset($success))
 									<span class="input-group-btn">
 										<?php echo form_checkbox(array('id'=>'discount_toggle', 'name'=>'discount_toggle', 'value'=>1, 'data-toggle'=>"toggle",'data-size'=>'small', 'data-onstyle'=>'success', 'data-on'=>'<b>'.$this->config->item('currency_symbol').'</b>', 'data-off'=>'<b>%</b>', 'data-line'=>$line, 'checked'=>$item['discount_type'])); ?>
 									</span>
-								</div> 
+								</div>
 							</td>
 
 							<td>
@@ -216,7 +216,7 @@ if(isset($success))
 								}
 								?>
 							</td>
-							
+
 							<td><a href="javascript:document.getElementById('<?php echo 'cart_'.$line ?>').submit();" title=<?php echo $this->lang->line('sales_update')?> ><span class="glyphicon glyphicon-refresh"></span></a></td>
 							</tr>
 							<tr>
@@ -474,7 +474,7 @@ if(isset($success))
 						</table>
 					<?php echo form_close(); ?>
 						<?php
-						$payment_type = $this->input->post('payment_type');							
+						$payment_type = $this->input->post('payment_type');
 						// Only show this part if the payment cover the total and in sale or return mode
 
 						if($pos_mode == '1' && $payment_type != $this->lang->line('sales_due') && !isset($customer))
@@ -484,7 +484,7 @@ if(isset($success))
 						<?php
 						}
 						?>
-						<?php							
+						<?php
 						if($pos_mode == '1' && $payment_type = $this->lang->line('sales_due') && isset($customer))
 						{
 						?>
@@ -556,7 +556,7 @@ if(isset($success))
 
 			<?php echo form_open($controller_name."/cancel", array('id'=>'buttons_form')); ?>
 				<div class="form-group" id="buttons_sale">
-					<div class='btn btn-sm btn-default pull-left' id='suspend_sale_button'><span class="glyphicon glyphicon-align-justify">&nbsp</span><?php echo $this->lang->line('sales_suspend_sale'); ?></div>
+					<div class='btn btn-sm btn-default pull-left' id='suspend_sale_button'><span class="glyphicon glyphicon-align-justify">&nbsp</span><?php echo ($this->config->item('dinner_table_enable') ? $this->lang->line('sales_pause_order_sale') : $this->lang->line('sales_suspend_sale')); ?></div>
 					<?php
 					// Only show this part if the payment covers the total
 					if(!$pos_mode && isset($customer))

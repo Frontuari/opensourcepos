@@ -19,6 +19,9 @@
 				<?php echo 'Recibo de '.$this->lang->line('costs_one_or_multiple') . ': ' .to_currency((!empty($overall_cash_summary->cost) ? $overall_cash_summary->cost : 0)); ?>
 				<?php echo anchor($controller_name.'/detail_cost/'.$overall_cash_summary->overall_cash_id.'/'.CURRENCY,'<span class="glyphicon glyphicon-list-alt">&nbsp</span>',array('title' => 'Ver detalle de egresos')); ?>
 				<br>
+				<?php echo 'Compras: ' .to_currency((!empty($overall_cash_summary->purchase) ? $overall_cash_summary->purchase : 0)); ?>
+				<?php echo anchor($controller_name.'/detail_purchase/'.$overall_cash_summary->overall_cash_id.'/'.CURRENCY,'<span class="glyphicon glyphicon-list-alt">&nbsp</span>',array('title' => 'Ver detalle de compras')); ?>
+				<br>
 				<?php echo $this->lang->line('overall_cashs_endingbalance') . ': ' .to_currency((!empty($overall_cash_summary->endingbalance) ? $overall_cash_summary->endingbalance : 0)); ?>
 				<br>
 				<br>
@@ -51,7 +54,10 @@
 				<?php echo anchor($controller_name.'/detail_income/'.$overall_cash_summary->overall_cash_id.'/'.USDCURRENCY,'<span class="glyphicon glyphicon-list-alt">&nbsp</span>',array('title' => 'Ver detalle de ingresos')); ?>
 				<br>
 				<?php echo 'Recibo de '.$this->lang->line('costs_one_or_multiple') . ': ' .to_usd((!empty($overall_cash_summary->usdcost) ? $overall_cash_summary->usdcost : 0)); ?>
-				<?php echo anchor($controller_name.'/detail_cost/'.$overall_cash_summary->overall_cash_id.'/'.USDCURRENCY,'<span class="glyphicon glyphicon-list-alt">&nbsp</span>',array('title' => 'Ver detalle de ingresos')); ?>
+				<?php echo anchor($controller_name.'/detail_cost/'.$overall_cash_summary->overall_cash_id.'/'.USDCURRENCY,'<span class="glyphicon glyphicon-list-alt">&nbsp</span>',array('title' => 'Ver detalle de egresos')); ?>
+				<br>
+				<?php echo 'Compras: ' .to_usd((!empty($overall_cash_summary->usdpurchase) ? $overall_cash_summary->usdpurchase : 0)); ?>
+				<?php echo anchor($controller_name.'/detail_purchase/'.$overall_cash_summary->overall_cash_id.'/'.USDCURRENCY,'<span class="glyphicon glyphicon-list-alt">&nbsp</span>',array('title' => 'Ver detalle de compras')); ?>
 				<br>
 				<?php echo $this->lang->line('overall_cashs_endingbalance') . ': ' .to_usd((!empty($overall_cash_summary->usdendingbalance) ? $overall_cash_summary->usdendingbalance : 0)); ?>
 				<br>

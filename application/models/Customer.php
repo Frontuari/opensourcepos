@@ -293,6 +293,8 @@ class Customer extends Person
 		$this->db->group_start();
 			$this->db->like('first_name', $search);
 			$this->db->or_like('last_name', $search);
+			$this->db->or_like('dni', $search);
+			$this->db->or_like('ruc', $search);
 			$this->db->or_like('CONCAT(first_name, " ", last_name)', $search);
 			if($unique)
 			{

@@ -59,7 +59,7 @@ class Overall_cash extends CI_Model
 	public function closed_all($today)
 	{
 		$this->db->select('oc.overall_cash_id,
-			SUM(COALESCE((CASE WHEN cf.currency = \''. CURRENCY .'\' THEN cf.amount * (CASE WHEN cf.operation_type = 1 THEN 1 ELSE -1 END) ELSE 0 END),0)) AS endingbalance, 
+			SUM(COALESCE((CASE WHEN cf.currency = \''. CURRENCY .'\' THEN cf.amount * (CASE WHEN cf.operation_type = 1 THEN 1 ELSE -1 END) ELSE 0 END),0)) AS endingbalance,
 			SUM(COALESCE((CASE WHEN cf.currency = \''. USDCURRENCY .'\' THEN cf.amount * (CASE WHEN cf.operation_type = 1 THEN 1 ELSE -1 END) ELSE 0 END),0)) AS usdendingbalance
 			');
 		$this->db->from('overall_cashs oc');
@@ -158,10 +158,12 @@ class Overall_cash extends CI_Model
 
 		$this->db->select('oc.overall_cash_id,oc.opendate,MAX(oc.startbalance) AS startbalance,MAX(oc.usdstartbalance) AS usdstartbalance,
 			SUM(COALESCE((CASE WHEN cf.operation_type = 1 AND cf.currency = \'' . CURRENCY . '\' THEN cf.amount ELSE 0 END),0)) AS income,
-			SUM(COALESCE((CASE WHEN cf.operation_type <> 1 AND cf.currency = \'' . CURRENCY . '\' THEN cf.amount ELSE 0 END),0)) AS cost,
+			SUM(COALESCE((CASE WHEN cf.operation_type = 0 AND cf.currency = \'' . CURRENCY . '\' THEN cf.amount ELSE 0 END),0)) AS cost,
+			SUM(COALESCE((CASE WHEN cf.operation_type = 2 AND cf.currency = \'' . CURRENCY . '\' THEN cf.amount ELSE 0 END),0)) AS purchase,
 			SUM(COALESCE((CASE WHEN cf.operation_type = 1 AND cf.currency = \'' . USDCURRENCY . '\' THEN cf.amount ELSE 0 END),0)) AS usdincome,
-			SUM(COALESCE((CASE WHEN cf.operation_type <> 1 AND cf.currency = \'' . USDCURRENCY . '\' THEN cf.amount ELSE 0 END),0)) AS usdcost,
-			SUM(COALESCE((CASE WHEN cf.currency = \''. CURRENCY .'\' THEN cf.amount * (CASE WHEN cf.operation_type = 1 THEN 1 ELSE -1 END) ELSE 0 END),0)) AS endingbalance, 
+			SUM(COALESCE((CASE WHEN cf.operation_type = 0 AND cf.currency = \'' . USDCURRENCY . '\' THEN cf.amount ELSE 0 END),0)) AS usdcost,
+			SUM(COALESCE((CASE WHEN cf.operation_type = 2 AND cf.currency = \'' . USDCURRENCY . '\' THEN cf.amount ELSE 0 END),0)) AS usdpurchase,
+			SUM(COALESCE((CASE WHEN cf.currency = \''. CURRENCY .'\' THEN cf.amount * (CASE WHEN cf.operation_type = 1 THEN 1 ELSE -1 END) ELSE 0 END),0)) AS endingbalance,
 			SUM(COALESCE((CASE WHEN cf.currency = \''. USDCURRENCY .'\' THEN cf.amount * (CASE WHEN cf.operation_type = 1 THEN 1 ELSE -1 END) ELSE 0 END),0)) AS usdendingbalance
 			');
 		$this->db->from('overall_cashs oc');
@@ -327,9 +329,9 @@ class Overall_cash extends CI_Model
 		$this->set_log("ID: ".$overall_cash_id);
 
 		$success = $this->db->insert('overall_cashs', $overall_cash_data);
-		
+
 		$this->set_log($this->db->last_query());
-		
+
 		$overall_cash_id = $this->db->insert_id();
 
 		$overall_cash_data['overall_cash_id'] = $overall_cash_id;
@@ -401,7 +403,7 @@ class Overall_cash extends CI_Model
 		$this->db->trans_complete();
 
 		$success &= $this->db->trans_status();
-		
+
 		return $success;
 	}
 
@@ -421,7 +423,7 @@ class Overall_cash extends CI_Model
 		// get_found_rows case
 		if($count_only == TRUE)
 		{
-			$this->db->select('COUNT(overall_cashs.overall_cash_id) as count');
+			$this->db->select('COUNT(DISTINCT overall_cashs.overall_cash_id) as count');
 		}
 		else
 		{
@@ -429,7 +431,7 @@ class Overall_cash extends CI_Model
 				SUM(COALESCE((CASE WHEN cash_flow.operation_type = 1 AND cash_flow.currency = \'' . CURRENCY . '\' THEN cash_flow.amount ELSE 0 END),0)) AS income,
 				SUM(COALESCE((CASE WHEN cash_flow.operation_type <> 1 AND cash_flow.currency = \'' . CURRENCY . '\' THEN cash_flow.amount ELSE 0 END),0)) AS cost,
 				SUM(COALESCE((CASE WHEN cash_flow.operation_type = 1 AND cash_flow.currency = \'' . USDCURRENCY . '\' THEN cash_flow.amount ELSE 0 END),0)) AS usdincome,
-				SUM(COALESCE((CASE WHEN cash_flow.operation_type <> 1 AND cash_flow.currency = \'' . USDCURRENCY . '\' THEN cash_flow.amount ELSE 0 END),0)) AS usdcost');	
+				SUM(COALESCE((CASE WHEN cash_flow.operation_type <> 1 AND cash_flow.currency = \'' . USDCURRENCY . '\' THEN cash_flow.amount ELSE 0 END),0)) AS usdcost');
 		}
 
 		$this->db->from('overall_cashs AS overall_cashs');
@@ -440,7 +442,7 @@ class Overall_cash extends CI_Model
 		{
 			return $this->db->get()->row()->count;
 		}
-		
+
 		$this->db->group_by(array('overall_cashs.overall_cash_id','overall_cashs.opendate','overall_cashs.state'));
 		$this->db->order_by($sort, $order);
 
@@ -497,7 +499,7 @@ class Overall_cash extends CI_Model
 		$this->db->where('overall_cash_id', $overall_cash_id);
 
 		$result &= $this->db->update('overall_cashs', array('deleted' => 1));
-		
+
 		return $result;
 	}
 

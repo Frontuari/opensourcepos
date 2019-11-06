@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 $lang["config_address"] = "Company Address";
 $lang["config_address_required"] = "Company address is a required field.";
@@ -251,6 +251,7 @@ $lang["config_show_office_group"] = "Show office icon";
 $lang["config_statistics"] = "Send Statistics";
 $lang["config_statistics_tooltip"] = "Send statistics for development and feature improvement purposes.";
 $lang["config_stock_location"] = "Stock location";
+$lang["config_stock_location_code"] = "Stock location code";
 $lang["config_stock_location_duplicate"] = "Stock Location must be unique.";
 $lang["config_stock_location_invalid_chars"] = "Stock Location can not contain '_'.";
 $lang["config_stock_location_required"] = "Stock location is a required field.";
