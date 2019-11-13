@@ -499,6 +499,8 @@ class Config extends Secure_Controller
 		$batch_save_data = array(
 			'sunat_token' => $this->input->post('sunat_token'),
 			'sunat_url' => $this->input->post('sunat_url'),
+			'sunat_token_fe' => $this->input->post('sunat_token_fe'),
+			'sunat_url_fe' => $this->input->post('sunat_url_fe'),
 			'sunat_enable' => $this->input->post('sunat_enable') != NULL
 		);
 

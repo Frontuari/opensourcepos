@@ -69,6 +69,11 @@ function get_sales_manage_table_headers()
 		array('payment_type' => $CI->lang->line('sales_payment_type'))
 	);
 
+	if($CI->config->item('dinner_table_enable'))
+	{
+		$headers[] = array('dinner_table_id' => $CI->lang->line('sales_table'));
+	}
+
 	if($CI->config->item('invoice_enable') == TRUE)
 	{
 		$headers[] = array('invoice_number' => $CI->lang->line('sales_invoice_number'));
@@ -98,6 +103,11 @@ function get_sale_data_row($sale)
 		'change_due' => to_currency($sale->change_due),
 		'payment_type' => $sale->payment_type
 	);
+
+	if($CI->config->item('dinner_table_enable'))
+	{
+		$row['dinner_table_id'] = $sale->dinner_table;
+	}
 
 	if($CI->config->item('invoice_enable'))
 	{

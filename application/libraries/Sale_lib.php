@@ -42,6 +42,7 @@ class Sale_lib
 				$register_modes['sale_work_order'] = $this->CI->lang->line('sales_work_order');
 			}
 			$register_modes['sale_invoice'] = $this->CI->lang->line('sales_invoice');
+			$register_modes['sale_ticket'] = $this->CI->lang->line('sales_ticket');
 		}
 		$register_modes['return'] = $this->CI->lang->line('sales_return');
 		return $register_modes;
@@ -284,6 +285,11 @@ class Sale_lib
 	public function is_work_order_mode()
 	{
 		return ($this->CI->session->userdata('sales_mode') == 'sale_work_order');
+	}
+
+	public function is_ticket_mode()
+	{
+		return ($this->CI->session->userdata('sales_mode') == 'sale_ticket');
 	}
 
 	public function set_invoice_number_enabled($invoice_number_enabled)
@@ -1213,7 +1219,7 @@ class Sale_lib
 			$discount_fraction = bcdiv($discount, 100);
 			$discount=bcmul($total,$discount_fraction);
 		}
-		
+
 		return round($discount, totals_decimals(), PHP_ROUND_HALF_UP);
 	}
 

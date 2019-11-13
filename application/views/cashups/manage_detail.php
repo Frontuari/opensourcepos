@@ -37,7 +37,7 @@ $(document).ready(function()
 					</li>
 					<li>
 						<?php echo 'Ventas: ' .to_currency((!empty($sales) ? $sales : 0)); ?>
-						<?php echo anchor($controller_name.'/detail_income/'.$cashup_summary->cashup_id.'/'.CURRENCY,'<span class="glyphicon glyphicon-list-alt">&nbsp</span>',array('title' => 'Ver detalle de Ventas')); ?>
+						<?php echo anchor($controller_name.'/detail_income/'.$cashup_summary->cashup_id.'/'.CURRENCY.'/3','<span class="glyphicon glyphicon-list-alt">&nbsp</span>',array('title' => 'Ver detalle de Ventas')); ?>
 					</li>
 					<li>
 						<?php echo 'Caja General Ingreso de Efectivo: ' .to_currency((!empty($open_cash) ? $open_cash : 0)); ?>
@@ -71,7 +71,7 @@ $(document).ready(function()
 					</li>
 					<!--<li>
 						<?php echo 'Compras: ' .to_currency((!empty($purchases) ? $purchases : 0)); ?>
-						<?php echo anchor($controller_name.'/detail_cost/'.$cashup_summary->cashup_id.'/'.CURRENCY,'<span class="glyphicon glyphicon-list-alt">&nbsp</span>',array('title' => 'Ver detalle de compras')); ?>
+						<?php echo anchor($controller_name.'/detail_cost/'.$cashup_summary->cashup_id.'/'.CURRENCY.'/3','<span class="glyphicon glyphicon-list-alt">&nbsp</span>',array('title' => 'Ver detalle de compras')); ?>
 					</li>-->
 					<!--<li>
 						<?php echo 'Comprobante de Operación Serie I: ' .to_currency((!empty($vo_serie01) ? $vo_serie01 : 0)); ?>
@@ -100,7 +100,7 @@ $(document).ready(function()
 					</li>
 					<?php endforeach;?>
 				</ul>
-				<b style="font-size: large;">Total: </b><?php echo to_currency($cashup_summary->cost+$cashup_summary->expense);?>
+				<b style="font-size: large;">Total: </b><?php echo to_currency($cashup_summary->cost_cash+$cashup_summary->cost_bank+$cashup_summary->expense);?>
 			</div>
 		</div>
 	</div>

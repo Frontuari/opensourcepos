@@ -147,7 +147,7 @@
 							</li>
 							<?php endforeach;?>
 						</ul>
-						<b style="font-size: large;">Total: </b><?php echo to_currency($cashup_summary->cost+$cashup_summary->expense);?>
+						<b style="font-size: large;">Total: </b><?php echo to_currency($cashup_summary->cost_cash+$cashup_summary->cost_bank+$cashup_summary->expense);?>
 					</div>
 				</div>
 			</div>

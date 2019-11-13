@@ -113,9 +113,9 @@ class Cash_daily extends CI_Model
 	 */
 	public function get_initial_balance($cash_book_id,$date)
 	{
-		$query = $this->db->query("SELECT SUM(amount * (CASE WHEN cash_daily.operation_type = 1 THEN 1 ELSE -1 END)) AS balance 
-			FROM ". $this->db->dbprefix('cash_daily')." AS cash_daily 
-			WHERE cash_daily.cash_book_id = $cash_book_id AND cash_daily.deleted = 0 
+		$query = $this->db->query("SELECT SUM(amount * (CASE WHEN cash_daily.operation_type = 1 THEN 1 ELSE -1 END)) AS balance
+			FROM ". $this->db->dbprefix('cash_daily')." AS cash_daily
+			WHERE cash_daily.cash_book_id = $cash_book_id AND cash_daily.deleted = 0
 			AND DATE_FORMAT(cash_daily.movementdate,'%Y-%m-%d') < DATE_FORMAT('$date','%Y-%m-%d')");
 
 		//echo $this->db->last_query()."<br>";
@@ -144,11 +144,11 @@ class Cash_daily extends CI_Model
 	public function get_balance_by_code($cashup_id,$code)
 	{
 		$query = $this->db->query("
-			SELECT SUM(COALESCE(cd.amount,0)) AS balance 
-			FROM ".$this->db->dbprefix('cash_daily')." cd 
-			WHERE cd.cashup_id = $cashup_id AND cd.deleted = 0 
-			AND cd.cash_concept_id IN (SELECT COALESCE(sc.cash_concept_id,cc.cash_concept_id) FROM ".$this->db->dbprefix('cash_concepts')." sc 
-			RIGHT JOIN ".$this->db->dbprefix('cash_concepts')." cc ON sc.cash_concept_parent_id = cc.cash_concept_id 
+			SELECT SUM(COALESCE(cd.amount,0)) AS balance
+			FROM ".$this->db->dbprefix('cash_daily')." cd
+			WHERE cd.cashup_id = $cashup_id AND cd.deleted = 0
+			AND cd.cash_concept_id IN (SELECT COALESCE(sc.cash_concept_id,cc.cash_concept_id) FROM ".$this->db->dbprefix('cash_concepts')." sc
+			RIGHT JOIN ".$this->db->dbprefix('cash_concepts')." cc ON sc.cash_concept_parent_id = cc.cash_concept_id
 			WHERE cc.code = '".$code."')");
 
 		//echo $this->db->last_query()."<br>";
@@ -176,13 +176,73 @@ class Cash_daily extends CI_Model
 	 */
 	public function get_vouchers($cash_book_id,$today)
 	{
-		$query = $this->db->query(" SELECT 
-				vouchers.amount-COALESCE((SELECT SUM(amount) FROM ". $this->db->dbprefix('payment_vouchers') ." AS payment_vouchers WHERE vouchers.voucher_id = payment_vouchers.voucher_id),0) AS balance 
+		$query = $this->db->query(" SELECT
+				vouchers.amount-COALESCE((SELECT SUM(amount) FROM ". $this->db->dbprefix('payment_vouchers') ." AS payment_vouchers WHERE vouchers.voucher_id = payment_vouchers.voucher_id),0) AS balance
 				FROM ". $this->db->dbprefix('vouchers') ." AS vouchers
-				WHERE vouchers.cash_book_id = $cash_book_id 
-				AND DATE_FORMAT(vouchers.voucherdate,'%Y-%m-%d') = DATE_FORMAT('$today','%Y-%m-%d') 
-				AND vouchers.deleted = 0 
+				WHERE vouchers.cash_book_id = $cash_book_id
+				AND DATE_FORMAT(vouchers.voucherdate,'%Y-%m-%d') = DATE_FORMAT('$today','%Y-%m-%d')
+				AND vouchers.deleted = 0
 			");
+
+		//echo $this->db->last_query()."<br>";
+
+		if($query->num_rows() == 1)
+		{
+			return $query->row();
+		}
+		else
+		{
+			//create object with empty properties.
+			$Cash_daily_obj = new stdClass;
+			$cash_daily_obj->balance = 0;
+
+			return $cash_daily_obj;
+		}
+	}
+
+	/**
+	 * Gets information about a Cash_daily as an array
+	 *
+	 * @param integer $cash_daily_id identifier of the Cash_daily
+	 *
+	 * @return array containing all the fields of the table row
+	 */
+	public function get_incomes($cashup_id)
+	{
+		$query = $this->db->query("
+			SELECT SUM(COALESCE(cd.amount,0)) AS balance
+			FROM ".$this->db->dbprefix('cash_daily')." cd
+			WHERE cd.cashup_id = $cashup_id AND cd.deleted = 0 AND cd.table_reference = 'incomes'");
+
+		//echo $this->db->last_query()."<br>";
+
+		if($query->num_rows() == 1)
+		{
+			return $query->row();
+		}
+		else
+		{
+			//create object with empty properties.
+			$Cash_daily_obj = new stdClass;
+			$cash_daily_obj->balance = 0;
+
+			return $cash_daily_obj;
+		}
+	}
+
+	/**
+	 * Gets information about a Cash_daily as an array
+	 *
+	 * @param integer $cash_daily_id identifier of the Cash_daily
+	 *
+	 * @return array containing all the fields of the table row
+	 */
+	public function get_costs($cashup_id)
+	{
+		$query = $this->db->query("
+			SELECT SUM(COALESCE(cd.amount,0)) AS balance
+			FROM ".$this->db->dbprefix('cash_daily')." cd
+			WHERE cd.cashup_id = $cashup_id AND cd.deleted = 0 AND cd.table_reference = 'costs'");
 
 		//echo $this->db->last_query()."<br>";
 
@@ -214,6 +274,7 @@ class Cash_daily extends CI_Model
 		$this->db->join('cash_concepts AS cc','cc.cash_concept_id = cd.cash_concept_id');
 		$this->db->where('cd.cashup_id',$cashup_id);
 		$this->db->where('cc.concept_type',3);
+		$this->db->where('cd.deleted',0);
 		$this->db->group_by(array('cc.cash_concept_id','cc.code','cc.name'));
 		$this->db->order_by(array('cc.cash_concept_id','cc.code','cc.name'));
 
@@ -319,7 +380,7 @@ class Cash_daily extends CI_Model
 			$this->db->select('cash_daily.*,
 				CASE WHEN cash_daily.operation_type = 1 THEN \'INGRESO\' WHEN cash_daily.operation_type = 2 THEN \'EGRESO\' ELSE \'GASTO\' END AS movementtype,
 				cash_concepts.name AS cash_concept_name,
-				COALESCE(cash_up.cashup_id,incomes.documentno,costs.documentno,expenses.documentno,loans.loan_id,payment_loans.payment_loan_id,payment_credits.payment_credit_id) AS referenceno,
+				COALESCE(cash_up.cashup_id,incomes.documentno,costs.documentno,expenses.documentno) AS referenceno,
 				CONCAT(\'( \',cash_books.code,\' ) \',stock_locations.location_name,\' \',people.first_name,\' \',people.last_name) AS cash_book_name
 				');
 		}
@@ -328,14 +389,11 @@ class Cash_daily extends CI_Model
 		$this->db->join('cash_concepts AS cash_concepts','cash_concepts.cash_concept_id = cash_daily.cash_concept_id');
 		$this->db->join('cash_books AS cash_books','cash_books.cash_book_id = cash_daily.cash_book_id');
 		$this->db->join('stock_locations AS stock_locations','cash_books.stock_location_id = stock_locations.location_id');
-		$this->db->join('people AS people','cash_books.user_id = people.person_id');
+		$this->db->join('people AS people','cash_books.employee_id = people.person_id');
 		$this->db->join('cash_up AS cash_up','cash_daily.reference_id = cash_up.cashup_id AND cash_daily.table_reference=\'cash_up\'','LEFT');
 		$this->db->join('incomes AS incomes','cash_daily.reference_id = incomes.income_id AND cash_daily.table_reference=\'incomes\'','LEFT');
 		$this->db->join('costs AS costs','cash_daily.reference_id = costs.cost_id AND cash_daily.table_reference=\'costs\'','LEFT');
 		$this->db->join('expenses AS expenses','cash_daily.reference_id = expenses.expense_id AND cash_daily.table_reference=\'expenses\'','LEFT');
-		$this->db->join('loans AS loans','cash_daily.reference_id = loans.loan_id AND cash_daily.table_reference=\'loans\'','LEFT');
-		$this->db->join('payment_loans AS payment_loans','cash_daily.reference_id = payment_loans.payment_loan_id AND cash_daily.table_reference=\'payment_loans\'','LEFT');
-		$this->db->join('payment_credits AS payment_credits','cash_daily.reference_id = payment_credits.payment_credit_id AND cash_daily.table_reference=\'payment_credits\'','LEFT');
 		$this->db->where('cash_daily.cashup_id',$cashup_id);
 		$this->db->group_start();
 			$this->db->like('cash_daily.description', $search);
@@ -371,6 +429,7 @@ class Cash_daily extends CI_Model
 		}
 
 		$query = $this->db->get();
+		//echo $this->db->last_query();
 		return $query;
 	}
 
@@ -421,7 +480,7 @@ class Cash_daily extends CI_Model
 		$this->db->where('cash_daily_id', $cash_daily_id);
 
 		$result &= $this->db->update('cash_daily', array('deleted' => 1));
-		
+
 		return $result;
 	}
 

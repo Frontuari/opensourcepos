@@ -47,6 +47,38 @@
 				</div>
 			</div>
 
+			<div id="integrations_header"><?php echo $this->lang->line('config_sunat_configuration_fe')?></div>
+
+
+
+			<div class="form-group form-group-sm">
+				<?php echo form_label($this->lang->line('config_sunat_url_fe'), 'sunat_url_fe', array('class' => 'control-label col-xs-2')); ?>
+				<div class="col-xs-4">
+					<div class="input-group">
+						<span class="input-group-addon input-sm"><span class="glyphicon glyphicon-globe"></span></span>
+						<?php echo form_input(array(
+							'name' => 'sunat_url_fe',
+							'id' => 'sunat_url_fe',
+							'class' => 'form-control input-sm',
+							'value' => $this->config->item('sunat_url_fe'))); ?>
+					</div>
+				</div>
+			</div>
+
+			<div class="form-group form-group-sm">
+				<?php echo form_label($this->lang->line('config_sunat_token_fe'), 'sunat_token_fe', array('class' => 'control-label col-xs-2')); ?>
+				<div class="col-xs-4">
+					<div class="input-group">
+						<span class="input-group-addon input-sm"><span class="glyphicon glyphicon-cloud"></span></span>
+						<?php echo form_input(array(
+							'name' => 'sunat_token_fe',
+							'id' => 'sunat_token_fe',
+							'class' => 'form-control input-sm',
+							'value' => $this->config->item('sunat_token_fe'))); ?>
+					</div>
+				</div>
+			</div>
+
 			<?php echo form_submit(array(
 				'name' => 'submit_sunat',
 				'id' => 'submit_sunat',

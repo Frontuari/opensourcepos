@@ -19,7 +19,7 @@ $(document).ready(function()
 	<?php $this->load->view('partial/bootstrap_tables_locale'); ?>
 
 	table_support.init({
-		resource: '<?php echo site_url($controller_name."/search_detail/".$cashup_summary->cashup_id);?>',
+		resource: '<?php echo site_url($controller_name."/search_detail/".(!empty($cashup_summary->cashup_id) ? $cashup_summary->cashup_id : $cashup_id));?>',
 		headers: <?php echo $table_headers; ?>,
 		pageSize: <?php echo $this->config->item('lines_per_page'); ?>,
 		uniqueId: 'cashup_id',
@@ -30,7 +30,7 @@ $(document).ready(function()
                 cash_concept_id: $("#cash_concept_id").val()
             });
         }
-		
+
 	});
 
 	// when any filter is clicked and the dropdown window is closed
@@ -42,7 +42,7 @@ $(document).ready(function()
 </script>
 
 <div id="page_title" class="btn-toolbar">
-	<?php echo anchor('cashups/detail/'.$cashup_summary->cashup_id, $this->lang->line('common_back')); ?>
+	<?php echo anchor('cashups/detail/'.(!empty($cashup_summary->cashup_id) ? $cashup_summary->cashup_id : $cashup_id), $this->lang->line('common_back')); ?>
 </div>
 
 <div id="toolbar">

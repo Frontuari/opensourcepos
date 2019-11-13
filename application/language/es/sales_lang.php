@@ -159,6 +159,7 @@ $lang["sales_tax"] = "Imp";
 $lang["sales_tax_id"] = "";
 $lang["sales_tax_invoice"] = "";
 $lang["sales_tax_percent"] = "% de Imp";
+$lang["sales_ticket"] = "Boleta de venta";
 $lang["sales_total"] = "Total";
 $lang["sales_total_tax_exclusive"] = "Sin impuesto";
 $lang["sales_transaction_failed"] = "La transacción de venta falló.";

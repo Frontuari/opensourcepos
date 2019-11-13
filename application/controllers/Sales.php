@@ -51,6 +51,19 @@ class Sales extends Secure_Controller
 					'only_check' => $this->lang->line('sales_check_filter'));
 			}
 
+			if($this->config->item('dinner_table_enable') == TRUE)
+			{
+
+				$dinner_tables = array('all' => $this->lang->line('common_none_selected_text'));
+
+				foreach($this->Dinner_table->get_all()->result_array() as $row)
+				{
+					$dinner_tables[$this->xss_clean($row['dinner_table_id'])] = $this->xss_clean($row['name']);
+				}
+
+				$data['dinner_tables'] = $dinner_tables;
+			}
+
 			$this->load->view('sales/manage', $data);
 		}
 	}
@@ -79,7 +92,9 @@ class Sales extends Secure_Controller
 						 'only_due' => FALSE,
 						 'only_check' => FALSE,
 						 'only_invoices' => $this->config->item('invoice_enable') && $this->input->get('only_invoices'),
-						 'is_valid_receipt' => $this->Sale->is_valid_receipt($search));
+						 'is_valid_receipt' => $this->Sale->is_valid_receipt($search),
+					 	 'dinner_table_id' => $this->input->get('tables'),
+					 	 'employee_id' =>	$this->session->userdata('person_id'));
 
 		// check if any filter is set in the multiselect dropdown
 		$filledup = array_fill_keys($this->input->get('filters'), TRUE);
@@ -677,6 +692,13 @@ class Sales extends Secure_Controller
 				// Save the data to the sales table
 				$data['sale_id_num'] = $this->Sale->save($sale_id, $data['sale_status'], $data['cart'], $customer_id, $employee_id, $data['comments'], $invoice_number, $work_order_number, $quote_number, $sale_type, $data['payments'], $data['dinner_table'], $tax_details);
 				$data['sale_id'] = 'POS ' . $data['sale_id_num'];
+
+				//	FE
+				if($this->config->item('sunat_enable'))
+				{
+					$this->load->library('sunat_lib');
+					$response = $this->sunat_lib->sendInvoice();
+				}
 
 				// Resort and filter cart lines for printing
 				$data['cart'] = $this->sale_lib->sort_and_filter_cart($data['cart']);

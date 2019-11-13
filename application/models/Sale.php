@@ -216,7 +216,9 @@ class Sale extends CI_Model
 					MAX(payments.sale_payment_amount) AS amount_tendered,
 					(MAX(payments.sale_payment_amount) - IFNULL($sale_total, $sale_subtotal)) AS change_due,
 					" . '
-					MAX(payments.payment_type) AS payment_type
+					MAX(payments.payment_type) AS payment_type,
+					MAX(sales.dinner_table_id) AS dinner_table_id,
+					MAX(dinner_tables.name) AS dinner_table
 			');
 		}
 
@@ -228,6 +230,7 @@ class Sale extends CI_Model
 		$this->db->join('sales_items_taxes_temp AS sales_items_taxes',
 			'sales_items.sale_id = sales_items_taxes.sale_id AND sales_items.item_id = sales_items_taxes.item_id AND sales_items.line = sales_items_taxes.line',
 			'LEFT OUTER');
+		$this->db->join('dinner_tables AS dinner_tables','dinner_tables.dinner_table_id = sales.dinner_table_id','LEFT OUTER');
 
 		$this->db->where($where);
 
@@ -279,6 +282,16 @@ class Sale extends CI_Model
 		if($filters['only_check'] != FALSE)
 		{
 			$this->db->like('payments.payment_type', $this->lang->line('sales_check'));
+		}
+
+		if($filters['dinner_table_id'] != 'all')
+		{
+			$this->db->where('sales.dinner_table_id', $filters['dinner_table_id']);
+		}
+
+		if(isset($filters['employee_id']) && !empty($filters['employee_id']))
+		{
+			$this->db->where('sales.employee_id', $filters['employee_id']);
 		}
 
 		// get_found_rows case
