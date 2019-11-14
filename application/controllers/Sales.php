@@ -186,6 +186,10 @@ class Sales extends Secure_Controller
 		{
 			$this->sale_lib->set_sale_type(SALE_TYPE_INVOICE);
 		}
+		else if($mode == 'sale_ticket')
+		{
+			$this->sale_lib->set_sale_type(SALE_TYPE_TICKET);
+		}
 		else
 		{
 			$this->sale_lib->set_sale_type(SALE_TYPE_RETURN);
@@ -235,6 +239,10 @@ class Sales extends Secure_Controller
 		elseif($sale_type == SALE_TYPE_INVOICE)
 		{
 			$this->sale_lib->set_mode('sale_invoice');
+		}
+		elseif($sale_type == SALE_TYPE_TICKET)
+		{
+			$this->sale_lib->set_mode('sale_ticket');
 		}
 		elseif($sale_type == SALE_TYPE_RETURN)
 		{
@@ -797,6 +805,39 @@ class Sales extends Secure_Controller
 				$this->sale_lib->clear_all();
 			}
 		}
+		else if($this->sale_lib->is_ticket_mode())
+		{
+			$data['sale_status'] = COMPLETED;
+			$sale_type = SALE_TYPE_TICKET;
+
+			// Save the data to the sales table
+			$data['sale_id_num'] = $this->Sale->save($sale_id, $data['sale_status'], $data['cart'], $customer_id, $employee_id, $data['comments'], $invoice_number, $work_order_number, $quote_number, $sale_type, $data['payments'], $data['dinner_table'], $tax_details);
+			$data['sale_id'] = 'POS ' . $data['sale_id_num'];
+
+			//	FE
+			if($this->config->item('sunat_enable'))
+			{
+				$this->load->library('sunat_lib');
+				$response = $this->sunat_lib->sendInvoice();
+			}
+
+			// Resort and filter cart lines for printing
+			$data['cart'] = $this->sale_lib->sort_and_filter_cart($data['cart']);
+
+			$data = $this->xss_clean($data);
+
+			if($data['sale_id_num'] == -1)
+			{
+				$data['error_message'] = $this->lang->line('sales_transaction_failed');
+			}
+			else
+			{
+				$data['barcode'] = $this->barcode_lib->generate_receipt_barcode($data['sale_id']);
+				$data['is_ticket'] = TRUE;
+				$this->load->view('sales/receipt', $data);
+				$this->sale_lib->clear_all();
+			}
+		}
 		else
 		{
 			// Save the data to the sales table
@@ -1207,6 +1248,12 @@ class Sales extends Secure_Controller
 			$data['mode_label'] = $this->lang->line('sales_return');
 			$data['customer_required'] = $this->lang->line('sales_customer_optional');
 		}
+		elseif($this->sale_lib->get_mode() == 'sale_ticket')
+		{
+			$data['is_ticket'] = TRUE;
+			$data['mode_label'] = $this->lang->line('sales_ticket');
+			$data['customer_required'] = $this->lang->line('sales_customer_required');
+		}
 		else
 		{
 			$data['mode_label'] = $this->lang->line('sales_receipt');
@@ -1241,7 +1288,7 @@ class Sales extends Secure_Controller
 		$data['taxes'] = $tax_details[0];
 		$data['discount'] = $this->sale_lib->get_discount();
 		$data['payments'] = $this->sale_lib->get_payments();
-		// sale_type (0=pos, 1=invoice, 2=work order, 3=quote, 4=return)
+		// sale_type (0=pos, 1=invoice, 2=work order, 3=quote, 4=return, 5=ticket)
 		$sale_type = $this->sale_lib->get_sale_type();
 
 		// Returns 'subtotal', 'total', 'cash_total', 'payment_total', 'amount_due', 'cash_amount_due', 'payments_cover_total'
@@ -1319,6 +1366,11 @@ class Sales extends Secure_Controller
 		{
 			$data['mode_label'] = $this->lang->line('sales_return');
 			$data['customer_required'] = $this->lang->line('sales_customer_optional');
+		}
+		elseif($this->sale_lib->get_mode() == 'sale_ticket')
+		{
+			$data['mode_label'] = $this->lang->line('sales_ticket');
+			$data['customer_required'] = $this->lang->line('sales_customer_required');
 		}
 		else
 		{

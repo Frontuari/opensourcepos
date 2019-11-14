@@ -23,7 +23,7 @@
 		<div id="company_address"><?php echo nl2br($this->config->item('address')); ?></div>
 		<div id="company_phone"><?php echo $this->config->item('phone'); ?></div>
 		<br>
-		<div id="sale_receipt"><?php echo $this->lang->line('sales_receipt'); ?></div>
+		<div id="sale_receipt"><?php echo ((isset($is_ticket) && $is_ticket) ? $this->lang->line('sales_ticket') : $this->lang->line('sales_receipt')); ?></div>
 		<div id="sale_time"><?php echo $transaction_time ?></div>
 	</div>
 
@@ -213,7 +213,7 @@
 	</div>
 
 	<br>
-	
+
 	<?php if(isset($barcode) && !empty($barcode)): ?>
 	<div id="barcode" style="text-align:center">
 		<img src='data:image/png;base64,<?php echo $barcode; ?>' /><br>
