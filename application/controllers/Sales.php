@@ -959,10 +959,12 @@ class Sales extends Secure_Controller
 					      "informacion_adicional" =>  "Forma de pago:Efectivo|Caja: 1"
 					];
 
-					print_r($fmData);
-
 					$response = $this->sunat_lib->sendInvoice($fmData);
-					print_r($response);
+
+					$responseArray = json_decode($response,true);
+					
+					$data['pdf_link'] = $responseArray['links']['pdf'];
+					
 				}
 			}
 
