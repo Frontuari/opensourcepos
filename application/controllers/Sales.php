@@ -16,6 +16,7 @@ class Sales extends Secure_Controller
 		$this->load->library('barcode_lib');
 		$this->load->library('email_lib');
 		$this->load->library('token_lib');
+		$this->load->model('Customer');
 	}
 
 	public function index()
@@ -705,7 +706,72 @@ class Sales extends Secure_Controller
 				if($this->config->item('sunat_enable'))
 				{
 					$this->load->library('sunat_lib');
-					$response = $this->sunat_lib->sendInvoice();
+
+					$items = [];
+					$customer = new Customer();
+					$custInfo = $customer->get_info($customer_id);
+
+					for($i=1;$i<=count($data['cart']);$i++){
+
+						$arrData = [
+							"codigo_interno" =>  "P0121",
+					        "descripcion" => $data['cart'][$i]['name'],
+					        "codigo_producto_sunat" =>  "51121703",
+					        "unidad_de_medida" =>  "NIU",
+					        "cantidad" =>  $data['cart'][$i]['quantity'],
+					        "valor_unitario" =>  $data['cart'][$i]['price'],
+					        "codigo_tipo_precio" =>  "01",
+					        "precio_unitario" =>  $data['cart'][$i]['price'],
+					        "codigo_tipo_afectacion_igv" =>  "10",
+					        "total_base_igv" =>  100.00,
+					        "porcentaje_igv" =>  18,
+					        "total_igv" =>  18,
+					        "total_impuestos" =>  18,
+					        "total_valor_item" =>  $data['cart'][$i]['total'],
+					        "total_item" =>  $data['cart'][$i]['total']
+					      ];
+
+					    array_push($items, $arrData);
+					}
+
+					$fmData = [
+					      "serie_documento" =>  "F001",
+					      "numero_documento" =>  $invoice_number,
+					      "fecha_de_emision" =>  date('Y-m-d'),
+					      "hora_de_emision" =>  date('H:m:s'),
+					      "codigo_tipo_operacion" =>  "0101",
+					      "codigo_tipo_documento" => "01",
+					      "codigo_tipo_moneda" =>  "PEN",
+					      "fecha_de_vencimiento" => date('Y-m-d'),
+					      "numero_orden_de_compra" =>  $work_order_number,
+
+					      "datos_del_cliente_o_receptor" => array(
+					        "codigo_tipo_documento_identidad" =>  "6",
+					        "numero_documento" =>  $custInfo->dni,
+					        "apellidos_y_nombres_o_razon_social" =>  $data['customer'],
+					        "codigo_pais" =>  "PE",
+					        "ubigeo" =>  "150101",
+					        "direccion" =>  $data['customer_address'],
+					        "correo_electronico" =>  $data['customer_email'],
+					        "telefono" =>  $data['customer_phone']
+					      ),
+
+					      "totales" =>  array(
+					        "total_exportacion" =>  0.00,
+					        "total_operaciones_gravadas" =>  $data['total'],
+					        "total_operaciones_inafectas" =>  0.00,
+					        "total_operaciones_exoneradas" =>  0.00,
+					        "total_operaciones_gratuitas" =>  0.00,
+					        "total_igv" =>  $data['taxes']['X18-IGV']['tax_rate'],
+					        "total_impuestos" =>  $data['taxes']['X18-IGV']['sale_tax_amount'] ,
+					        "total_valor" =>  $data['subtotal'],
+					        "total_venta" =>  $data['total']
+					      ),
+					      "items" => $items,
+					      "informacion_adicional" =>  "Forma de pago:Efectivo|Caja: 1"
+					];
+
+					$response = $this->sunat_lib->sendInvoice($fmData);
 				}
 
 				// Resort and filter cart lines for printing
