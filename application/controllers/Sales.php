@@ -714,9 +714,9 @@ class Sales extends Secure_Controller
 					for($i=1;$i<=count($data['cart']);$i++){
 
 						$arrData = [
-							"codigo_interno" =>  "P0121",
+							"codigo_interno" => $data['cart'][$i]['item_id'],
 					        "descripcion" => $data['cart'][$i]['name'],
-					        "codigo_producto_sunat" =>  "51121703",
+					        "codigo_producto_sunat" =>  (!empty($data['cart'][$i]['item_number'])) ? $data['cart'][$i]['item_number']  : $data['cart'][$i]['item_id'],
 					        "unidad_de_medida" =>  "NIU",
 					        "cantidad" =>  $data['cart'][$i]['quantity'],
 					        "valor_unitario" =>  $data['cart'][$i]['price'],
@@ -732,6 +732,8 @@ class Sales extends Secure_Controller
 					      ];
 
 					    array_push($items, $arrData);
+
+					    $arrData = [];
 					}
 
 					$fmData = [
@@ -747,7 +749,7 @@ class Sales extends Secure_Controller
 
 					      "datos_del_cliente_o_receptor" => array(
 					        "codigo_tipo_documento_identidad" =>  "6",
-					        "numero_documento" =>  $custInfo->dni,
+					        "numero_documento" =>  $custInfo->ruc,
 					        "apellidos_y_nombres_o_razon_social" =>  $data['customer'],
 					        "codigo_pais" =>  "PE",
 					        "ubigeo" =>  "150101",
@@ -758,11 +760,11 @@ class Sales extends Secure_Controller
 
 					      "totales" =>  array(
 					        "total_exportacion" =>  0.00,
-					        "total_operaciones_gravadas" =>  $data['total'],
+					        "total_operaciones_gravadas" =>  $data['subtotal'],
 					        "total_operaciones_inafectas" =>  0.00,
 					        "total_operaciones_exoneradas" =>  0.00,
 					        "total_operaciones_gratuitas" =>  0.00,
-					        "total_igv" =>  $data['taxes']['X18-IGV']['tax_rate'],
+					        "total_igv" =>  $data['taxes']['X18-IGV']['sale_tax_amount'],
 					        "total_impuestos" =>  $data['taxes']['X18-IGV']['sale_tax_amount'] ,
 					        "total_valor" =>  $data['subtotal'],
 					        "total_venta" =>  $data['total']
@@ -772,6 +774,7 @@ class Sales extends Secure_Controller
 					];
 
 					$response = $this->sunat_lib->sendInvoice($fmData);
+					print_r($response);
 				}
 
 				// Resort and filter cart lines for printing
@@ -884,7 +887,82 @@ class Sales extends Secure_Controller
 			if($this->config->item('sunat_enable'))
 			{
 				$this->load->library('sunat_lib');
-				$response = $this->sunat_lib->sendInvoice();
+
+				if($this->config->item('sunat_enable'))
+				{
+					$this->load->library('sunat_lib');
+
+					$items = [];
+					$customer = new Customer();
+					$custInfo = $customer->get_info($customer_id);
+
+					for($i=1;$i<=count($data['cart']);$i++){
+
+						$arrData = [
+							"codigo_interno" =>  $data['cart'][$i]['item_id'],
+					        "descripcion" => $data['cart'][$i]['name'],
+					        "codigo_producto_sunat" =>  (!empty($data['cart'][$i]['item_number'])) ? $data['cart'][$i]['item_number']  : $data['cart'][$i]['item_id'],
+					        "unidad_de_medida" =>  "NIU",
+					        "cantidad" =>  $data['cart'][$i]['quantity'],
+					        "valor_unitario" =>  $data['cart'][$i]['price'],
+					        "codigo_tipo_precio" =>  "01",
+					        "precio_unitario" =>  $data['cart'][$i]['price'],
+					        "codigo_tipo_afectacion_igv" =>  "10",
+					        "total_base_igv" =>  100.00,
+					        "porcentaje_igv" =>  18,
+					        "total_igv" =>  18,
+					        "total_impuestos" =>  18,
+					        "total_valor_item" =>  $data['cart'][$i]['total'],
+					        "total_item" =>  $data['cart'][$i]['total']
+					      ];
+
+					    array_push($items, $arrData);
+
+					    $arrData = [];
+					}
+
+					$fmData = [
+					      "serie_documento" =>  "B001",
+					      "numero_documento" =>  $data['sale_id_num'],
+					      "fecha_de_emision" =>  date('Y-m-d'),
+					      "hora_de_emision" =>  date('H:m:s'),
+					      "codigo_tipo_operacion" =>  "0101",
+					      "codigo_tipo_documento" => "03",
+					      "codigo_tipo_moneda" =>  "PEN",
+					      "fecha_de_vencimiento" => date('Y-m-d'),
+					      "numero_orden_de_compra" =>  $work_order_number,
+
+					      "datos_del_cliente_o_receptor" => array(
+					        "codigo_tipo_documento_identidad" =>  "6",
+					        "numero_documento" =>  $custInfo->dni,
+					        "apellidos_y_nombres_o_razon_social" =>  $data['customer'],
+					        "codigo_pais" =>  "PE",
+					        "ubigeo" =>  "150101",
+					        "direccion" =>  $data['customer_address'],
+					        "correo_electronico" =>  $data['customer_email'],
+					        "telefono" =>  $data['customer_phone']
+					      ),
+
+					      "totales" =>  array(
+					        "total_exportacion" =>  0.00,
+					        "total_operaciones_gravadas" =>  $data['subtotal'],
+					        "total_operaciones_inafectas" =>  0.00,
+					        "total_operaciones_exoneradas" =>  0.00,
+					        "total_operaciones_gratuitas" =>  0.00,
+					        "total_igv" =>  $data['taxes']['X18-IGV']['sale_tax_amount'],
+					        "total_impuestos" =>  $data['taxes']['X18-IGV']['sale_tax_amount'] ,
+					        "total_valor" =>  $data['subtotal'],
+					        "total_venta" =>  $data['total']
+					      ),
+					      "items" => $items,
+					      "informacion_adicional" =>  "Forma de pago:Efectivo|Caja: 1"
+					];
+
+					print_r($fmData);
+
+					$response = $this->sunat_lib->sendInvoice($fmData);
+					print_r($response);
+				}
 			}
 
 			// Resort and filter cart lines for printing
@@ -942,6 +1020,7 @@ class Sales extends Secure_Controller
 			//	End save cash journal movement
 
 			$data['cart'] = $this->sale_lib->sort_and_filter_cart($data['cart']);
+
 			$data = $this->xss_clean($data);
 
 			if($data['sale_id_num'] == -1)
