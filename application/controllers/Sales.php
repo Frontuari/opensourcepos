@@ -774,20 +774,21 @@ class Sales extends Secure_Controller
 					];
 
 					$response = $this->sunat_lib->sendInvoice($fmData);
-					print_r($response);
+					$responseArray = json_decode($response,true);
+					
+					$data['pdf_link'] = $responseArray['links']['pdf'];
 				}
 
 				// Resort and filter cart lines for printing
 				$data['cart'] = $this->sale_lib->sort_and_filter_cart($data['cart']);
-
 				$data = $this->xss_clean($data);
-
 				if($data['sale_id_num'] == -1)
 				{
 					$data['error_message'] = $this->lang->line('sales_transaction_failed');
 				}
 				else
 				{
+
 					$data['barcode'] = $this->barcode_lib->generate_receipt_barcode($data['sale_id']);
 					$this->load->view('sales/'.$invoice_view, $data);
 					$this->sale_lib->clear_all();
