@@ -59,6 +59,7 @@ class Doctypesequences extends Secure_Controller
 			'expenses0' => $this->lang->line('doctypesequences_doctype_expense'),
 			'incomes0' => $this->lang->line('doctypesequences_doctype_income'),
 			'incomes1' => $this->lang->line('doctypesequences_doctype_income_overallcash'),
+			'sales1' => $this->lang->line('sales_ticket'),
 			//'invoices0' => $this->lang->line('doctypesequences_doctype_invoice'),
 			//'ticketsales0' => $this->lang->line('doctypesequences_doctype_ticketsale'),
 			//'vouchers0' => $this->lang->line('doctypesequences_doctype_voucher'),

@@ -775,7 +775,7 @@ class Sales extends Secure_Controller
 
 					$response = $this->sunat_lib->sendInvoice($fmData);
 					$responseArray = json_decode($response,true);
-					
+
 					$data['pdf_link'] = $responseArray['links']['pdf'];
 				}
 
@@ -878,6 +878,7 @@ class Sales extends Secure_Controller
 		else if($this->sale_lib->is_ticket_mode())
 		{
 			$data['sale_status'] = COMPLETED;
+			$data['invoice_number'] = $this->Appconfig->acquire_save_next_doctype_sequence(7);
 			$sale_type = SALE_TYPE_TICKET;
 
 			// Save the data to the sales table
@@ -924,7 +925,7 @@ class Sales extends Secure_Controller
 
 					$fmData = [
 					      "serie_documento" =>  "B001",
-					      "numero_documento" =>  $data['sale_id_num'],
+					      "numero_documento" =>  $data['invoice_number'],
 					      "fecha_de_emision" =>  date('Y-m-d'),
 					      "hora_de_emision" =>  date('H:m:s'),
 					      "codigo_tipo_operacion" =>  "0101",
@@ -962,9 +963,9 @@ class Sales extends Secure_Controller
 					$response = $this->sunat_lib->sendInvoice($fmData);
 
 					$responseArray = json_decode($response,true);
-					
+
 					$data['pdf_link'] = $responseArray['links']['pdf'];
-					
+
 				}
 			}
 
