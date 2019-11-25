@@ -699,85 +699,8 @@ class Sales extends Secure_Controller
 				$invoice_view = $this->config->item('invoice_type');
 
 				// Save the data to the sales table
-				$data['sale_id_num'] = $this->Sale->save($sale_id, $data['sale_status'], $data['cart'], $customer_id, $employee_id, $data['comments'], $invoice_number, $work_order_number, $quote_number, $sale_type, $data['payments'], $data['dinner_table'], $tax_details);
+				$data['sale_id_num'] = $this->Sale->save($sale_id, $data['sale_status'], $data['cart'], $customer_id, $employee_id, $data['comments'], $invoice_number, $work_order_number, $quote_number, $sale_type, $data['payments'], $data['dinner_table'], $tax_details, $data);
 				$data['sale_id'] = 'POS ' . $data['sale_id_num'];
-
-				//	FE
-				if($this->config->item('sunat_enable'))
-				{
-					$this->load->library('sunat_lib');
-
-					$items = [];
-					$customer = new Customer();
-					$custInfo = $customer->get_info($customer_id);
-
-					for($i=1;$i<=count($data['cart']);$i++){
-
-						$arrData = [
-							"codigo_interno" => $data['cart'][$i]['item_id'],
-					        "descripcion" => $data['cart'][$i]['name'],
-					        "codigo_producto_sunat" =>  (!empty($data['cart'][$i]['item_number'])) ? $data['cart'][$i]['item_number']  : $data['cart'][$i]['item_id'],
-					        "unidad_de_medida" =>  "NIU",
-					        "cantidad" =>  $data['cart'][$i]['quantity'],
-					        "valor_unitario" =>  $data['cart'][$i]['price'],
-					        "codigo_tipo_precio" =>  "01",
-					        "precio_unitario" =>  $data['cart'][$i]['price'],
-					        "codigo_tipo_afectacion_igv" =>  "10",
-					        "total_base_igv" =>  100.00,
-					        "porcentaje_igv" =>  18,
-					        "total_igv" =>  18,
-					        "total_impuestos" =>  18,
-					        "total_valor_item" =>  $data['cart'][$i]['total'],
-					        "total_item" =>  $data['cart'][$i]['total']
-					      ];
-
-					    array_push($items, $arrData);
-
-					    $arrData = [];
-					}
-
-					$fmData = [
-					      "serie_documento" =>  "F001",
-					      "numero_documento" =>  $invoice_number,
-					      "fecha_de_emision" =>  date('Y-m-d'),
-					      "hora_de_emision" =>  date('H:m:s'),
-					      "codigo_tipo_operacion" =>  "0101",
-					      "codigo_tipo_documento" => "01",
-					      "codigo_tipo_moneda" =>  "PEN",
-					      "fecha_de_vencimiento" => date('Y-m-d'),
-					      "numero_orden_de_compra" =>  $work_order_number,
-
-					      "datos_del_cliente_o_receptor" => array(
-					        "codigo_tipo_documento_identidad" =>  "6",
-					        "numero_documento" =>  $custInfo->ruc,
-					        "apellidos_y_nombres_o_razon_social" =>  $data['customer'],
-					        "codigo_pais" =>  "PE",
-					        "ubigeo" =>  "150101",
-					        "direccion" =>  $data['customer_address'],
-					        "correo_electronico" =>  $data['customer_email'],
-					        "telefono" =>  $data['customer_phone']
-					      ),
-
-					      "totales" =>  array(
-					        "total_exportacion" =>  0.00,
-					        "total_operaciones_gravadas" =>  $data['subtotal'],
-					        "total_operaciones_inafectas" =>  0.00,
-					        "total_operaciones_exoneradas" =>  0.00,
-					        "total_operaciones_gratuitas" =>  0.00,
-					        "total_igv" =>  $data['taxes']['X18-IGV']['sale_tax_amount'],
-					        "total_impuestos" =>  $data['taxes']['X18-IGV']['sale_tax_amount'] ,
-					        "total_valor" =>  $data['subtotal'],
-					        "total_venta" =>  $data['total']
-					      ),
-					      "items" => $items,
-					      "informacion_adicional" =>  "Forma de pago:Efectivo|Caja: 1"
-					];
-
-					$response = $this->sunat_lib->sendInvoice($fmData);
-					$responseArray = json_decode($response,true);
-
-					$data['pdf_link'] = $responseArray['links']['pdf'];
-				}
 
 				// Resort and filter cart lines for printing
 				$data['cart'] = $this->sale_lib->sort_and_filter_cart($data['cart']);
@@ -788,8 +711,10 @@ class Sales extends Secure_Controller
 				}
 				else
 				{
-
 					$data['barcode'] = $this->barcode_lib->generate_receipt_barcode($data['sale_id']);
+
+					//print_r($this->Sale->get_pdf_link($data['sale_id_num']));
+
 					$this->load->view('sales/'.$invoice_view, $data);
 					$this->sale_lib->clear_all();
 				}
@@ -882,92 +807,8 @@ class Sales extends Secure_Controller
 			$sale_type = SALE_TYPE_TICKET;
 
 			// Save the data to the sales table
-			$data['sale_id_num'] = $this->Sale->save($sale_id, $data['sale_status'], $data['cart'], $customer_id, $employee_id, $data['comments'], $invoice_number, $work_order_number, $quote_number, $sale_type, $data['payments'], $data['dinner_table'], $tax_details);
+			$data['sale_id_num'] = $this->Sale->save($sale_id, $data['sale_status'], $data['cart'], $customer_id, $employee_id, $data['comments'], $invoice_number, $work_order_number, $quote_number, $sale_type, $data['payments'], $data['dinner_table'], $tax_details, $data);
 			$data['sale_id'] = 'POS ' . $data['sale_id_num'];
-
-			//	FE
-			if($this->config->item('sunat_enable'))
-			{
-				$this->load->library('sunat_lib');
-
-				if($this->config->item('sunat_enable'))
-				{
-					$this->load->library('sunat_lib');
-
-					$items = [];
-					$customer = new Customer();
-					$custInfo = $customer->get_info($customer_id);
-
-					for($i=1;$i<=count($data['cart']);$i++){
-
-						$arrData = [
-							"codigo_interno" =>  $data['cart'][$i]['item_id'],
-					        "descripcion" => $data['cart'][$i]['name'],
-					        "codigo_producto_sunat" =>  (!empty($data['cart'][$i]['item_number'])) ? $data['cart'][$i]['item_number']  : $data['cart'][$i]['item_id'],
-					        "unidad_de_medida" =>  "NIU",
-					        "cantidad" =>  $data['cart'][$i]['quantity'],
-					        "valor_unitario" =>  $data['cart'][$i]['price'],
-					        "codigo_tipo_precio" =>  "01",
-					        "precio_unitario" =>  $data['cart'][$i]['price'],
-					        "codigo_tipo_afectacion_igv" =>  "10",
-					        "total_base_igv" =>  100.00,
-					        "porcentaje_igv" =>  18,
-					        "total_igv" =>  18,
-					        "total_impuestos" =>  18,
-					        "total_valor_item" =>  $data['cart'][$i]['total'],
-					        "total_item" =>  $data['cart'][$i]['total']
-					      ];
-
-					    array_push($items, $arrData);
-
-					    $arrData = [];
-					}
-
-					$fmData = [
-					      "serie_documento" =>  "B001",
-					      "numero_documento" =>  $data['invoice_number'],
-					      "fecha_de_emision" =>  date('Y-m-d'),
-					      "hora_de_emision" =>  date('H:m:s'),
-					      "codigo_tipo_operacion" =>  "0101",
-					      "codigo_tipo_documento" => "03",
-					      "codigo_tipo_moneda" =>  "PEN",
-					      "fecha_de_vencimiento" => date('Y-m-d'),
-					      "numero_orden_de_compra" =>  $work_order_number,
-
-					      "datos_del_cliente_o_receptor" => array(
-					        "codigo_tipo_documento_identidad" =>  "6",
-					        "numero_documento" =>  $custInfo->dni,
-					        "apellidos_y_nombres_o_razon_social" =>  $data['customer'],
-					        "codigo_pais" =>  "PE",
-					        "ubigeo" =>  "150101",
-					        "direccion" =>  $data['customer_address'],
-					        "correo_electronico" =>  $data['customer_email'],
-					        "telefono" =>  $data['customer_phone']
-					      ),
-
-					      "totales" =>  array(
-					        "total_exportacion" =>  0.00,
-					        "total_operaciones_gravadas" =>  $data['subtotal'],
-					        "total_operaciones_inafectas" =>  0.00,
-					        "total_operaciones_exoneradas" =>  0.00,
-					        "total_operaciones_gratuitas" =>  0.00,
-					        "total_igv" =>  $data['taxes']['X18-IGV']['sale_tax_amount'],
-					        "total_impuestos" =>  $data['taxes']['X18-IGV']['sale_tax_amount'] ,
-					        "total_valor" =>  $data['subtotal'],
-					        "total_venta" =>  $data['total']
-					      ),
-					      "items" => $items,
-					      "informacion_adicional" =>  "Forma de pago:Efectivo|Caja: 1"
-					];
-
-					$response = $this->sunat_lib->sendInvoice($fmData);
-
-					$responseArray = json_decode($response,true);
-
-					$data['pdf_link'] = $responseArray['links']['pdf'];
-
-				}
-			}
 
 			// Resort and filter cart lines for printing
 			$data['cart'] = $this->sale_lib->sort_and_filter_cart($data['cart']);

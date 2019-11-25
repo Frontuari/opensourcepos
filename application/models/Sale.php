@@ -20,6 +20,11 @@ define('FIXED', 1);
 
 class Sale extends CI_Model
 {
+	public function __construct()
+	{
+		$this->load->model('Customer');
+	}
+
 	/**
 	 * Get sale info
 	 */
@@ -610,8 +615,9 @@ class Sale extends CI_Model
 	 * The sales_taxes variable needs to be initialized to an empty array before calling
 	 */
 	public function save($sale_id, &$sale_status, &$items, $customer_id, $employee_id, $comment, $invoice_number,
-							$work_order_number, $quote_number, $sale_type, $payments, $dinner_table, &$sales_taxes)
+							$work_order_number, $quote_number, $sale_type, $payments, $dinner_table, &$sales_taxes, &$full_data = [])
 	{
+
 		if($sale_id != -1)
 		{
 			$this->clear_suspended_sale_detail($sale_id);
@@ -768,6 +774,104 @@ class Sale extends CI_Model
 		if($this->db->trans_status() === FALSE)
 		{
 			return -1;
+		}else{
+			//-----------------------------------------------------------------------------------------
+			//---------------Comenzando el Proceso para realizar la facturacion electronica------------
+			//-----------------------------------------------------------------------------------------
+			if($this->config->item('sunat_enable')){
+				$this->load->library('sunat_lib');
+				$items_car = [];
+				$custInfo = $this->get_customer($sale_id);
+
+				for($i=1;$i<=count($items);$i++){
+
+					$arrData = [
+						"codigo_interno" => $items[$i]['item_id'],
+				        "descripcion" => $items[$i]['name'],
+				        "codigo_producto_sunat" =>  (!empty($items[$i]['item_number'])) ? $items[$i]['item_number']  : $items[$i]['item_id'],
+				        "unidad_de_medida" =>  "NIU",
+				        "cantidad" =>  $items[$i]['quantity'],
+				        "valor_unitario" =>  $items[$i]['price'],
+				        "codigo_tipo_precio" =>  "01",
+				        "precio_unitario" =>  $items[$i]['price'],
+				        "codigo_tipo_afectacion_igv" =>  "10",
+				        "total_base_igv" =>  100.00,
+				        "porcentaje_igv" =>  18,
+				        "total_igv" =>  18,
+				        "total_impuestos" =>  18,
+				        "total_valor_item" =>  $items[$i]['total'],
+				        "total_item" =>  $items[$i]['total']
+				      ];
+
+				    array_push($items_car, $arrData);
+
+				    $arrData = [];
+				}
+
+				$serie_number = '';
+
+				switch($sale_type){
+					case 1:
+						$serie_number = 'F001';
+					break;
+
+					case 5:
+						$serie_number = 'B001';
+					break;
+				}
+
+				$fmData = [
+				      "serie_documento" =>  $serie_number,
+				      "numero_documento" =>  $invoice_number,
+				      "fecha_de_emision" =>  date('Y-m-d'),
+				      "hora_de_emision" =>  date('H:m:s'),
+				      "codigo_tipo_operacion" =>  "0101",
+				      "codigo_tipo_documento" => "01",
+				      "codigo_tipo_moneda" =>  "PEN",
+				      "fecha_de_vencimiento" => date('Y-m-d'),
+				      "numero_orden_de_compra" =>  $work_order_number,
+
+				      "datos_del_cliente_o_receptor" => array(
+				        "codigo_tipo_documento_identidad" =>  "6",
+				        "numero_documento" =>  $custInfo->ruc,
+				        "apellidos_y_nombres_o_razon_social" =>  $full_data['customer'],
+				        "codigo_pais" =>  "PE",
+				        "ubigeo" =>  "150101",
+				        "direccion" =>  $full_data['customer_address'],
+				        "correo_electronico" =>  $full_data['customer_email'],
+				        "telefono" =>  $full_data['customer_phone']
+				      ),
+
+				      "totales" =>  array(
+				        "total_exportacion" =>  0.00,
+				        "total_operaciones_gravadas" =>  $full_data['subtotal'],
+				        "total_operaciones_inafectas" =>  0.00,
+				        "total_operaciones_exoneradas" =>  0.00,
+				        "total_operaciones_gratuitas" =>  0.00,
+				        "total_igv" =>  $full_data['taxes']['X18-IGV']['sale_tax_amount'],
+				        "total_impuestos" =>  $full_data['taxes']['X18-IGV']['sale_tax_amount'] ,
+				        "total_valor" =>  $full_data['subtotal'],
+				        "total_venta" =>  $full_data['total']
+				      ),
+				      "items" => $items_car,
+				      "informacion_adicional" =>  "Forma de pago:Efectivo|Caja: 1"
+				];
+
+				$response = $this->sunat_lib->sendInvoice($fmData);
+				$responseArray = json_decode($response,true);
+
+				print_r($responseArray);
+
+				$sales_update_data = [
+					'pdf_link' => $responseArray['links']['pdf']
+				];
+
+				$this->db->where('sale_id', $sale_id);
+				$this->db->update('sales', $sales_update_data);
+			}
+			//-----------------------------------------------------------------------------------------
+			//-----------------------------Fin de la Facturacion Electronica---------------------------
+			//-----------------------------------------------------------------------------------------
 		}
 
 		return $sale_id;
@@ -1422,8 +1526,15 @@ class Sale extends CI_Model
 		$this->db->from('sales');
 		$this->db->where('sale_id', $sale_id);
 		$this->db->join('people', 'people.person_id = sales.customer_id', 'LEFT');
-		$this->db-where('sale_status', SUSPENDED);
+		$this->db->where('sale_status', SUSPENDED);
 
+		return $this->db->get();
+	}
+
+	public function get_pdf_link($sale_id){
+		$this->db->from('sales');
+		$this->db->select('pdf_link');
+		$this->db->where('sale_id', $sale_id);
 		return $this->db->get();
 	}
 

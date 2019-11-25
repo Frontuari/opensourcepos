@@ -1,0 +1,1 @@
+alter table ospos_sales add column pdf_link text AFTER sale_type
