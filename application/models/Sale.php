@@ -813,27 +813,31 @@ class Sale extends CI_Model
 				switch($sale_type){
 					case 1:
 						$serie_number = 'F001';
+						$cod_num_doc = '01';
+						$cus_doc = $custInfo->ruc;
 					break;
 
 					case 5:
 						$serie_number = 'B001';
+						$cod_num_doc = '03';
+						$cus_doc = $custInfo->dni;
 					break;
 				}
 
 				$fmData = [
 				      "serie_documento" =>  $serie_number,
-				      "numero_documento" =>  $invoice_number,
+				      "numero_documento" =>  !empty($invoice_number) ? $invoice_number : $full_data['invoice_number'],
 				      "fecha_de_emision" =>  date('Y-m-d'),
 				      "hora_de_emision" =>  date('H:m:s'),
 				      "codigo_tipo_operacion" =>  "0101",
-				      "codigo_tipo_documento" => "01",
+				      "codigo_tipo_documento" => $cod_num_doc,
 				      "codigo_tipo_moneda" =>  "PEN",
 				      "fecha_de_vencimiento" => date('Y-m-d'),
 				      "numero_orden_de_compra" =>  $work_order_number,
 
 				      "datos_del_cliente_o_receptor" => array(
 				        "codigo_tipo_documento_identidad" =>  "6",
-				        "numero_documento" =>  $custInfo->ruc,
+				        "numero_documento" =>  $cus_doc,
 				        "apellidos_y_nombres_o_razon_social" =>  $full_data['customer'],
 				        "codigo_pais" =>  "PE",
 				        "ubigeo" =>  "150101",

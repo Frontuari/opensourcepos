@@ -809,7 +809,7 @@ class Sales extends Secure_Controller
 			// Save the data to the sales table
 			$data['sale_id_num'] = $this->Sale->save($sale_id, $data['sale_status'], $data['cart'], $customer_id, $employee_id, $data['comments'], $invoice_number, $work_order_number, $quote_number, $sale_type, $data['payments'], $data['dinner_table'], $tax_details, $data);
 			$data['sale_id'] = 'POS ' . $data['sale_id_num'];
-
+			
 			// Resort and filter cart lines for printing
 			$data['cart'] = $this->sale_lib->sort_and_filter_cart($data['cart']);
 
