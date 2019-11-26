@@ -526,7 +526,7 @@ class Cashups extends Secure_Controller
 		}
 
 		$cash_concept = array('-1' => $this->lang->line('common_none_selected_text'));
-		foreach($this->Cash_concept->get_all_summary(1)->result_array() as $row)
+		foreach($this->Cash_concept->get_all_summary(1,"0")->result_array() as $row)
 		{
 			$cash_concept[$this->xss_clean($row['cash_concept_id'])] = $this->xss_clean($row['name']);
 		}
@@ -723,7 +723,7 @@ class Cashups extends Secure_Controller
 		$data['selected_bankaccount'] = (!empty($data['cost_info']->bankaccount_id) ? $data['cost_info']->bankaccount_id : -1);
 
 		$cash_concept = array('-1' => $this->lang->line('common_none_selected_text'));
-		foreach($this->Cash_concept->get_all_summary(2)->result_array() as $row)
+		foreach($this->Cash_concept->get_all_summary(2,"0")->result_array() as $row)
 		{
 			$cash_concept[$this->xss_clean($row['cash_concept_id'])] = $this->xss_clean($row['name']);
 		}
@@ -920,7 +920,7 @@ class Cashups extends Secure_Controller
 		$data['selected_bankaccount'] = (!empty($data['expense_info']->bankaccount_id) ? $data['expense_info']->bankaccount_id : -1);
 
 		$cash_concept = array('-1' => $this->lang->line('common_none_selected_text'));
-		foreach($this->Cash_concept->get_all_summary(3)->result_array() as $row)
+		foreach($this->Cash_concept->get_all_summary(3,"0")->result_array() as $row)
 		{
 			$cash_concept[$this->xss_clean($row['cash_concept_id'])] = $this->xss_clean($row['name']);
 		}

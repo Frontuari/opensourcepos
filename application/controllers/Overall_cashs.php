@@ -518,7 +518,7 @@ class Overall_cashs extends Secure_Controller
 		$data['selected_bankaccount'] = (!empty($data['income_info']->bankaccount_id) ? $data['income_info']->bankaccount_id : -1);
 
 		$cash_concept = array('-1' => $this->lang->line('common_none_selected_text'));
-		foreach($this->Cash_concept->get_all_summary(1)->result_array() as $row)
+		foreach($this->Cash_concept->get_all_summary(1,1)->result_array() as $row)
 		{
 			$cash_concept[$this->xss_clean($row['cash_concept_id'])] = $this->xss_clean($row['name']);
 		}
@@ -528,7 +528,7 @@ class Overall_cashs extends Secure_Controller
 		if(!empty($data['income_info']->cash_subconcept_id))
 		{
 			$cash_subconcept = array('-1' => $this->lang->line('common_none_selected_text'));
-			foreach ($this->Cash_concept->get_parent_all($data['income_info']->cash_concept_id,1)->result_array() as $row) {
+			foreach ($this->Cash_concept->get_parent_all($data['income_info']->cash_concept_id,2)->result_array() as $row) {
 				$cash_subconcept[$this->xss_clean($row['cash_concept_id'])] = $this->xss_clean($row['name']);
 			}
 			$data['cash_subconcepts'] = $cash_subconcept;
@@ -714,7 +714,7 @@ class Overall_cashs extends Secure_Controller
 		$data['selected_bankaccount'] = (!empty($data['cost_info']->bankaccount_id) ? $data['cost_info']->bankaccount_id : -1);
 
 		$cash_concept = array('-1' => $this->lang->line('common_none_selected_text'));
-		foreach($this->Cash_concept->get_all_summary(2)->result_array() as $row)
+		foreach($this->Cash_concept->get_all_summary(2,1)->result_array() as $row)
 		{
 			$cash_concept[$this->xss_clean($row['cash_concept_id'])] = $this->xss_clean($row['name']);
 		}
@@ -724,7 +724,7 @@ class Overall_cashs extends Secure_Controller
 		if(!empty($data['cost_info']->cash_subconcept_id))
 		{
 			$cash_subconcept = array('-1' => $this->lang->line('common_none_selected_text'));
-			foreach ($this->Cash_concept->get_parent_all($data['cost_info']->cash_concept_id)->result_array() as $row) {
+			foreach ($this->Cash_concept->get_parent_all($data['cost_info']->cash_concept_id,1)->result_array() as $row) {
 				$cash_subconcept[$this->xss_clean($row['cash_concept_id'])] = $this->xss_clean($row['name']);
 			}
 			$data['cash_subconcepts'] = $cash_subconcept;

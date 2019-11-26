@@ -62,7 +62,7 @@ class Cash_concept extends CI_Model
 	 *
 	 * @return array array of cash_concept table rows
 	 */
-	public function get_all_summary($concept_type,$limit = 10000, $offset = 0)
+	public function get_all_summary($concept_type, $overall_cash = "all", $limit = 10000, $offset = 0)
 	{
 		$this->db->from('cash_concepts');
 		$this->db->where('is_internal',0);
@@ -70,11 +70,17 @@ class Cash_concept extends CI_Model
 		$this->db->where('concept_type',$concept_type);
 		$this->db->where('deleted',0);
 		$this->db->where('cash_concept_parent_id IS NULL',null,false);
+		if($overall_cash != "all")
+		{
+			$this->db->where('is_cash_general_used',$overall_cash);
+		}
 		$this->db->order_by('code', 'asc');
 		$this->db->limit($limit);
 		$this->db->offset($offset);
 
-		return $this->db->get();
+		$query = $this->db->get();
+		//echo $this->db->last_query();
+		return $query;
 	}
 
 	/**
