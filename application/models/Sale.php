@@ -864,8 +864,6 @@ class Sale extends CI_Model
 				$response = $this->sunat_lib->sendInvoice($fmData);
 				$responseArray = json_decode($response,true);
 
-				print_r($responseArray);
-
 				$sales_update_data = [
 					'pdf_link' => $responseArray['links']['pdf']
 				];
@@ -1536,10 +1534,11 @@ class Sale extends CI_Model
 	}
 
 	public function get_pdf_link($sale_id){
-		$this->db->from('sales');
 		$this->db->select('pdf_link');
+		$this->db->from('sales');
 		$this->db->where('sale_id', $sale_id);
-		return $this->db->get();
+		$data = $this->db->get()->result();
+		return $data[0]->pdf_link;
 	}
 
 	/**
