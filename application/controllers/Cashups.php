@@ -173,7 +173,7 @@ class Cashups extends Secure_Controller
 	{
 		$data['table_headers'] = $this->xss_clean(get_cash_daily_manage_table_headers());
 
-		$data['cashup_summary'] = $this->Cashup->get_cashup_employee_daily($this->Employee->get_logged_in_employee_info()->person_id,date('Y-m-d'));
+		$data['cashup_summary'] = $this->Cashup->get_info($cashup_id);
 
 		$data['operation_types'] = array('all' => $this->lang->line('common_none_selected_text'), '1' => "INGRESO", '2' => "EGRESO", '3' => "GASTO");
 
@@ -203,7 +203,7 @@ class Cashups extends Secure_Controller
 	{
 		$data['table_headers'] = $this->xss_clean(get_cash_daily_manage_table_headers());
 
-		$data['cashup_summary'] = $this->Cashup->get_cashup_employee_daily($this->Employee->get_logged_in_employee_info()->person_id,date('Y-m-d'));
+		$data['cashup_summary'] = $this->Cashup->get_info($cashup_id);
 
 		$data['operation_types'] = array('all' => $this->lang->line('common_none_selected_text'), '1' => "INGRESO", '2' => "EGRESO", '3' => "GASTO");
 
@@ -233,7 +233,7 @@ class Cashups extends Secure_Controller
 	{
 		$data['table_headers'] = $this->xss_clean(get_cash_daily_manage_table_headers());
 
-		$data['cashup_summary'] = $this->Cashup->get_cashup_employee_daily($this->Employee->get_logged_in_employee_info()->person_id,date('Y-m-d'));
+		$data['cashup_summary'] = $this->Cashup->get_info($cashup_id);
 
 		$data['operation_types'] = array('all' => $this->lang->line('common_none_selected_text'), '1' => "INGRESO", '2' => "EGRESO", '3' => "GASTO");
 

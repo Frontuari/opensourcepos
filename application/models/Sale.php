@@ -341,6 +341,11 @@ class Sale extends CI_Model
 			$this->db->where('sales.sale_time BETWEEN ' . $this->db->escape(rawurldecode($filters['start_date'])) . ' AND ' . $this->db->escape(rawurldecode($filters['end_date'])));
 		}
 
+		if(isset($filters['employee_id']) && !empty($filters['employee_id']))
+		{
+			$this->db->where('sales.employee_id', $filters['employee_id']);
+		}
+
 		if(!empty($search))
 		{
 			if($filters['is_valid_receipt'] != FALSE)

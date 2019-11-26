@@ -316,6 +316,8 @@ class Customer extends Person
 			$this->db->join('people', 'customers.person_id = people.person_id');
 			$this->db->where('deleted', 0);
 			$this->db->like('email', $search);
+			$this->db->or_like('dni', $search);
+			$this->db->or_like('ruc', $search);
 			$this->db->order_by('email', 'asc');
 			foreach($this->db->get()->result() as $row)
 			{
@@ -326,6 +328,8 @@ class Customer extends Person
 			$this->db->join('people', 'customers.person_id = people.person_id');
 			$this->db->where('deleted', 0);
 			$this->db->like('phone_number', $search);
+			$this->db->or_like('dni', $search);
+			$this->db->or_like('ruc', $search);
 			$this->db->order_by('phone_number', 'asc');
 			foreach($this->db->get()->result() as $row)
 			{
@@ -336,6 +340,8 @@ class Customer extends Person
 			$this->db->join('people', 'customers.person_id = people.person_id');
 			$this->db->where('deleted', 0);
 			$this->db->like('account_number', $search);
+			$this->db->or_like('dni', $search);
+			$this->db->or_like('ruc', $search);
 			$this->db->order_by('account_number', 'asc');
 			foreach($this->db->get()->result() as $row)
 			{
@@ -345,6 +351,8 @@ class Customer extends Person
 			$this->db->join('people', 'customers.person_id = people.person_id');
 			$this->db->where('deleted', 0);
 			$this->db->like('company_name', $search);
+			$this->db->or_like('dni', $search);
+			$this->db->or_like('ruc', $search);
 			$this->db->order_by('company_name', 'asc');
 			foreach($this->db->get()->result() as $row)
 			{
