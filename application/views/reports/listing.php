@@ -63,9 +63,10 @@ if(isset($error))
 				show_report_if_allowed('specific', 'customer', $person_id, 'reports_customers');
 				show_report_if_allowed('specific', 'discount', $person_id, 'reports_discounts');
 				show_report_if_allowed('specific', 'employee', $person_id, 'reports_employees');
+				show_report_if_allowed('detailed', 'costs', $person_id, 'reports_costs');
 				show_report_if_allowed('detailed', 'expenses', $person_id, 'reports_expenses');
 				?>
-				<a class="list-group-item" href="<?php echo site_url('reports/detailed_costs');?>">Egresos</a>
+				<!--<a class="list-group-item" href="<?php echo site_url('reports/detailed_costs');?>">Egresos</a>-->
 			 </div>
 		</div>
 

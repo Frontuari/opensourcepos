@@ -286,12 +286,7 @@ class Cashups extends Secure_Controller
 
 	public function print_report($cashup_id)
 	{
-		$data['cashup_summary'] = $this->Cashup->get_cashup_employee_daily($this->Employee->get_logged_in_employee_info()->person_id,date('Y-m-d'));
-
-		if(!empty($data['cashup_summary']))
-		{
-			$data['cashup_summary'] = $this->Cashup->get_info($cashup_id);
-		}
+		$data['cashup_summary'] = $this->Cashup->get_info($cashup_id);
 
 		$data['denomination_currency'] = $this->Cashup->get_denominations($cashup_id,CURRENCY);
 		$data['initial_balance'] = $this->Cash_daily->get_initial_balance($data['cashup_summary']->cash_book_id,$data['cashup_summary']->open_date)->balance;

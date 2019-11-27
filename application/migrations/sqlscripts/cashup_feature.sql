@@ -320,3 +320,6 @@ CREATE TABLE `ospos_doctype_sequences`(
     VALUES ('reports_expenses', 'reports', NULL), ('reports_costs', 'reports', NULL);
 
 ALTER TABLE `ospos_sales` ADD COLUMN `pdf_link` text AFTER `sale_type`;
+
+INSERT INTO `ospos_permissions` (`permission_id`, `module_id`, `location_id`)
+    VALUES ('reports_cashups', 'reports', NULL), ('reports_overallcashs', 'reports', NULL);

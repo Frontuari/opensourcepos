@@ -140,6 +140,50 @@ class Reports extends Secure_Controller
 		$this->load->view('reports/tabular', $data);
 	}
 
+	//Summary Expenses by Categories report
+	public function summary_cashups($start_date, $end_date)
+	{
+		$inputs = array('start_date' => $start_date, 'end_date' => $end_date);
+
+		$this->load->model('reports/Summary_cashups');
+		$model = $this->Summary_cashups;
+
+		$data = $model->getData($inputs);
+
+		$data['subtitle'] = $this->_get_subtitle_report(array('start_date' => $start_date, 'end_date' => $end_date));
+
+		$html = $this->load->view('reports/cashs', $data, TRUE);
+
+		// Cargamos la librería
+		$this->load->library('pdfgenerator_lib');
+		// definamos un nombre para el archivo. No es necesario agregar la extension .pdf
+		$filename = 'arqueo_de_caja';
+		// generamos el PDF. Pasemos por encima de la configuración general y definamos otro tipo de papel
+		$this->pdfgenerator_lib->generate($html, $filename, true, 'Letter', 'portrait',0);
+	}
+
+	//Summary Expenses by Categories report
+	public function summary_overallcashs($start_date, $end_date)
+	{
+		$inputs = array('start_date' => $start_date, 'end_date' => $end_date);
+
+		$this->load->model('reports/Summary_overall_cashs');
+		$model = $this->Summary_overall_cashs;
+
+		$data = $model->getData($inputs);
+
+		$data['subtitle'] = $this->_get_subtitle_report(array('start_date' => $start_date, 'end_date' => $end_date));
+
+		$html = $this->load->view('reports/overall_cashs', $data, TRUE);
+
+		// Cargamos la librería
+		$this->load->library('pdfgenerator_lib');
+		// definamos un nombre para el archivo. No es necesario agregar la extension .pdf
+		$filename = 'arqueo_de_caja';
+		// generamos el PDF. Pasemos por encima de la configuración general y definamos otro tipo de papel
+		$this->pdfgenerator_lib->generate($html, $filename, true, 'Letter', 'portrait',0);
+	}
+
 	//Summary Customers report
 	public function summary_customers($start_date, $end_date, $sale_type, $location_id = 'all')
 	{
