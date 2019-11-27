@@ -45,6 +45,22 @@ class Employee extends Person
 	}
 
 	/*
+	Returns all the employees
+	*/
+	public function get_all_cashups($limit = 10000, $offset = 0)
+	{
+		$this->db->from('employees');
+		$this->db->where('employees.deleted', 0);
+		$this->db->join('people', 'employees.person_id = people.person_id');
+		$this->db->join('cash_books', 'cash_books.employee_id = people.person_id');
+		$this->db->order_by('last_name', 'asc');
+		$this->db->limit($limit);
+		$this->db->offset($offset);
+
+		return $this->db->get();
+	}
+
+	/*
 	Gets information about a particular employee
 	*/
 	public function get_info($employee_id)

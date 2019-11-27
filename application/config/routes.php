@@ -82,6 +82,12 @@ $route['reports/detailed_sales'] = 'reports/date_input_sales';
 $route['reports/(detailed_receivings)/([^/]+)/([^/]+)/([^/]+)'] = 'reports/$1/$2/$3/$4';
 $route['reports/detailed_receivings'] = 'reports/date_input_recv';
 
+$route['reports/detailed_expenses/([^/]+)/([^/]+)/([^/]+)'] = 'reports/$1/$2/$3$/$4';
+$route['reports/detailed_expenses'] = 'reports/date_input_cashups';
+$route['reports/detailed_costs/([^/]+)/([^/]+)/([^/]+)'] = 'reports/$1/$2/$3$/$4';
+$route['reports/detailed_costs'] = 'reports/date_input_cashups';
+
+
 $route['reports/(specific_:any)/([^/]+)/([^/]+)/([^/]+)'] = 'reports/$1/$2/$3/$4';
 $route['reports/specific_customer'] = 'reports/specific_customer_input';
 $route['reports/specific_employee'] = 'reports/specific_employee_input';

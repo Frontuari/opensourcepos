@@ -315,3 +315,8 @@ CREATE TABLE `ospos_doctype_sequences`(
 
     INSERT INTO `ospos_grants` (`permission_id`, `person_id`, `menu_group`) VALUES
     ('doctypesequences', 1, 'office');
+
+    INSERT INTO `ospos_permissions` (`permission_id`, `module_id`, `location_id`)
+    VALUES ('reports_expenses', 'reports', NULL), ('reports_costs', 'reports', NULL);
+
+ALTER TABLE `ospos_sales` ADD COLUMN `pdf_link` text AFTER `sale_type`;

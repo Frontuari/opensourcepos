@@ -469,6 +469,22 @@ class Reports extends Secure_Controller
 	}
 
 	//Input for reports that require only a date range. (see routes.php to see that all graphical summary reports route here)
+	public function date_input_cashups()
+	{
+		$data = array();
+
+		foreach ($this->Employee->get_all_cashups()->result_array() as $row) {
+			$cashups[$row['employee_id']] = $row['first_name']."  ".$row['last_name'];
+		}
+
+		$cashups['all'] = $this->lang->line('reports_all');
+
+		$data['cashups'] = array_reverse($cashups, TRUE);
+
+		$this->load->view('reports/date_input', $data);
+	}
+
+	//Input for reports that require only a date range. (see routes.php to see that all graphical summary reports route here)
 	public function date_input_only()
 	{
 		$data = array();
@@ -1567,6 +1583,88 @@ class Reports extends Secure_Controller
 		);
 
 		$this->load->view('reports/tabular', $data);
+	}
+
+	public function detailed_expenses($start_date, $end_date, $locator_id = FALSE, $sales_type = FALSE, $type = FALSE, $employee_id = 'all')
+	{
+
+		$inputs = array('start_date' => $start_date, 'end_date' => $end_date, 'employee_id' => $employee_id);
+
+		$this->load->model('reports/Detailed_expenses');
+		$model = $this->Detailed_expenses;
+
+		$columns = $model->getDataColumns();
+
+		$headers = $this->xss_clean($columns);
+
+		$report_data = $model->getData($inputs);
+
+		$summary_data = array();
+
+		foreach($report_data['summary'] as $key => $row)
+		{
+			$summary_data[] = $this->xss_clean(array(
+				'id' => $row['expense_id'],
+				'documentno' => $row['documentno'],
+				'documentdate' => to_date(strtotime($row['documentdate'])),
+				'person_name' => $row['person_name'],
+				'cash_concept' => $row['cash_concept'],
+				'total' => to_currency($row['total']),
+				'movementtype' => ($row['movementtype']=="C" ? $this->lang->line('expenses_cash') : $this->lang->line('expenses_check')),
+				'detail' => $row['detail']
+			));
+		}
+
+		$data = array(
+			'title' => $this->lang->line('reports_detailed_expenses_report'),
+			'subtitle' => $this->_get_subtitle_report(array('start_date' => $start_date, 'end_date' => $end_date)),
+			'headers' => $headers,
+			'editable' => 'expenses',
+			'summary_data' => $summary_data,
+			'overall_summary_data' => $this->xss_clean($model->getSummaryData($inputs))
+		);
+		$this->load->view('reports/tabular_details', $data);
+	}
+
+	public function detailed_costs($start_date, $end_date, $locator_id = FALSE, $sales_type = FALSE, $type = FALSE, $employee_id = 'all')
+	{
+
+		$inputs = array('start_date' => $start_date, 'end_date' => $end_date, 'employee_id' => $employee_id);
+
+		$this->load->model('reports/Detailed_costs');
+		$model = $this->Detailed_costs;
+
+		$columns = $model->getDataColumns();
+
+		$headers = $this->xss_clean($columns);
+
+		$report_data = $model->getData($inputs);
+
+		$summary_data = array();
+
+		foreach($report_data['summary'] as $key => $row)
+		{
+			$summary_data[] = $this->xss_clean(array(
+				'id' => $row['cost_id'],
+				'documentno' => $row['documentno'],
+				'documentdate' => to_date(strtotime($row['documentdate'])),
+				'person_name' => $row['person_name'],
+				'cash_concept' => $row['cash_concept'],
+				'total' => to_currency($row['total']),
+				'movementtype' => ($row['movementtype']=="C" ? $this->lang->line('expenses_cash') : $this->lang->line('expenses_bank')),
+				'detail' => $row['detail']
+			));
+		}
+
+		$data = array(
+			'title' => $this->lang->line('reports_detailed_costs_report'),
+			'subtitle' => $this->_get_subtitle_report(array('start_date' => $start_date, 'end_date' => $end_date)),
+			'headers' => $headers,
+			'editable' => 'costs',
+			'summary_data' => $summary_data,
+			'overall_summary_data' => $this->xss_clean($model->getSummaryData($inputs))
+		);
+		$this->load->view('reports/tabular_details', $data);
 	}
 
 	//	Returns subtitle for the reports

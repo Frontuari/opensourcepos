@@ -146,6 +146,59 @@ class Cashup extends CI_Model
 	/*
 	Gets information about a particular cashup
 	*/
+	public function get_all($rows = 0, $limit_from = 0)
+	{
+
+		$this->db->select('
+			cash_up.cashup_id AS cashup_id,
+			MAX(cash_up.cash_book_id) AS cash_book_id,
+			MAX(cash_up.deleted) AS deleted,
+			MAX(cash_books.code) AS code,
+			MAX(cash_up.open_date) AS open_date,
+			MAX(cash_up.close_date) AS close_date,
+			MAX(cash_up.open_amount_cash) AS open_amount_cash,
+			MAX(cash_up.transfer_amount_cash) AS transfer_amount_cash,
+			MAX(cash_up.closed_amount_cash) AS closed_amount_cash,
+			MAX(cash_up.closed_amount_due) AS closed_amount_due,
+			MAX(cash_up.closed_amount_card) AS closed_amount_card,
+			MAX(cash_up.closed_amount_check) AS closed_amount_check,
+			COALESCE(SUM(cash_daily.amount * (CASE WHEN cash_daily.operation_type = 1 THEN 1 ELSE -1 END)),MAX(cash_up.closed_amount_total))+COALESCE((SELECT SUM(initial.amount * (CASE WHEN initial.operation_type = 1 THEN 1 ELSE -1 END)) FROM '. $this->db->dbprefix('cash_daily').' AS initial WHERE initial.cash_book_id = cash_up.cash_book_id AND initial.deleted = 0 AND initial.cashup_id < cash_up.cashup_id),0) AS closed_amount_total,
+			MAX(cash_up.description) AS description,
+			MAX(cash_up.note) AS note,
+			MAX(cash_up.open_employee_id) AS open_employee_id,
+			MAX(cash_up.close_employee_id) AS close_employee_id,
+			MAX(open_employees.first_name) AS open_first_name,
+			MAX(open_employees.last_name) AS open_last_name,
+			MAX(close_employees.first_name) AS close_first_name,
+			MAX(close_employees.last_name) AS close_last_name,
+			SUM(COALESCE((CASE WHEN cash_daily.operation_type = 1 AND cash_daily.currency = \'' . CURRENCY . '\' THEN cash_daily.amount ELSE 0 END),0)) AS income,
+			SUM(COALESCE((CASE WHEN cash_daily.operation_type = 2 AND cash_daily.isbankmovement = 0 AND cash_daily.currency = \'' . CURRENCY . '\' THEN cash_daily.amount ELSE 0 END),0)) AS cost_cash,
+			SUM(COALESCE((CASE WHEN cash_daily.operation_type = 2 AND cash_daily.isbankmovement = 1 AND cash_daily.currency = \'' . CURRENCY . '\' THEN cash_daily.amount ELSE 0 END),0)) AS cost_bank,
+			SUM(COALESCE((CASE WHEN cash_daily.operation_type = 3 AND cash_daily.currency = \'' . CURRENCY . '\' THEN cash_daily.amount ELSE 0 END),0)) AS expense,
+			CASE WHEN MAX(cash_up.close_date) IS NULL THEN 0 ELSE 1 END state,
+			COALESCE((SELECT SUM(initial.amount * (CASE WHEN initial.operation_type = 1 THEN 1 ELSE -1 END)) FROM '. $this->db->dbprefix('cash_daily').' AS initial WHERE initial.cash_book_id = cash_up.cash_book_id AND initial.deleted = 0 AND initial.cashup_id < cash_up.cashup_id),0) AS initial_balance
+		');
+		$this->db->from('cash_up AS cash_up');
+		$this->db->join('cash_books AS cash_books', 'cash_books.cash_book_id = cash_up.cash_book_id');
+		$this->db->join('people AS open_employees', 'open_employees.person_id = cash_up.open_employee_id', 'LEFT');
+		$this->db->join('people AS close_employees', 'close_employees.person_id = cash_up.close_employee_id', 'LEFT');
+		$this->db->join('cash_daily AS cash_daily', 'cash_daily.cashup_id = cash_up.cashup_id AND cash_daily.deleted = 0', 'LEFT');
+		$this->db->group_by('cash_up.cashup_id');
+		$this->db->order_by('cash_up.cashup_id', 'asc');
+
+		if($rows > 0)
+		{
+			$this->db->limit($rows, $limit_from);
+		}
+
+		$query = $this->db->get();
+		
+		return $query;
+	}
+
+	/*
+	Gets information about a particular cashup
+	*/
 	public function get_info($cashup_id)
 	{
 

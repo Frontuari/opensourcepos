@@ -319,6 +319,16 @@ class Sale extends CI_Model
 		return $this->db->get();
 	}
 
+	public function get_payments_on_sales($sale_id)
+	{
+		$this->db->select('CONCAT(\'Forma de pago: \',GROUP_CONCAT(payment_type),\'|Cajero: \',MAX(first_name),\' \',MAX(last_name)) AS payments');
+		$this->db->from('sales_payments');
+		$this->db->join('people','person_id = employee_id');
+		$this->db->where('sale_id',$sale_id);
+
+		return $this->db->get();
+	}
+
 	/**
 	 * Get the payment summary for the takings (sales/manage) view
 	 */
@@ -820,14 +830,18 @@ class Sale extends CI_Model
 						$serie_number = 'F001';
 						$cod_num_doc = '01';
 						$cus_doc = $custInfo->ruc;
+						$customer_name = $custInfo->company_name;
 					break;
 
 					case 5:
 						$serie_number = 'B001';
 						$cod_num_doc = '03';
 						$cus_doc = $custInfo->dni;
+						$customer_name = $custInfo->first_name.' '.$custInfo->last_name;
 					break;
 				}
+
+				$payment_term = $this->get_payments_on_sales($sale_id)->row();
 
 				$fmData = [
 				      "serie_documento" =>  $serie_number,
@@ -843,7 +857,7 @@ class Sale extends CI_Model
 				      "datos_del_cliente_o_receptor" => array(
 				        "codigo_tipo_documento_identidad" =>  "6",
 				        "numero_documento" =>  $cus_doc,
-				        "apellidos_y_nombres_o_razon_social" =>  $full_data['customer'],
+				        "apellidos_y_nombres_o_razon_social" =>  $customer_name,
 				        "codigo_pais" =>  "PE",
 				        "ubigeo" =>  "150101",
 				        "direccion" =>  $full_data['customer_address'],
@@ -863,7 +877,7 @@ class Sale extends CI_Model
 				        "total_venta" =>  $full_data['total']
 				      ),
 				      "items" => $items_car,
-				      "informacion_adicional" =>  "Forma de pago:Efectivo|Caja: 1"
+				      "informacion_adicional" =>  $payment_term->payments
 				];
 
 				$response = $this->sunat_lib->sendInvoice($fmData);

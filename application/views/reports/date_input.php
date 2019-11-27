@@ -22,7 +22,7 @@ if(isset($error))
 		</div>
 	</div>
 
-	<?php	
+	<?php
 	if(!empty($mode))
 	{
 	?>
@@ -55,7 +55,7 @@ if(isset($error))
 	}
 	?>
 
-	<?php	
+	<?php
 	if (isset($discount_type_options))
 	{
 	?>
@@ -69,7 +69,7 @@ if(isset($error))
 	}
 	?>
 
-	<?php	
+	<?php
 	if (!empty($stock_locations) && count($stock_locations) > 2)
 	{
 	?>
@@ -77,6 +77,20 @@ if(isset($error))
 			<?php echo form_label($this->lang->line('reports_stock_location'), 'reports_stock_location_label', array('class'=>'required control-label col-xs-2')); ?>
 			<div id='report_stock_location' class="col-xs-3">
 				<?php echo form_dropdown('stock_location', $stock_locations, 'all', array('id'=>'location_id', 'class'=>'form-control')); ?>
+			</div>
+		</div>
+	<?php
+	}
+	?>
+
+	<?php
+	if (!empty($cashups))
+	{
+	?>
+		<div class="form-group form-group-sm">
+			<?php echo form_label($this->lang->line('reports_employees'), 'reports_cashup_label', array('class'=>'required control-label col-xs-2')); ?>
+			<div id='reports_cashup' class="col-xs-3">
+				<?php echo form_dropdown('cashup', $cashups, 'all', array('id'=>'employee_id', 'class'=>'form-control')); ?>
 			</div>
 		</div>
 	<?php
@@ -101,8 +115,8 @@ $(document).ready(function()
 	<?php $this->load->view('partial/daterangepicker'); ?>
 
 	$("#generate_report").click(function()
-	{		
-		window.location = [window.location, start_date, end_date, $("#input_type").val() || 0, $("#location_id").val() || 'all', $("#discount_type_id").val() || 0 ].join("/");
+	{
+		window.location = [window.location, start_date, end_date, $("#input_type").val() || 0, $("#location_id").val() || 'all', $("#discount_type_id").val() || 0, $("#employee_id").val() || 'all' ].join("/");
 	});
 });
 </script>
