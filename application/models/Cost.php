@@ -114,17 +114,28 @@ class Cost extends CI_Model
 	 *
 	 * @return array containing all the fields of the table row
 	 */
-	public function get_summary_info($cashmovement = 0)
+	public function get_summary_info($cashmovement = 0,$employee_id)
 	{
 
 		$this->db->select('
-				SUM(CASE WHEN movementtype = \'C\' AND currency = \'' . CURRENCY . '\' THEN amount ELSE 0 END) AS cash_amount,
-				SUM(CASE WHEN movementtype = \'B\' AND currency = \'' . CURRENCY . '\' THEN amount ELSE 0 END) AS check_amount,
-				SUM(CASE WHEN movementtype = \'C\' AND currency = \'' . USDCURRENCY . '\' THEN amount ELSE 0 END) AS cash_usdamount,
-				SUM(CASE WHEN movementtype = \'B\' AND currency = \'' . USDCURRENCY . '\' THEN amount ELSE 0 END) AS check_usdamount');
-		$this->db->from('costs');
-		$this->db->where('is_cashupmovement',$cashmovement);
-		$this->db->where('deleted',0);
+				SUM(CASE WHEN costs.movementtype = \'C\' AND costs.currency = \'' . CURRENCY . '\' THEN costs.amount ELSE 0 END) AS cash_amount,
+				SUM(CASE WHEN costs.movementtype = \'B\' AND costs.currency = \'' . CURRENCY . '\' THEN costs.amount ELSE 0 END) AS check_amount,
+				SUM(CASE WHEN costs.movementtype = \'C\' AND costs.currency = \'' . USDCURRENCY . '\' THEN costs.amount ELSE 0 END) AS cash_usdamount,
+				SUM(CASE WHEN costs.movementtype = \'B\' AND costs.currency = \'' . USDCURRENCY . '\' THEN costs.amount ELSE 0 END) AS check_usdamount');
+		$this->db->from('costs AS costs');
+		if($cash_movement==1)
+		{
+			$this->db->join('cash_daily AS c','costs.cost_id = c.reference_id AND c.table_reference = \'costs\'');
+			$this->db->join('cash_books AS cb','c.cash_book_id = cb.cash_book_id');
+		}
+		else
+		{
+			$this->db->join('cash_flow AS c','costs.cost_id = c.reference_id AND c.table_reference = \'costs\'');
+			$this->db->join('cash_books AS cb','c.cash_book_id = cb.cash_book_id');
+		}
+		$this->db->where('costs.is_cashupmovement',$cashmovement);
+		$this->db->where('cb.employee_id',$employee_id);
+		$this->db->where('costs.deleted',0);
 		$query = $this->db->get();
 		//echo $this->db->last_query();
 		if($query->num_rows() == 1)
@@ -252,6 +263,16 @@ class Cost extends CI_Model
 		$this->db->join('people AS people','costs.person_id = people.person_id');
 		$this->db->join('cash_concepts AS cash_concepts','costs.cash_concept_id = cash_concepts.cash_concept_id');
 		$this->db->join('cash_concepts AS cash_subconcepts','costs.cash_subconcept_id = cash_subconcepts.cash_concept_id');
+		if($cash_movement==1)
+		{
+			$this->db->join('cash_daily AS c','costs.cost_id = c.reference_id AND c.table_reference = \'costs\'');
+			$this->db->join('cash_books AS cb','c.cash_book_id = cb.cash_book_id');
+		}
+		else
+		{
+			$this->db->join('cash_flow AS c','costs.cost_id = c.reference_id AND c.table_reference = \'costs\'');
+			$this->db->join('cash_books AS cb','c.cash_book_id = cb.cash_book_id');
+		}
 		$this->db->group_start();
 			$this->db->like('costs.documentno', $search);
 			$this->db->or_like('CONCAT(people.first_name,\' \',people.last_name)', $search);
@@ -268,6 +289,11 @@ class Cost extends CI_Model
 		else
 		{
 			$this->db->where('costs.documentdate BETWEEN ' . $this->db->escape(rawurldecode($filters['start_date'])) . ' AND ' . $this->db->escape(rawurldecode($filters['end_date'])));
+		}
+
+		if(!empty($filters['employee_id']))
+		{
+			$this->db->where('cb.employee_id', $filters['employee_id']);
 		}
 
 		// get_found_rows case

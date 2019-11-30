@@ -504,6 +504,7 @@ $(document).ready(function()
 				dataType: 'json',
 				success: function(result){
 					resp = JSON.parse(result);
+					console.log(resp);
 					$('#business_name').val(resp.razonSocial);
 					$('#company_name').val(resp.nombreComercial);
 					$('#address_1').val(resp.direccion);

@@ -827,14 +827,14 @@ class Sale extends CI_Model
 
 				switch($sale_type){
 					case 1:
-						$serie_number = 'F001';
+						$serie_number = 'F002';
 						$cod_num_doc = '01';
 						$cus_doc = $custInfo->ruc;
 						$customer_name = $custInfo->business_name;
 					break;
 
 					case 5:
-						$serie_number = 'B001';
+						$serie_number = 'B002';
 						$cod_num_doc = '03';
 						$cus_doc = $custInfo->dni;
 						$customer_name = $custInfo->first_name.' '.$custInfo->last_name;

@@ -475,7 +475,7 @@ class Cashups extends Secure_Controller
 	{
 		$data['table_headers'] = $this->xss_clean(get_income_manage_table_headers(1));
 
-		$data['income_summary'] = $this->Income->get_summary_info(1);
+		$data['income_summary'] = $this->Income->get_summary_info(1,$this->Employee->get_logged_in_employee_info()->person_id);
 
 		$this->load->view('cashups/manage_income', $data);
 	}
@@ -492,7 +492,8 @@ class Cashups extends Secure_Controller
 		$order  = $this->input->get('order');
 		$filters  = array(
 					 'start_date' => $this->input->get('start_date'),
-					 'end_date' => $this->input->get('end_date')
+					 'end_date' => $this->input->get('end_date'),
+					 'employee_id' => $this->Employee->get_logged_in_employee_info()->person_id
 					);
 
 		$incomes = $this->Income->search($search, $filters, 1, $limit, $offset, $sort, $order);
@@ -659,7 +660,7 @@ class Cashups extends Secure_Controller
 	{
 		$data['table_headers'] = $this->xss_clean(get_cost_manage_table_headers(1));
 
-		$data['cost_summary'] = $this->Cost->get_summary_info(1);
+		$data['cost_summary'] = $this->Cost->get_summary_info(1,$this->Employee->get_logged_in_employee_info()->person_id);
 
 		$this->load->view('cashups/manage_cost', $data);
 	}
@@ -676,7 +677,8 @@ class Cashups extends Secure_Controller
 		$order  = $this->input->get('order');
 		$filters  = array(
 					 'start_date' => $this->input->get('start_date'),
-					 'end_date' => $this->input->get('end_date')
+					 'end_date' => $this->input->get('end_date'),
+					 'employee_id' => $this->Employee->get_logged_in_employee_info()->person_id
 					);
 
 		$costs = $this->Cost->search($search, $filters, 1, $limit, $offset, $sort, $order);
@@ -856,7 +858,7 @@ class Cashups extends Secure_Controller
 	{
 		$data['table_headers'] = $this->xss_clean(get_expense_manage_table_headers(1));
 
-		$data['expense_summary'] = $this->Expense->get_summary_info(1);
+		$data['expense_summary'] = $this->Expense->get_summary_info(1,$this->Employee->get_logged_in_employee_info()->person_id);
 
 		$this->load->view('cashups/manage_expense', $data);
 	}
@@ -873,7 +875,8 @@ class Cashups extends Secure_Controller
 		$order  = $this->input->get('order');
 		$filters  = array(
 					 'start_date' => $this->input->get('start_date'),
-					 'end_date' => $this->input->get('end_date')
+					 'end_date' => $this->input->get('end_date'),
+					 'employee_id' => $this->Employee->get_logged_in_employee_info()->person_id
 					);
 
 		$expenses = $this->Expense->search($search, $filters, 1, $limit, $offset, $sort, $order);
