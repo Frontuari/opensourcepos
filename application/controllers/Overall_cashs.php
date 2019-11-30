@@ -459,7 +459,7 @@ class Overall_cashs extends Secure_Controller
 	{
 		$data['table_headers'] = $this->xss_clean(get_income_manage_table_headers());
 
-		$data['income_summary'] = $this->Income->get_summary_info();
+		$data['income_summary'] = $this->Income->get_summary_info(0,$this->Employee->get_logged_in_employee_info()->person_id);
 
 		$this->load->view('overall_cashs/manage_income', $data);
 	}
@@ -476,7 +476,8 @@ class Overall_cashs extends Secure_Controller
 		$order  = $this->input->get('order');
 		$filters  = array(
 					 'start_date' => $this->input->get('start_date'),
-					 'end_date' => $this->input->get('end_date')
+					 'end_date' => $this->input->get('end_date'),
+					 'employee_id' => $this->Employee->get_logged_in_employee_info()->person_id
 					);
 
 		$incomes = $this->Income->search($search, $filters, 0, $limit, $offset, $sort, $order);
@@ -655,7 +656,7 @@ class Overall_cashs extends Secure_Controller
 	{
 		$data['table_headers'] = $this->xss_clean(get_cost_manage_table_headers());
 
-		$data['cost_summary'] = $this->Cost->get_summary_info();
+		$data['cost_summary'] = $this->Cost->get_summary_info(0,$this->Employee->get_logged_in_employee_info()->person_id);
 
 		$this->load->view('overall_cashs/manage_cost', $data);
 	}
@@ -672,7 +673,8 @@ class Overall_cashs extends Secure_Controller
 		$order  = $this->input->get('order');
 		$filters  = array(
 					 'start_date' => $this->input->get('start_date'),
-					 'end_date' => $this->input->get('end_date')
+					 'end_date' => $this->input->get('end_date'),
+					 'employee_id' => $this->Employee->get_logged_in_employee_info()->person_id
 					);
 
 		$costs = $this->Cost->search($search, $filters, 0, $limit, $offset, $sort, $order);
