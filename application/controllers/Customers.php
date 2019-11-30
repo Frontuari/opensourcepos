@@ -282,6 +282,7 @@ class Customers extends Persons
 			'consent' => $this->input->post('consent') != NULL,
 			'account_number' => $this->input->post('account_number') == '' ? NULL : $this->input->post('account_number'),
 			'tax_id' => $this->input->post('tax_id'),
+			'business_name' => $this->input->post('business_name') == '' ? NULL : $this->input->post('business_name'),
 			'company_name' => $this->input->post('company_name') == '' ? NULL : $this->input->post('company_name'),
 			'discount' => $this->input->post('discount') == '' ? 0.00 : $this->input->post('discount'),
 			'discount_type' => $this->input->post('discount_type') == NULL ? PERCENT : $this->input->post('discount_type'),

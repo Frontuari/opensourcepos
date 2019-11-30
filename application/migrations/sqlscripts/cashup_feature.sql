@@ -323,3 +323,5 @@ ALTER TABLE `ospos_sales` ADD COLUMN `pdf_link` text AFTER `sale_type`;
 
 INSERT INTO `ospos_permissions` (`permission_id`, `module_id`, `location_id`)
     VALUES ('reports_cashups', 'reports', NULL), ('reports_overallcashs', 'reports', NULL);
+
+ALTER TABLE `ospos_customers` ADD `business_name` VARCHAR(255) NULL DEFAULT NULL AFTER `ruc`;

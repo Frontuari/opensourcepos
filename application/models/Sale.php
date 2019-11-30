@@ -830,7 +830,7 @@ class Sale extends CI_Model
 						$serie_number = 'F001';
 						$cod_num_doc = '01';
 						$cus_doc = $custInfo->ruc;
-						$customer_name = $custInfo->company_name;
+						$customer_name = $custInfo->business_name;
 					break;
 
 					case 5:
