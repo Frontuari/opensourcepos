@@ -301,13 +301,15 @@ class Customer extends Person
 				$this->db->or_like('email', $search);
 				$this->db->or_like('phone_number', $search);
 				$this->db->or_like('company_name', $search);
+				$this->db->or_like('business_name', $search);
 			}
 		$this->db->group_end();
 		$this->db->where('deleted', 0);
 		$this->db->order_by('last_name', 'asc');
 		foreach($this->db->get()->result() as $row)
 		{
-			$suggestions[] = array('value' => $row->person_id, 'label' => $row->first_name . ' ' . $row->last_name . (!empty($row->company_name) ? ' [' . $row->company_name . ']' : ''). (!empty($row->phone_number) ? ' [' . $row->phone_number . ']' : ''));
+			$company_name = (!empty($row->business_name) ? ' [' . $row->business_name . ']' : (!empty($row->company_name) ? ' [' . $row->company_name . ']' : ''));
+			$suggestions[] = array('value' => $row->person_id, 'label' => $row->first_name . ' ' . $row->last_name . $company_name. (!empty($row->phone_number) ? ' [' . $row->phone_number . ']' : ''));
 		}
 
 		if(!$unique)
