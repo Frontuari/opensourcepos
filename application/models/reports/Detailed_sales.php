@@ -68,12 +68,13 @@ class Detailed_sales extends Report
 
 	public function getData(array $inputs)
 	{
-		$this->db->select('sale_id, 
+		$this->db->select('sale_id,
 			MAX(CASE
-			WHEN sale_type = ' . SALE_TYPE_POS . ' && sale_status = ' . COMPLETED . ' THEN \'' . $this->lang->line('reports_code_pos') . '\'			
+			WHEN sale_type = ' . SALE_TYPE_POS . ' && sale_status = ' . COMPLETED . ' THEN \'' . $this->lang->line('reports_code_pos') . '\'
 			WHEN sale_type = ' . SALE_TYPE_INVOICE . ' && sale_status = ' . COMPLETED . ' THEN \'' . $this->lang->line('reports_code_invoice') . '\'
 			WHEN sale_type = ' . SALE_TYPE_WORK_ORDER . ' && sale_status = ' . SUSPENDED . ' THEN \'' . $this->lang->line('reports_code_work_order') . '\'
 			WHEN sale_type = ' . SALE_TYPE_QUOTE . ' && sale_status = ' . SUSPENDED . ' THEN \'' . $this->lang->line('reports_code_quote') . '\'
+			WHEN sale_type = ' . SALE_TYPE_TICKET . ' && sale_status = ' . COMPLETED . ' THEN \'' . $this->lang->line('reports_code_ticket') . '\'
 			WHEN sale_type = ' . SALE_TYPE_RETURN . ' && sale_status = ' . COMPLETED . ' THEN \'' . $this->lang->line('reports_code_return') . '\'
 			WHEN sale_status = ' . CANCELED . ' THEN \'' . $this->lang->line('reports_code_canceled') . '\'
 			ELSE \'\'
@@ -104,6 +105,7 @@ class Detailed_sales extends Report
 			$this->db->where('sale_type', SALE_TYPE_POS);
 			$this->db->or_where('sale_type', SALE_TYPE_INVOICE);
 			$this->db->or_where('sale_type', SALE_TYPE_RETURN);
+			$this->db->or_where('sale_type', SALE_TYPE_TICKET);
 			$this->db->group_end();
 		}
 		elseif($inputs['sale_type'] == 'sales')
@@ -112,6 +114,7 @@ class Detailed_sales extends Report
 			$this->db->group_start();
 			$this->db->where('sale_type', SALE_TYPE_POS);
 			$this->db->or_where('sale_type', SALE_TYPE_INVOICE);
+			$this->db->or_where('sale_type', SALE_TYPE_TICKET);
 			$this->db->group_end();
 		}
 		elseif($inputs['sale_type'] == 'quotes')
@@ -185,6 +188,7 @@ class Detailed_sales extends Report
 			$this->db->where('sale_type', SALE_TYPE_POS);
 			$this->db->or_where('sale_type', SALE_TYPE_INVOICE);
 			$this->db->or_where('sale_type', SALE_TYPE_RETURN);
+			$this->db->or_where('sale_type', SALE_TYPE_TICKET);
 			$this->db->group_end();
 		}
 		elseif($inputs['sale_type'] == 'sales')
@@ -193,6 +197,7 @@ class Detailed_sales extends Report
 			$this->db->group_start();
 			$this->db->where('sale_type', SALE_TYPE_POS);
 			$this->db->or_where('sale_type', SALE_TYPE_INVOICE);
+			$this->db->or_where('sale_type', SALE_TYPE_TICKET);
 			$this->db->group_end();
 		}
 		elseif($inputs['sale_type'] == 'quotes')

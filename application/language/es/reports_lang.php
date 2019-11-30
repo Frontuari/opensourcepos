@@ -11,6 +11,7 @@ $lang["reports_code_invoice"] = "INV";
 $lang["reports_code_pos"] = "POS";
 $lang["reports_code_quote"] = "Q";
 $lang["reports_code_return"] = "RET";
+$lang["reports_code_ticket"] = "BLT";
 $lang["reports_code_type"] = "Tipo";
 $lang["reports_code_work_order"] = "OdT";
 $lang["reports_comments"] = "Comentarios";

@@ -23,7 +23,12 @@ if(isset($error))
 				{
 					if (preg_match('/reports_/', $grant['permission_id']) && !preg_match('/(inventory|receivings)/', $grant['permission_id']))
 					{
-						show_report('graphical_summary', $grant['permission_id']);
+						if($grant['permission_id'] != 'reports_cashups'
+							&& $grant['permission_id'] != 'reports_costs'
+							&& $grant['permission_id'] != 'reports_expenses'
+							&& $grant['permission_id'] != 'reports_overallcashs'){
+								show_report('graphical_summary', $grant['permission_id']);
+							}
 					}
 				}
 				?>
@@ -42,7 +47,9 @@ if(isset($error))
 				{
 					if (preg_match('/reports_/', $grant['permission_id']) && !preg_match('/(inventory|receivings)/', $grant['permission_id']))
 					{
-						show_report('summary', $grant['permission_id']);
+						if($grant['permission_id'] != 'reports_costs' && $grant['permission_id'] != 'reports_expenses'){
+								show_report('summary', $grant['permission_id']);
+						}
 					}
 				}
 				?>

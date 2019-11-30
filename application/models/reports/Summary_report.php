@@ -97,6 +97,7 @@ abstract class Summary_report extends Report
 				$this->db->where('sales.sale_type', SALE_TYPE_POS);
 				$this->db->or_where('sales.sale_type', SALE_TYPE_INVOICE);
 				$this->db->or_where('sales.sale_type', SALE_TYPE_RETURN);
+				$this->db->or_where('sales.sale_type', SALE_TYPE_TICKET);
 			$this->db->group_end();
 		}
 		elseif($inputs['sale_type'] == 'sales')
@@ -105,6 +106,7 @@ abstract class Summary_report extends Report
 			$this->db->group_start();
 				$this->db->where('sales.sale_type', SALE_TYPE_POS);
 				$this->db->or_where('sales.sale_type', SALE_TYPE_INVOICE);
+				$this->db->or_where('sales.sale_type', SALE_TYPE_TICKET);
 			$this->db->group_end();
 		}
 		elseif($inputs['sale_type'] == 'quotes')
@@ -140,8 +142,8 @@ abstract class Summary_report extends Report
 	protected function _group_order()			{}
 
 	/**
-	 * Public interface implementing the base abstract class, 
-	 * in general it should not be extended unless there is a valid reason 
+	 * Public interface implementing the base abstract class,
+	 * in general it should not be extended unless there is a valid reason
 	 * like a non sale report (e.g. expenses)
 	 */
 
