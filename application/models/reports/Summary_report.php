@@ -72,6 +72,7 @@ abstract class Summary_report extends Report
 		$this->db->join('sales_items_taxes_temp AS sales_items_taxes',
 			'sales_items.sale_id = sales_items_taxes.sale_id AND sales_items.item_id = sales_items_taxes.item_id AND sales_items.line = sales_items_taxes.line',
 			'left outer');
+		$this->db->join('dinner_tables AS dinner_tables','sales.dinner_table_id = dinner_tables.dinner_table_id','LEFT');
 	}
 
 	private function __common_where(array $inputs)
@@ -127,6 +128,11 @@ abstract class Summary_report extends Report
 		{
 			$this->db->where('sales.sale_status', COMPLETED);
 			$this->db->where('sales.sale_type', SALE_TYPE_RETURN);
+		}
+
+		if($inputs['employee_id'] != 'all')
+		{
+			$this->db->where('sales.employee_id', $inputs['employee_id']);
 		}
 	}
 

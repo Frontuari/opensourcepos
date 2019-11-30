@@ -71,6 +71,42 @@ class Reports extends Secure_Controller
 		$this->load->view('reports/tabular', $data);
 	}
 
+	//Summary sales report
+	public function summary_dinnersales($start_date, $end_date, $sale_type, $location_id = 'all', $discount_type, $employee_id = 'all')
+	{
+		$inputs = array('start_date' => $start_date, 'end_date' => $end_date, 'sale_type' => $sale_type, 'location_id' => $location_id, 'employee_id' => $employee_id);
+
+		$this->load->model('reports/Summary_dinnersales');
+		$model = $this->Summary_dinnersales;
+
+		$report_data = $model->getData($inputs);
+		$summary = $this->xss_clean($model->getSummaryData($inputs));
+
+		$tabular_data = array();
+		foreach($report_data as $row)
+		{
+			$tabular_data[] = $this->xss_clean(array(
+				'dinner_table' => $row['dinner_table'],
+				'quantity' => to_quantity_decimals($row['quantity_purchased']),
+				'subtotal' => to_currency($row['subtotal']),
+				'tax' => to_currency_tax($row['tax']),
+				'total' => to_currency($row['total']),
+				'cost' => to_currency($row['cost']),
+				'profit' => to_currency($row['profit'])
+			));
+		}
+
+		$data = array(
+			'title' => $this->lang->line('reports_dinnersales_summary_report'),
+			'subtitle' => $this->_get_subtitle_report(array('start_date' => $start_date, 'end_date' => $end_date)),
+			'headers' => $this->xss_clean($model->getDataColumns()),
+			'data' => $tabular_data,
+			'summary_data' => $summary
+		);
+
+		$this->load->view('reports/tabular', $data);
+	}
+
 	//Summary Categories report
 	public function summary_categories($start_date, $end_date, $sale_type, $location_id = 'all')
 	{
@@ -512,6 +548,26 @@ class Reports extends Secure_Controller
 		$this->load->view('reports/date_input', $data);
 	}
 
+	public function date_input_dinner()
+	{
+		$data = array();
+		$stock_locations = $data = $this->xss_clean($this->Stock_location->get_allowed_locations('sales'));
+		$stock_locations['all'] = $this->lang->line('reports_all');
+		$data['stock_locations'] = array_reverse($stock_locations, TRUE);
+		$data['mode'] = 'sale';
+		$data['sale_type_options'] = $this->get_sale_type_options();
+		$data['employees'];
+
+		$employees = array('all' => $this->lang->line('reports_all'));
+		foreach($this->Employee->get_all()->result() as $employee)
+		{
+			$employees[$employee->person_id] = $this->xss_clean($employee->first_name . ' ' . $employee->last_name);
+		}
+		$data['employees'] = $employees;
+
+		$this->load->view('reports/date_input', $data);
+	}
+
 	//Input for reports that require only a date range. (see routes.php to see that all graphical summary reports route here)
 	public function date_input_cashups()
 	{
@@ -625,6 +681,41 @@ class Reports extends Secure_Controller
 			'summary_data_1' => $summary,
 			'yaxis_title' => $this->lang->line('reports_revenue'),
 			'xaxis_title' => $this->lang->line('reports_date'),
+			'show_currency' => TRUE
+		);
+
+		$this->load->view('reports/graphical', $data);
+	}
+
+	//Graphical summary sales report
+	public function graphical_summary_dinnersales($start_date, $end_date, $sale_type, $location_id = 'all', $discount_type, $employee_id = 'all')
+	{
+		$inputs = array('start_date' => $start_date, 'end_date' => $end_date, 'sale_type' => $sale_type, 'location_id' => $location_id, 'employee_id' => $employee_id);
+
+		$this->load->model('reports/Summary_dinnersales');
+		$model = $this->Summary_dinnersales;
+
+		$report_data = $model->getData($inputs);
+		$summary = $this->xss_clean($model->getSummaryData($inputs));
+
+		$labels = array();
+		$series = array();
+		foreach($report_data as $row)
+		{
+			$row = $this->xss_clean($row);
+
+			$dinner_table = $row['dinner_table'];
+			$labels[] = $dinner_table;
+			$series[] = array('meta' => $dinner_table . ' ' . round($row['total'] / $summary['total'] * 100, 2) . '%', 'value' => $row['total']);
+		}
+
+		$data = array(
+			'title' => $this->lang->line('reports_dinnersales_summary_report'),
+			'subtitle' => $this->_get_subtitle_report(array('start_date' => $start_date, 'end_date' => $end_date)),
+			'chart_type' => 'reports/graphs/pie',
+			'labels_1' => $labels,
+			'series_data_1' => $series,
+			'summary_data_1' => $summary,
 			'show_currency' => TRUE
 		);
 

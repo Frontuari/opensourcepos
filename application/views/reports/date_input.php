@@ -98,6 +98,20 @@ if(isset($error))
 	?>
 
 	<?php
+	if (!empty($employees))
+	{
+	?>
+	<div class="form-group form-group-sm" id="report_specific_input_data">
+		<?php echo form_label($this->lang->line('reports_employee'), 'specific_input_name_label', array('class'=>'required control-label col-xs-2')); ?>
+		<div class="col-xs-3 discount_percent">
+			<?php echo form_dropdown('employee_id', $employees, 'all', 'id="employee_id" class="form-control"'); ?>
+		</div>
+	</div>
+	<?php
+	}
+	?>
+
+	<?php
 	echo form_button(array(
 		'name'=>'generate_report',
 		'id'=>'generate_report',

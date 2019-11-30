@@ -69,11 +69,13 @@ $route['reports/summary_cashups'] = 'reports/date_input_only';
 $route['reports/summary_overallcashs'] = 'reports/date_input_only';
 $route['reports/summary_payments'] = 'reports/date_input_only';
 $route['reports/summary_discounts'] = 'reports/summary_discounts_input';
+$route['reports/summary_dinnersales'] = 'reports/date_input_dinner';
 $route['reports/summary_:any'] = 'reports/date_input';
 
 $route['reports/(graphical_:any)/([^/]+)/([^/]+)'] = 'reports/$1/$2/$3/$4';
 $route['reports/graphical_summary_expenses_categories'] = 'reports/date_input_only';
 $route['reports/graphical_summary_discounts'] = 'reports/summary_discounts_input';
+$route['reports/graphical_summary_dinnersales'] = 'reports/date_input_dinner';
 $route['reports/graphical_:any'] = 'reports/date_input';
 
 $route['reports/(inventory_:any)/([^/]+)'] = 'reports/$1/$2';
