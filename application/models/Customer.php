@@ -446,6 +446,7 @@ class Customer extends Person
 	*/
 	public function search($search, $rows = 0, $limit_from = 0, $sort = 'last_name', $order = 'asc', $count_only = FALSE)
 	{
+
 		// get_found_rows case
 		if($count_only == TRUE)
 		{
@@ -453,12 +454,32 @@ class Customer extends Person
 		}
 		else
 		{
+
+			// create a temporary table to contain all the sum and average of items
+			$this->db->query('CREATE TEMPORARY TABLE IF NOT EXISTS ' . $this->db->dbprefix('sales_payments_temp') .
+				' (INDEX(customer_id)) ENGINE=MEMORY
+				(
+					SELECT
+						COALESCE(sales.customer_id,0) AS customer_id,
+						SUM(sales_payments.payment_amount - sales_payments.cash_refund) AS total 
+					FROM ' . $this->db->dbprefix('sales') . ' AS sales
+					INNER JOIN ' . $this->db->dbprefix('sales_payments') . ' AS sales_payments
+						ON sales_payments.sale_id = sales.sale_id
+					GROUP BY sales.customer_id
+				)'
+			);
+
 			$this->db->select('customers.*,people.*,items.name AS discipline');
 		}
 
 		$this->db->from('customers AS customers');
 		$this->db->join('people AS people', 'customers.person_id = people.person_id');
 		$this->db->join('items AS items', 'customers.discipline_id = items.item_id','LEFT');
+		if($count_only == FALSE)
+		{
+			$this->db->join('sales_payments_temp AS sales_payments_temp', 'customers.person_id = sales_payments_temp.customer_id','LEFT');
+		}
+
 		$this->db->group_start();
 			$this->db->like('people.first_name', $search);
 			$this->db->or_like('people.last_name', $search);
@@ -468,13 +489,22 @@ class Customer extends Person
 			$this->db->or_like('customers.account_number', $search);
 			$this->db->or_like('customers.company_name', $search);
 			$this->db->or_like('CONCAT(people.first_name, " ", people.last_name)', $search);
+			if($count_only == FALSE)
+			{
+				$this->db->or_like('sales_payments_temp.total', $search);
+			}
 		$this->db->group_end();
 		$this->db->where('customers.deleted', 0);
 
 		// get_found_rows case
 		if($count_only == TRUE)
 		{
-			return $this->db->get()->row()->count;
+
+			$query = $this->db->get();
+
+			//echo $this->db->last_query();
+
+			return $query->row()->count;
 		}
 
 		$this->db->order_by($sort, $order);
@@ -484,7 +514,14 @@ class Customer extends Person
 			$this->db->limit($rows, $limit_from);
 		}
 
-		return $this->db->get();
+		$query = $this->db->get();
+
+		// drop the temporary table to contain memory consumption as it's no longer required
+		$this->db->query('DROP TEMPORARY TABLE IF EXISTS ' . $this->db->dbprefix('sales_payments_temp'));
+
+		//echo $this->db->last_query();
+
+		return $query;
 	}
 
  	/*

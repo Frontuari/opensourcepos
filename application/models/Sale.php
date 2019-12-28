@@ -123,7 +123,7 @@ class Sale extends CI_Model
 		$this->db->select('sales_items.line,
 			COALESCE(sales_items_taxes.percent,0) AS tax,
 			sales_items.item_unit_price,
-			ROUND(sales_items.item_unit_price-COALESCE(sales_items_taxes.item_tax_amount,0),2) AS price,
+			ROUND(sales_items.item_unit_price-COALESCE((sales_items_taxes.item_tax_amount/sales_items.quantity_purchased),0),2) AS price,
 			sales_items.quantity_purchased AS quantity,
 			items.item_number AS code,
 			items.name AS description');

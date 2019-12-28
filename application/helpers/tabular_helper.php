@@ -239,7 +239,7 @@ function get_customer_manage_table_headers()
 		array('discipline_id' => $CI->lang->line('customers_discipline_id')),
 		array('service_duedate' => $CI->lang->line('customers_service_duedate')),
 		array('is_exhonerated' => $CI->lang->line('customers_is_exhonerated')),
-		array('total' => $CI->lang->line('common_total_spent'), 'sortable' => FALSE)
+		array('total' => $CI->lang->line('common_total_spent'))
 	);
 
 	$headers[] = array('customer_pic' => $CI->lang->line('customers_image'), 'sortable' => FALSE);

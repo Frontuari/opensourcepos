@@ -1529,8 +1529,11 @@ class Reports extends Secure_Controller
 			}
 			else
 			{
-				$button_key = 'data-btn-delete';
-				$button_label = $this->lang->line('common_delete');
+				if(($user_info->username == 'admin' || $user_info->username == 'yGutierrez'))
+				{
+					$button_key = 'data-btn-delete';
+					$button_label = $this->lang->line('common_delete');
+				}
 			}
 
 			$type_printer = (empty($row['sale_fiscalprinter_status']) ? "/I" : ($row['sale_fiscalprinter_status'] == "I" ? "/NC" : "/ND"));
